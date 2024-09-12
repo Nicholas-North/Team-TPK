@@ -1,2 +1,2 @@
 # BSN-Senior-Project
-Repository for the senior project of Brandon Scott, Sam Puffer, and Nicholas North
+Repository for the senior project of Brandon Thompson, Sam Puffer, and Nicholas North
