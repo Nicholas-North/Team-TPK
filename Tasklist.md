@@ -10,7 +10,7 @@ Sam - Design player actor
   - Gather info on actions common to players
   - Create new actors based off initail design
 
-Specify our actors options in a simple format
+Nick- Specify our actors options in a simple format
 
 Brandon - Create our Monte Carlo Simulation
   - Document the simulations performance
