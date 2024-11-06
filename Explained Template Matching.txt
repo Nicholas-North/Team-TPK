@@ -15,39 +15,32 @@
 *-Run Away {Within Enemy Reach[0,1], Current Health[0.0-1.0], Percentage Allies Unconsious[0.0-1.0], Percentage Allies Retreated[0.0-1.0], Percentage Enemies Alive[0.0-1.0]}
 	- Accepts when {Within Enemy Reach 0|1, Current Health <.25, Percentage Allies Unconsious >=.75, Percentage Allies Retreated >=.75, Percentage Enemies Alive > .5}
 	- Action: moves the characters movement up to the x,y location furthest from all enemies, possible dashing or disengaging as well
+
 =======Actions=======
 
 *-Melee Weapon Attack {Enemy Within Movement[0,1], Melee Attack Exists[0,1], Multi-Attack[0,1], (Something About Damage output being optimal should be put here)}
-	- Accepts:
-	- Action:
-
-*-Melee Weapon Attack {Enemy Within Movement[0,1], Melee Attack Exists[0,1], Multi-Attack[0,1], (Something About Damage output being optimal should be put here)}
-	- Accepts:
-	- Action:
+	- Accepts: {Enemy Within Range = 1, Melee Attack Exists = 1, Multi-Attack = 0|1}
+	- Action: Runs the attack action with the highest average DPS from the character sheet's list of melee attacks
 
 *-Self Target Heal {Available Self Target Heal[0,1], Current Health[0.0-1.0]}
-	- Accepts:
-	- Action:
+	- Accepts: {Available Self Target Heal = 1, Current Health <= .20}
+	- Action: Uses the action in the list of possible actions on the sheet marked with Self Target Healing to heal the player.
 
 *-Melee Heal {Available Melee Heal[0,1], Ally Within Movement[0,1], Num Allies Unconsious[0.0-1.0]}
-	- Accepts:
-	- Action:
+	- Accepts: {Available Melee Heal = 1, Ally Within Movement 1, Num Allies Unconsious >= .33}
+	- Action: Moves to the closest ally and uses the action in the list of actions for this character sheet to heal them
 
 *-Self Buff {Advantage Attack Rolls[0,1], Advantage Saving Throws[0,1], Available Self Buff[0,1]}
-	- Accepts:
-	- Action:
-
-*-Single Target Buff
-	- Accepts:
-	- Action:
+	- Accepts: {Advantage Attack Rolls = 0, Advantage Saving Throws = 0, Available Self Buff = 1}
+	- Action: Uses the action in the list of character actions to either give the player advantage on attacks or saving throws: i.e: hide action
 
 *-Dash {Enemy Within Double Movement[0,1], Enemy Within Movement[0,1], Enemy Within Melee Range[0,1], Enemy Within Ranged Range[0,1]}
-	- Accepts:
-	- Action:
+	- Accepts: {Enemy Within Double Movement = 1, Enemy Within Movement = 0, Enemy Within Melee Range = 0, Enemy Within Ranged Range = 0}
+	- Action: Uses the action to dash up to the players movement towards the closest enemy
 
 *-Disengage {Enemy Within Melee Range[0,1], Current Health[0.0-1.0], Num Allies Retreated[0.0-1.0], Num Enemies Alive[0.0-1.0]}
-	- Accepts:
-	- Action:
+	- Accepts: {Enemy Within Melee Range = 1, Current Health < .25, Num Allies Retreated >= 0, Num Enemies Alive >= .75}
+	- Action: Takes the disengage action
 
 =======Bonus Actions=======
 
