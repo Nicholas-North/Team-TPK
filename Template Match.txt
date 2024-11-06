@@ -1,0 +1,50 @@
+Default Templates
+=======Movement=======
+*-Move Towards Nearest Enemy: Example Slots {Enemy Within Movement[0,1], Current Health[0.0-1.0], Num Allies Unconsious[0.0-1.0], Num Allies Retreated[0.0-1.0]}
+*-Move Towards Nearest Ally {Ally Within Movement[0,1], Current Health[0.0-1.0], Num Allies Unconsious[0.0-1.0], Num Allies Retreated[0.0-1.0]}
+-Move Towards Wounded Ally
+-Move Towards Unconsious Ally
+*-Move Away From Enemy {Within Enemy Reach[0,1], Current Health[0.0-1.0], Num Allies Unconsious[0.0-1.0], Num Allies Retreated[0.0-1.0]}
+*-Run Away {Within Enemy Reach[0,1], Current Health[0.0-1.0], Num Allies Unconsious[0.0-1.0], Num Allies Retreated[0.0-1.0], Num Enemies Alive[0.0-1.0]}
+-Move To Cover
+=======Actions=======
+*-Melee Weapon Attack {Enemy Within Movement[0,1], Melee Attack Exists[0,1], Multi-Attack[0,1], (Something About Damage output being optimal should be put here)}
+-Magic Melee Attack
+*-Ranged Weapon Attack {Ranged Attack Exists[0,1], Enemy Within Range[0,1], Multi-Attack[0,1], (Something About Damage output being optimal should be put here)}
+-Magic Ranged Single Target Attack
+-Magic AOE
+-Magic Self Buff
+-Magic Single Target Buff
+-Magic Multi-Target Buff
+-Magic Single Target De-Buff
+-Magic Multi-Target Buff
+*-Self Target Heal {Available Self Target Heal[0,1], Current Health[0.0-1.0]}
+	- i.e Class action, Drinking a potion
+*-Melee Heal {Available Melee Heal[0,1], Ally Within Movement[0,1], Num Allies Unconsious[0.0-1.0]}
+-Range Heal
+-Multitarget Heal
+*-Self Buff {Advantage Attack Rolls[0,1], Advantage Saving Throws[0,1], Available Self Buff[0,1]}
+	- i.e Hide, Dodge
+*-Single Target Buff
+	- i.e Help
+*-Dash {Enemy Within Double Movement[0,1], Enemy Within Movement[0,1], Enemy Within Melee Range[0,1], Enemy Within Ranged Range[0,1]}
+*-Disengage {Enemy Within Melee Range[0,1], Current Health[0.0-1.0], Num Allies Retreated[0.0-1.0], Num Enemies Alive[0.0-1.0]}
+-Stabilize
+=======Bonus Actions=======
+-Magic Self Buff
+-Magic Single Target Buff
+-Magic Multi-Target Buff
+-Magic Single Target De-Buff
+-Magic Multi-Target Buff
+*-Self Target Heal {Available BA Self Target Heal[0,1], Current Health[0.0-1.0]}
+	- i.e Class action, Drinking a potion
+-Melee Heal
+-Range Heal
+-Multitarget Heal
+*-Self Buff {Advantage Attack Rolls[0,1], Advantage Saving Throws[0,1], Available BA Self Buff[0,1]}
+	- i.e Hide, Dodge
+*-Single Target Buff {Advantage Attack Rolls[0,1], Advantage Saving Throws[0,1], Available BA Target Buff[0,1]}
+	- i.e Help
+*-Dash {Available BA movement[0,1], Enemy Within Double Movement[0,1], Enemy Within Movement[0,1], Enemy Within Melee Range[0,1], Enemy Within Ranged Range[0,1]}
+*-Disengage {Available BA Disengage[0,1], Enemy Within Melee Range[0,1], Current Health[0.0-1.0], Num Allies Retreated[0.0-1.0], Num Enemies Alive[0.0-1.0]}
+-Stabilize
