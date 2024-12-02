@@ -1,6 +1,6 @@
 # Project TPK
 
-## Team Names
+## Team-Members
     - Team-Member:  Nicholas North
     - Team-Member:  Brandon Thompson
     - Team-Member:  Samuel Puffer
