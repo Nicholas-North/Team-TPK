@@ -47,8 +47,7 @@ Design Level 2:
 
 ## [ABET Concerns](Documentation/Overview/Project-Constraints-Essay.md)
 
-## Slideshow
-- [Presentation Slideshow](Documentation/Team-TPK-Presentation.pptx)
+## [Presentation Slideshow](Documentation/Team-TPK-Presentation.pptx)
 
 ## Professional Biographies
 - [North's Professional Biography](Professional-Profiles/North's-Professional-Biography.md)
