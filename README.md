@@ -77,6 +77,8 @@ The main project constraints we're facing with our project are economic, legal, 
 
 ## Professional Biographies
 - [North's Self-Assessment Essay](Professional-Profiles/North's-Professional-Biography.md)
+- [Sam's Self-Assessment Essay](Professional-Profiles/Individual-Capstone-Assessment-Essay.docx)
+- [Brandon's Self-Assessment Essay](Professional-Profiles/Individual-Capstone-Assignment-(1).pdf)
 
 ## Budget
 
