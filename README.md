@@ -27,6 +27,18 @@ Story 5: As a concerned parent, my child spends too much time designing complex 
 
 ## Design Diagrams
 
+Design Level 0:
+
+<img width="352" alt="D0_Screenshot" src="https://github.com/user-attachments/assets/a979b51b-5cef-4e68-bf37-2aa248fdb1c5">
+
+Design Level 1:
+
+![D1_Screenshot](https://github.com/user-attachments/assets/f3bd9f6d-88e5-4b35-90d2-05b1741ab5d6)
+
+Design Level 2:
+
+<img width="602" alt="D2_Screenshot" src="https://github.com/user-attachments/assets/7d7eabc6-fbc3-4a3c-9b39-f3f25e1d4116">
+
 ## Project Tasks
 
 ## ABET Concerns
