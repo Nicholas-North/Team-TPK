@@ -10,7 +10,7 @@
 
 We aim to design an innovative web application tailored for Dungeons and Dragons game masters to assist with balancing combat encounters. This project will delve into the realms of web development, database design, and machine learning to create a robust tool that enhances the gaming experience by providing precise and dynamic combat simulations.
 
-## Project Description
+## [Project Description](Documentation/Project-Overview.md)
 
 ## User Stories
 
