@@ -81,12 +81,12 @@ The main project constraints we're facing with our project are economic, legal, 
 ## Self-Assessment Essays
 - [North's Self-Assessment Essay](Professional-Profiles/North's-Professional-Biography.md)
 - [Sam's Self-Assessment Essay](Professional-Profiles/Brandon-Thompson-Professional-Biography.md)
-- [Brandon's Self-Assessment Essay](Professional-Profiles/Sam-Puffer---Professional-Biography.md)
+- [Brandon's Self-Assessment Essay](Professional-Profiles/Sam-Puffer-Professional-Biography.md)
 
 ## Professional Biographies
 - [North's Self-Assessment Essay](Professional-Profiles/North's-Professional-Biography.md)
-- [Sam's Self-Assessment Essay](Professional-Profiles/Individual-Capstone-Assessment-Essay.docx)
-- [Brandon's Self-Assessment Essay](Professional-Profiles/Individual-Capstone-Assignment-(1).pdf)
+- [Sam's Self-Assessment Essay](Professional-Profiles/Samuel-Self-Assessment.docx)
+- [Brandon's Self-Assessment Essay](Professional-Profiles/Brandon-Self-Assessment)
 
 ## Budget
 
