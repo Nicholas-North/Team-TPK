@@ -12,7 +12,7 @@ We aim to design an innovative web application tailored for Dungeons and Dragons
 
 ## [Project Description](Documentation/Project-Overview.md)
 
-## User Stories
+## [User Stories](Ideation/User_Stories.md)
 
 Story 1: As a person who runs a Dungeons and Dragons group, I want to see more information about combat encounters. This will help me plan my sessions easier and run my combats more smoothly. 
 
