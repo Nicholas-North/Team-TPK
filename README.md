@@ -68,6 +68,8 @@ Sam - Create our SQL server
   - Implement our data into our actors
 
 [Expected Effort Matrix](Documentation/Effort-Matrix.png)
+![Effort Matrix](https://github.com/user-attachments/assets/f6ef6c40-4c4f-47dd-a57d-ed4a6c1e6a5b)
+
 
 ## ABET Concerns
 
