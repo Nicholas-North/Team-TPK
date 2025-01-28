@@ -162,7 +162,7 @@ class CombatSimulation:
         self.players[1].charisma_score = 10
         self.players[1].charisma_score = 0
         self.players[1].can_heal = 1
-        self.players[1].num_heals = 3
+        self.players[1].num_heals = 5
         
         # Give players some templates
         self.players[0].add_template(self.templates[7])  # Dash (BA)
@@ -187,7 +187,7 @@ class CombatSimulation:
                 print("Attack missed!")
                 
     def resolve_heal(self, player):
-        heal_amount = 10  
+        heal_amount = self.roll_dice(1,8) + player.charisma_score 
         player.hit_points += heal_amount
         player.num_heals = player.num_heals - 1
         print(f"{player.name} heals for {heal_amount} HP! New HP: {player.hit_points}")            
@@ -205,6 +205,7 @@ class CombatSimulation:
         while all(player.hit_points > 0 for player in self.players):
             # Simulate player 1's actions
             self.perform_actions(self.players[0], self.players[1])
+            self.perform_Bactions(self.players[0], self.players[1])
 
             # Check if Player 2 is still alive
             if self.players[1].hit_points <= 0:
@@ -213,7 +214,7 @@ class CombatSimulation:
         
             
             self.perform_actions(self.players[1], self.players[0])
-
+            self.perform_Bactions(self.players[1], self.players[0])
             # Check if Player 1 is still alive
             if self.players[0].hit_points <= 0:
                 print(f"{self.players[0].name} has been defeated!")
@@ -223,13 +224,13 @@ class CombatSimulation:
         print(f"\n{player.name}'s turn:")
 
         
-        dash_template = self.templates[7]  
-        print(f" chooses bonus action: {dash_template.name}")
-        dash_template.print_template()
+        #dash_template = self.templates[7]  
+        #print(f" chooses bonus action: {dash_template.name}")
+        #dash_template.print_template()
 
         # Move into range 
-        print(f"{player.name} moves into range of {opponent.name}")
-
+        # print(f"{player.name} moves into range of {opponent.name}")
+        ##
        
         melee_attack_template = self.templates[3]  
         print(f" chooses action: {melee_attack_template.name}")
@@ -240,7 +241,20 @@ class CombatSimulation:
         if player.multi_attack == 1:
             print(f"{player.name} performs a second attack!")
             self.resolve_attack(player, opponent, "Melee Attack")
+        
+        
+        if opponent.hit_points <= 0:
+            return  # Exit the turn if the opponent is defeated
+        
+    def perform_Bactions(self, player, opponent):   
+        
+        dash_template = self.templates[7]  
+        print(f" chooses bonus action: {dash_template.name}")
+        dash_template.print_template()
 
+        # Move into range 
+        print(f"{player.name} moves into range of {opponent.name}")
+        
         
         if player.can_heal == 1 & player.num_heals > 0:
             heal_template = self.templates[5]  
@@ -248,9 +262,10 @@ class CombatSimulation:
             
             heal_template.print_template()
             self.resolve_heal(player)
-        
-        
+            
+            
         if opponent.hit_points <= 0:
+        
             return  # Exit the turn if the opponent is defeated
 
 # Run the simulation
