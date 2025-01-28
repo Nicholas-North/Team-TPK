@@ -144,7 +144,7 @@ class CombatSimulation:
         self.players[0].wisdom_score = 8
         self.players[0].charisma_score = 10
         self.players[0].multi_attack = 1
-        self.players[0].can_heal = 1
+        self.players[0].can_heal = 0
         
         
         
@@ -162,7 +162,7 @@ class CombatSimulation:
         self.players[1].charisma_score = 10
         self.players[1].charisma_score = 0
         self.players[1].can_heal = 1
-        self.players[1].num_heals = 5
+        self.players[1].num_heals = 2
         
         # Give players some templates
         self.players[0].add_template(self.templates[7])  # Dash (BA)
@@ -248,20 +248,20 @@ class CombatSimulation:
         
     def perform_Bactions(self, player, opponent):   
         
-        dash_template = self.templates[7]  
-        print(f" chooses bonus action: {dash_template.name}")
-        dash_template.print_template()
+        #dash_template = self.templates[7]  
+        #print(f" chooses bonus action: {dash_template.name}")
+        #dash_template.print_template()
 
         # Move into range 
-        print(f"{player.name} moves into range of {opponent.name}")
+        # print(f"{player.name} moves into range of {opponent.name}")
         
         
-        if player.can_heal == 1 & player.num_heals > 0:
+        if player.can_heal == 1 and player.num_heals > 0:
             heal_template = self.templates[5]  
             print(f"{player.name} chooses to heal!")
-            
             heal_template.print_template()
             self.resolve_heal(player)
+            print (f"{player.num_heals} heals left")
             
             
         if opponent.hit_points <= 0:
