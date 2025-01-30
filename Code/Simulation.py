@@ -1,6 +1,7 @@
 import random
 from enum import Enum
 from typing import List, Tuple
+from Classes import create_classes
 
 class ActionType(Enum):
     Movement = 1
@@ -96,10 +97,11 @@ def initialize_templates() -> List[Template]:
 
 # Player class definition
 class Player:
-    def __init__(self, name="", player_class="", hit_points=0, armor_class=0, movement_speed=0, level=1, strength_score=10, dexterity_score=10, constitution_score=10, intelligence_score=10, wisdom_score=10, charisma_score=10, multi_attack=0, can_heal=0, num_heals=0):
-        self.name = name
+    def __init__(self, name="", player_class="", hit_points=0, hit_point_max = 0, armor_class=0, movement_speed=0, level=1, strength_score=10, dexterity_score=10, constitution_score=10, intelligence_score=10, wisdom_score=10, charisma_score=10, multi_attack=0, can_heal=0, num_heals=0):
+        self.name = player_class  # Set the name to the class by default
         self.player_class = player_class
         self.hit_points = hit_points
+        self.hit_point_max = hit_point_max
         self.armor_class = armor_class
         self.movement_speed = movement_speed
         self.level = level
@@ -124,45 +126,14 @@ class Player:
 # Combat Simulation class definition
 class CombatSimulation:
     def __init__(self):
-        
         self.templates = initialize_templates()
+        self.players = create_classes()
 
+        if not isinstance(self.players, list):
+            raise TypeError("create_classes() did not return a list of players.")
         
-        self.players = [Player(), Player()]
-        
-        
-        self.players[0].name = "Player 1"
-        self.players[0].player_class = "Fighter"
-        self.players[0].hit_points = 100
-        self.players[0].armor_class = 15
-        self.players[0].movement_speed = 6
-        self.players[0].level = 1
-        self.players[0].strength_score = 16
-        self.players[0].dexterity_score = 12
-        self.players[0].constitution_score = 14
-        self.players[0].intelligence_score = 10
-        self.players[0].wisdom_score = 8
-        self.players[0].charisma_score = 10
-        self.players[0].multi_attack = 1
-        self.players[0].can_heal = 0
-        
-        
-        
-        self.players[1].name = "Player 2"
-        self.players[1].player_class = "Wizard"
-        self.players[1].hit_points = 25
-        self.players[1].armor_class = 12
-        self.players[1].movement_speed = 5
-        self.players[1].level = 1
-        self.players[1].strength_score = 8
-        self.players[1].dexterity_score = 14
-        self.players[1].constitution_score = 10
-        self.players[1].intelligence_score = 16
-        self.players[1].wisdom_score = 12
-        self.players[1].charisma_score = 10
-        self.players[1].charisma_score = 0
-        self.players[1].can_heal = 1
-        self.players[1].num_heals = 2
+        self.selected_players = self.select_players(self.players)
+        self.p1, self.p2 = self.selected_players
         
         # Give players some templates
         self.players[0].add_template(self.templates[7])  # Dash (BA)
@@ -170,6 +141,30 @@ class CombatSimulation:
         self.players[1].add_template(self.templates[7])  # Dash (BA)
         self.players[1].add_template(self.templates[8])  # Dash (change to disengage later) (BA)
         self.players[1].add_template(self.templates[4])  # Ranged Weapon Attack
+        
+        
+    def select_players(self, all_players):
+        """Allow the user to select two players from the available options."""
+        print("Available Players:")
+        for i, player in enumerate(all_players):
+            print(f"{i + 1}: {player.name} ({player.player_class})")
+
+        while True:
+            try:
+                p1_index = int(input("Select Player 1 (enter number): ")) - 1
+                p2_index = int(input("Select Player 2 (enter number): ")) - 1
+
+                if p1_index == p2_index:
+                    print("You must select two different players!")
+                    continue
+
+                if 0 <= p1_index < len(all_players) and 0 <= p2_index < len(all_players):
+                    return [all_players[p1_index], all_players[p2_index]]
+                else:
+                    print("Invalid selection, please choose valid player numbers.")
+            except ValueError:
+                print("Invalid input. Please enter numbers only.")
+
 
     # Function to simulate a player's attack
     def resolve_attack(self, attacker, defender, attack_type):
@@ -199,7 +194,7 @@ class CombatSimulation:
 
     
     def run_round(self):
-        print("=== COMBAT START ===")
+        print(f"\n=== COMBAT START: {self.players[0].name} vs {self.players[1].name} ===")
     
         # Loop until one player has 0 or less health
         while all(player.hit_points > 0 for player in self.players):
@@ -223,50 +218,78 @@ class CombatSimulation:
     def perform_actions(self, player, opponent):
         print(f"\n{player.name}'s turn:")
 
-        
-        #dash_template = self.templates[7]  
-        #print(f" chooses bonus action: {dash_template.name}")
-        #dash_template.print_template()
-
-        # Move into range 
-        # print(f"{player.name} moves into range of {opponent.name}")
-        ##
-       
-        melee_attack_template = self.templates[3]  
-        print(f" chooses action: {melee_attack_template.name}")
-        melee_attack_template.print_template()
-        self.resolve_attack(player, opponent, "Melee Attack")
+    # Randomly choose an action (melee attack, heal self, heal opponent)
+        action_choices = ["melee_attack", "heal_self"]
+        action = random.choice(action_choices)
+    
+        if action == "melee_attack":
+            melee_attack_template = self.templates[3]
+            print(f"{player.name} chooses action: {melee_attack_template.name}")
+            melee_attack_template.print_template()
+            self.resolve_attack(player, opponent, "Melee Attack")
 
         # If multi-attack is enabled, perform an additional attack
-        if player.multi_attack == 1:
-            print(f"{player.name} performs a second attack!")
+            if player.multi_attack == 1:
+                print(f"{player.name} performs a second attack!")
+                self.resolve_attack(player, opponent, "Melee Attack")
+    
+        elif action == "heal_self" and player.can_heal == 1 and player.num_heals > 0 and player.hit_points < player.hit_point_max:
+            heal_template = self.templates[5]  
+            print(f"{player.name} chooses to heal!")
+            heal_template.print_template()
+            self.resolve_heal(player)
+            print(f"{player.num_heals} heals left")
+        
+        elif action == "heal_self" and player.can_heal == 0 or player.num_heals < 1 or player.hit_points == player.hit_point_max:
+
+            melee_attack_template = self.templates[3]
+            print(f"{player.name} chooses action: {melee_attack_template.name}")
+            melee_attack_template.print_template()
             self.resolve_attack(player, opponent, "Melee Attack")
-        
-        
+
+        # If multi-attack is enabled, perform an additional attack
+            if player.multi_attack == 1:
+                print(f"{player.name} performs a second attack!")
+                self.resolve_attack(player, opponent, "Melee Attack")
+            
+       # elif action == "heal_other" and player.can_heal == 1 and player.num_heals > 0 and opponent.hit_points < opponent.max_hit_points:
+       #     heal_template = self.templates[5]  
+        #    print(f"{player.name} chooses to heal {opponent.name}!")
+        #    heal_template.print_template()
+        #    self.resolve_heal(opponent)
+        #    print(f"{player.num_heals} heals left")
+    
+    # If opponent is defeated, end the turn
         if opponent.hit_points <= 0:
             return  # Exit the turn if the opponent is defeated
-        
-    def perform_Bactions(self, player, opponent):   
-        
-        #dash_template = self.templates[7]  
-        #print(f" chooses bonus action: {dash_template.name}")
-        #dash_template.print_template()
 
-        # Move into range 
-        # print(f"{player.name} moves into range of {opponent.name}")
+
+    def perform_Bactions(self, player, opponent):
+    # Randomly select between dodge, heal self, or heal other
+        action_choices = ["dodge", "heal_self"]
+        action = random.choice(action_choices)
+
+        if action == "dodge":
         
-        
-        if player.can_heal == 1 and player.num_heals > 0:
+            print(f"{player.name} chooses to dodge!")
+
+        elif action == "heal_self" and player.can_heal == 1 and player.num_heals > 0 and player.hit_points < player.hit_point_max:
             heal_template = self.templates[5]  
             print(f"{player.name} chooses to heal!")
             heal_template.print_template()
             self.resolve_heal(player)
             print (f"{player.num_heals} heals left")
+
+        elif action == "heal_self" and player.can_heal == 0 or player.num_heals < 1 or player.hit_points == player.hit_point_max:
+            print(f"{player.name} chooses to dodge!")
             
             
-        if opponent.hit_points <= 0:
-        
-            return  # Exit the turn if the opponent is defeated
+        #elif action == "heal_other" and player.can_heal == 1 and player.num_heals > 0 and opponent.hit_points < opponent.max_hit_points:
+        #    heal_template = self.templates[5]
+        #    print(f"{player.name} chooses to heal {opponent.name}!")
+         #   heal_template.print_template()
+        #    self.resolve_heal(opponent)
+        #    print(f"{player.num_heals} heals left")
 
 # Run the simulation
 simulation = CombatSimulation()
