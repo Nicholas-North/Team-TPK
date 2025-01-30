@@ -97,10 +97,11 @@ def initialize_templates() -> List[Template]:
 
 # Player class definition
 class Player:
-    def __init__(self, name="", player_class="", hit_points=0, armor_class=0, movement_speed=0, level=1, strength_score=10, dexterity_score=10, constitution_score=10, intelligence_score=10, wisdom_score=10, charisma_score=10, multi_attack=0, can_heal=0, num_heals=0):
-        self.name = name
+    def __init__(self, name="", player_class="", hit_points=0, hit_point_max = 0, armor_class=0, movement_speed=0, level=1, strength_score=10, dexterity_score=10, constitution_score=10, intelligence_score=10, wisdom_score=10, charisma_score=10, multi_attack=0, can_heal=0, num_heals=0):
+        self.name = player_class  # Set the name to the class by default
         self.player_class = player_class
         self.hit_points = hit_points
+        self.hit_point_max = hit_point_max
         self.armor_class = armor_class
         self.movement_speed = movement_speed
         self.level = level
@@ -136,6 +137,7 @@ class Classes:
         self.players[0].name = "Fighter"
         self.players[0].player_class = "Fighter"
         self.players[0].hit_points = 18
+        self.players[0].hit_point_max = 18
         self.players[0].armor_class = 15
         self.players[0].movement_speed = 6
         self.players[0].level = 1
@@ -153,6 +155,7 @@ class Classes:
         self.players[1].name = "Wizard"
         self.players[1].player_class = "Wizard"
         self.players[1].hit_points = 10
+        self.players[1].hit_point_max = 10
         self.players[1].armor_class = 12
         self.players[1].movement_speed = 5
         self.players[1].level = 1
@@ -170,6 +173,7 @@ class Classes:
         self.players[2].name = "Cleric"
         self.players[2].player_class = "Cleric"
         self.players[2].hit_points = 14
+        self.players[2].hit_point_max = 14
         self.players[2].armor_class = 12
         self.players[2].movement_speed = 5
         self.players[2].level = 1
@@ -185,6 +189,7 @@ class Classes:
         self.players[3].name = "Rogue"
         self.players[3].player_class = "Rogue"
         self.players[3].hit_points = 12
+        self.players[3].hit_point_max = 12
         self.players[3].armor_class = 12
         self.players[3].movement_speed = 5
         self.players[3].level = 1
@@ -196,36 +201,37 @@ class Classes:
         self.players[3].charisma_score = 10
         self.players[3].can_heal = 0
         
-        self.players[3].name = "Zombie"
-        self.players[3].player_class = "Zombie"
-        self.players[3].hit_points = 22
-        self.players[3].armor_class = 8
-        self.players[3].movement_speed = 4
-        self.players[3].level = 1
-        self.players[3].strength_score = 12
-        self.players[3].dexterity_score = 6
-        self.players[3].constitution_score = 16
-        self.players[3].intelligence_score = 2
-        self.players[3].wisdom_score = 6
-        self.players[3].charisma_score = 4
-        self.players[3].can_heal = 0
+        self.players[4].name = "Zombie"
+        self.players[4].player_class = "Zombie"
+        self.players[4].hit_points = 22
+        self.players[4].hit_point_max = 22
+        self.players[4].armor_class = 8
+        self.players[4].movement_speed = 4
+        self.players[4].level = 1
+        self.players[4].strength_score = 12
+        self.players[4].dexterity_score = 6
+        self.players[4].constitution_score = 16
+        self.players[4].intelligence_score = 2
+        self.players[4].wisdom_score = 6
+        self.players[4].charisma_score = 4
+        self.players[4].can_heal = 0
         
 def create_classes():
     players = []
 
     # Player 1 - Fighter
-    players.append(Player("Fighter", "Fighter", 18, 15, 6, 1, 16, 12, 14, 10, 8, 10, 0, 0, 0))
+    players.append(Player("Fighter", "Fighter", 18, 18, 15, 6, 1, 16, 12, 14, 10, 8, 10, 0, 0, 0))
 
     # Player 2 - Wizard
-    players.append(Player("Wizard", "Wizard", 10, 12, 5, 1, 8, 14, 10, 16, 12, 10, 0, 0, 0))
+    players.append(Player("Wizard", "Wizard", 10, 10, 12, 5, 1, 8, 14, 10, 16, 12, 10, 0, 0, 0))
 
     # Player 3 - Cleric
-    players.append(Player("Cleric", "Cleric", 14, 12, 5, 1, 12, 10, 10, 12, 12, 16, 0, 1, 2))
+    players.append(Player("Cleric", "Cleric", 14, 14, 12, 5, 1, 12, 10, 10, 12, 12, 16, 0, 1, 2))
 
     # Player 4 - Rogue
-    players.append(Player("Rogue", "Rogue", 12, 12, 5, 1, 10, 16, 10, 12, 12, 10, 0, 0, 0))
+    players.append(Player("Rogue", "Rogue", 12, 12, 12, 5, 1, 10, 16, 10, 12, 12, 10, 0, 0, 0))
 
     # Player 5 - Zombie
-    players.append(Player("Zombie", "Monster", 22, 8, 4, 1, 12, 6, 16, 2, 6, 4, 0, 0, 0))
+    players.append(Player("Zombie", "Zombie", 880, 880, 8, 4, 1, 12, 6, 16, 2, 6, 4, 0, 0, 0))
 
     return players

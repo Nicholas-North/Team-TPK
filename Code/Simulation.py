@@ -124,6 +124,8 @@ class Player:
         self.templates.append(template)
 
 # Combat Simulation class definition
+import random
+
 class CombatSimulation:
     def __init__(self):
         self.templates = initialize_templates()
@@ -133,8 +135,21 @@ class CombatSimulation:
             raise TypeError("create_classes() did not return a list of players.")
         
         self.selected_players = self.select_players(self.players)
-        self.p1, self.p2 = self.selected_players
         
+        # Debug print statement
+        print(f"Selected players: {len(self.selected_players)} players")
+
+        # Check if the list has exactly 3 players
+        if len(self.selected_players) != 3:
+            print("Error: The selected players list does not have exactly 3 players.")
+            return
+        
+        self.team_players = self.selected_players[:2]  # The two team members
+        self.solo_player = self.selected_players[2]   # The solo player
+
+        # Assign individual team players
+        self.p1, self.p2 = self.team_players
+
         # Give players some templates
         self.players[0].add_template(self.templates[7])  # Dash (BA)
         self.players[0].add_template(self.templates[3])  # Melee Weapon Attack
@@ -144,27 +159,36 @@ class CombatSimulation:
         
         
     def select_players(self, all_players):
-        """Allow the user to select two players from the available options."""
+        """Allow the user to select two players from the available options, with one solo player."""
         print("Available Players:")
         for i, player in enumerate(all_players):
             print(f"{i + 1}: {player.name} ({player.player_class})")
 
         while True:
             try:
-                p1_index = int(input("Select Player 1 (enter number): ")) - 1
-                p2_index = int(input("Select Player 2 (enter number): ")) - 1
+                team_indices = input("Select two players for the team (enter two numbers separated by a comma): ").split(',')
+                team_indices = [int(i.strip()) - 1 for i in team_indices]  # Convert to zero-index
 
-                if p1_index == p2_index:
+                if len(team_indices) != 2 or len(set(team_indices)) != 2:
                     print("You must select two different players!")
                     continue
 
-                if 0 <= p1_index < len(all_players) and 0 <= p2_index < len(all_players):
-                    return [all_players[p1_index], all_players[p2_index]]
+                solo_index = int(input("Select one solo player (enter a number): ")) - 1
+
+                # Ensure no overlap between team and solo player
+                if solo_index in team_indices:
+                    print("Solo player cannot be part of the team!")
+                    continue
+
+                if all(0 <= i < len(all_players) for i in team_indices + [solo_index]):
+                    self.team_players = [all_players[i] for i in team_indices]  # Team players list
+                    self.solo_player = all_players[solo_index]  # Solo player
+                    return self.team_players  # Return only team players list (self.solo_player will be used directly)
+
                 else:
                     print("Invalid selection, please choose valid player numbers.")
             except ValueError:
                 print("Invalid input. Please enter numbers only.")
-
 
     # Function to simulate a player's attack
     def resolve_attack(self, attacker, defender, attack_type):
@@ -191,106 +215,90 @@ class CombatSimulation:
     def roll_dice(self, num_dice, die_size):
         return sum(random.randint(1, die_size) for _ in range(num_dice))
 
-
-    
     def run_round(self):
-        print(f"\n=== COMBAT START: {self.players[0].name} vs {self.players[1].name} ===")
+        print(f"\n=== COMBAT START: Team vs {self.solo_player.name} ===")
     
-        # Loop until one player has 0 or less health
-        while all(player.hit_points > 0 for player in self.players):
-            # Simulate player 1's actions
-            self.perform_actions(self.players[0], self.players[1])
-            self.perform_Bactions(self.players[0], self.players[1])
+        # Loop until the solo player has 0 or less health
+        while self.solo_player.hit_points > 0:
+            # Simulate both team players' actions against the solo player
+            for player in self.team_players:
+                self.perform_actions(player, self.solo_player)
+                self.perform_Bactions(player, self.solo_player)
+                if self.solo_player.hit_points <= 0:
+                    print(f"{self.solo_player.name} has been defeated!")
+                    break
 
-            # Check if Player 2 is still alive
-            if self.players[1].hit_points <= 0:
-                print(f"{self.players[1].name} has been defeated!")
+            if self.solo_player.hit_points <= 0:
                 break
-        
-            
-            self.perform_actions(self.players[1], self.players[0])
-            self.perform_Bactions(self.players[1], self.players[0])
-            # Check if Player 1 is still alive
-            if self.players[0].hit_points <= 0:
-                print(f"{self.players[0].name} has been defeated!")
+
+            # Solo player retaliates
+            self.perform_actions(self.solo_player, self.team_players[0])
+            self.perform_Bactions(self.solo_player, self.team_players[0])
+
+            if self.team_players[0].hit_points <= 0 and self.team_players[1].hit_points <= 0:
+                print("Both team members have been defeated!")
                 break
 
     def perform_actions(self, player, opponent):
         print(f"\n{player.name}'s turn:")
 
-    # Randomly choose an action (melee attack, heal self, heal opponent)
+    # Check if the opponent is still alive
+        if opponent.hit_points <= 0:
+            print(f"{opponent.name} is already defeated!")
+        
+        # Choose a new target if the opponent is dead
+            if player == self.solo_player:
+            # If the solo player is attacking and the current team player is dead, switch target
+                new_target = self.team_players[0] if self.team_players[1].hit_points <= 0 else self.team_players[1]
+                print(f"{player.name} will now attack {new_target.name}.")
+                opponent = new_target
+            else:
+            # If team players are attacking and the solo player is dead, skip attack
+                print(f"{player.name} has no valid opponent to attack.")
+                return  # Skip the attack if no valid opponent
+
         action_choices = ["melee_attack", "heal_self"]
         action = random.choice(action_choices)
-    
+
         if action == "melee_attack":
             melee_attack_template = self.templates[3]
             print(f"{player.name} chooses action: {melee_attack_template.name}")
             melee_attack_template.print_template()
             self.resolve_attack(player, opponent, "Melee Attack")
 
-        # If multi-attack is enabled, perform an additional attack
-            if player.multi_attack == 1:
-                print(f"{player.name} performs a second attack!")
-                self.resolve_attack(player, opponent, "Melee Attack")
-    
         elif action == "heal_self" and player.can_heal == 1 and player.num_heals > 0 and player.hit_points < player.hit_point_max:
-            heal_template = self.templates[5]  
+            heal_template = self.templates[5]
             print(f"{player.name} chooses to heal!")
             heal_template.print_template()
             self.resolve_heal(player)
             print(f"{player.num_heals} heals left")
-        
-        elif action == "heal_self" and player.can_heal == 0 or player.num_heals < 1 or player.hit_points == player.hit_point_max:
 
+        elif action == "heal_self" and (player.can_heal == 0 or player.num_heals < 1 or player.hit_points == player.hit_point_max):
             melee_attack_template = self.templates[3]
             print(f"{player.name} chooses action: {melee_attack_template.name}")
             melee_attack_template.print_template()
             self.resolve_attack(player, opponent, "Melee Attack")
 
-        # If multi-attack is enabled, perform an additional attack
             if player.multi_attack == 1:
                 print(f"{player.name} performs a second attack!")
                 self.resolve_attack(player, opponent, "Melee Attack")
-            
-       # elif action == "heal_other" and player.can_heal == 1 and player.num_heals > 0 and opponent.hit_points < opponent.max_hit_points:
-       #     heal_template = self.templates[5]  
-        #    print(f"{player.name} chooses to heal {opponent.name}!")
-        #    heal_template.print_template()
-        #    self.resolve_heal(opponent)
-        #    print(f"{player.num_heals} heals left")
-    
-    # If opponent is defeated, end the turn
-        if opponent.hit_points <= 0:
-            return  # Exit the turn if the opponent is defeated
-
 
     def perform_Bactions(self, player, opponent):
-    # Randomly select between dodge, heal self, or heal other
+        # Randomly select between dodge, heal self, or heal other
         action_choices = ["dodge", "heal_self"]
         action = random.choice(action_choices)
 
         if action == "dodge":
-        
             print(f"{player.name} chooses to dodge!")
 
         elif action == "heal_self" and player.can_heal == 1 and player.num_heals > 0 and player.hit_points < player.hit_point_max:
-            heal_template = self.templates[5]  
+            heal_template = self.templates[5]
             print(f"{player.name} chooses to heal!")
             heal_template.print_template()
             self.resolve_heal(player)
-            print (f"{player.num_heals} heals left")
-
-        elif action == "heal_self" and player.can_heal == 0 or player.num_heals < 1 or player.hit_points == player.hit_point_max:
-            print(f"{player.name} chooses to dodge!")
-            
-            
-        #elif action == "heal_other" and player.can_heal == 1 and player.num_heals > 0 and opponent.hit_points < opponent.max_hit_points:
-        #    heal_template = self.templates[5]
-        #    print(f"{player.name} chooses to heal {opponent.name}!")
-         #   heal_template.print_template()
-        #    self.resolve_heal(opponent)
-        #    print(f"{player.num_heals} heals left")
+            print(f"{player.num_heals} heals left")
 
 # Run the simulation
 simulation = CombatSimulation()
 simulation.run_round()
+
