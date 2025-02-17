@@ -1,0 +1,88 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="container">
+    <div class="bar" onclick="toggleDropdown('section1')">
+        <img src="~/resources/Character_Creation_Icon.jpg" alt="Image 1" class="bar-image">
+        <span class="bar-title">Character Creation</span>
+    </div>
+    <div id="section1" class="dropdown-content">
+        <p>Description for Character Creation.</p>
+    </div>
+
+    <div class="bar" onclick="toggleDropdown('section2')">
+        <img src="~/resources/Encounter_Creation_Icon.jpg" alt="Image 2" class="bar-image">
+        <span class="bar-title">Encounter Creation</span>
+    </div>
+    <div id="section2" class="dropdown-content">
+        <p>Description for Encounter Creation.</p>
+    </div>
+
+    <div class="bar" onclick="toggleDropdown('section3')">
+        <img src="~/resources/Visualization_Icon.png" alt="Image 3" class="bar-image">
+        <span class="bar-title">Encounter History</span>
+    </div>
+    <div id="section3" class="dropdown-content">
+        <p>Description for Encounter History.</p>
+    </div>
+
+    <div class="bar" onclick="toggleDropdown('section4')">
+        <img src="~/resources/Account_Icon.png" alt="Image 4" class="bar-image">
+        <span class="bar-title">User Account</span>
+    </div>
+    <div id="section4" class="dropdown-content">
+        <p>Description for User Account.</p>
+    </div>
+</div>
+
+<style>
+    .bar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 80%;
+        padding: 10px;
+        margin-bottom: 0; /* No margin between bar and dropdown */
+        background-color: #f0f0f0;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        border-radius: 5px 5px 0 0;
+    }
+    .bar + .dropdown-content {
+        margin-top: 0;
+    }
+    .bar + .dropdown-content + .bar {
+        margin-top: 10px; /* Add spacing between bars */
+    }
+    .bar-image {
+        width: 50px;
+        height: 50px;
+        margin-right: 20px;
+    }
+    .bar-title {
+        font-size: 1.5em;
+    }
+    .dropdown-content {
+        display: none;
+        width: 80%;
+        padding: 10px;
+        margin: 0;
+        background-color: #e0e0e0;
+        border: 1px solid #ccc;
+        border-radius: 0 0 5px 5px;
+    }
+</style>
+
+<script>
+    function toggleDropdown(sectionId) {
+        var content = document.getElementById(sectionId);
+        if (content.style.display === "none" || content.style.display === "") {
+            content.style.display = "block";
+        } else {
+            content.style.display = "none";
+        }
+    }
+</script>

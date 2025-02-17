@@ -1,0 +1,75 @@
+﻿@page
+@model PrivacyModel
+@{
+    ViewData["Title"] = "Privacy Policy";
+}
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <h1>@ViewData["Title"]</h1>
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="form1-tab" data-toggle="tab" href="#form1" role="tab" aria-controls="form1" aria-selected="true">Form1</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="form2-tab" data-toggle="tab" href="#form2" role="tab" aria-controls="form2" aria-selected="false">Form2</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="form3-tab" data-toggle="tab" href="#form3" role="tab" aria-controls="form3" aria-selected="false">Form3</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="form1" role="tabpanel" aria-labelledby="form1-tab">
+                        <form>
+                            <div class="form-group">
+                                <label for="input1">Label 1</label>
+                                <input type="text" class="form-control" id="input1" placeholder="Enter value">
+                            </div>
+                            <div class="form-group">
+                                <label for="input2">Label 2</label>
+                                <input type="text" class="form-control" id="input2" placeholder="Enter value">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="form2" role="tabpanel" aria-labelledby="form2-tab">
+                        <form>
+                            <div class="form-group">
+                                <label for="input3">Label 3</label>
+                                <input type="text" class="form-control" id="input3" placeholder="Enter value">
+                            </div>
+                            <div class="form-group">
+                                <label for="input4">Label 4</label>
+                                <input type="text" class="form-control" id="input4" placeholder="Enter value">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="form3" role="tabpanel" aria-labelledby="form3-tab">
+                        <form>
+                            <div class="form-group">
+                                <label for="input5">Label 5</label>
+                                <input type="text" class="form-control" id="input5" placeholder="Enter value">
+                            </div>
+                            <div class="form-group">
+                                <label for="input6">Label 6</label>
+                                <input type="text" class="form-control" id="input6" placeholder="Enter value">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h2>List</h2>
+                <ul class="list-group">
+                    <li class="list-group-item">Item 1</li>
+                    <li class="list-group-item">Item 2</li>
+                    <li class="list-group-item">Item 3</li>
+                    <li class="list-group-item">Item 4</li>
+                    <li class="list-group-item">Item 5</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
