@@ -220,18 +220,18 @@ def create_classes():
     players = []
 
     # Player 1 - Fighter
-    players.append(Player("Fighter", "Fighter", 18, 18, 15, 6, 1, 16, 12, 14, 10, 8, 10, 0, 0, 0))
+    players.append(Player("Fighter", "Fighter", 14, 18, 15, 6, 1, 16, 12, 14, 10, 8, 10, 1, 0, 0))
 
     # Player 2 - Wizard
-    players.append(Player("Wizard", "Wizard", 10, 10, 12, 5, 1, 8, 14, 10, 16, 12, 10, 0, 0, 0))
+    players.append(Player("Wizard", "Wizard", 4, 10, 12, 5, 1, 8, 14, 10, 16, 12, 10, 0, 0, 0))
 
     # Player 3 - Cleric
-    players.append(Player("Cleric", "Cleric", 14, 14, 12, 5, 1, 12, 10, 10, 12, 12, 16, 0, 1, 2))
+    players.append(Player("Cleric", "Cleric", 8, 14, 12, 5, 1, 12, 10, 10, 12, 12, 16, 0, 1, 2))
 
     # Player 4 - Rogue
     players.append(Player("Rogue", "Rogue", 12, 12, 12, 5, 1, 10, 16, 10, 12, 12, 10, 0, 0, 0))
 
     # Player 5 - Zombie
-    players.append(Player("Zombie", "Zombie", 44, 44, 8, 4, 1, 12, 6, 16, 2, 6, 4, 0, 0, 0))
+    players.append(Player("Zombie", "Zombie", 200, 200, 8, 4, 1, 12, 6, 16, 2, 6, 4, 1, 0, 0))
 
     return players
