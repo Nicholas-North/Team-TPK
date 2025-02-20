@@ -4,6 +4,9 @@ from enum import Enum
 from typing import List, Tuple
 from collections import defaultdict
 from Classes import create_classes
+from tqdm import tqdm
+import os
+import sys
 
 
 class ActionType(Enum):
@@ -129,7 +132,7 @@ class Player:
 # Combat Simulation class definition
 
 class MonteCarloSimulation:
-    def __init__(self, num_simulations=100):
+    def __init__(self, num_simulations=10000):
         self.num_simulations = num_simulations
         self.results = defaultdict(int)
         
@@ -170,12 +173,22 @@ class MonteCarloSimulation:
 
         
     def run_simulation(self):
-        for i in range(self.num_simulations):
-            fresh_players = copy.deepcopy(self.selected_players)  # Ensure players are fresh each run
-            simulation = CombatSimulation(fresh_players)  # Pass fresh copies
-            winner = simulation.run_round()
-            self.results[winner] += 1
-            print(f"Simulation {i + 1}: Winner - {winner}")
+        with tqdm(total=self.num_simulations, desc="Running Simulations", unit="sim") as pbar:
+            for _ in range(self.num_simulations):
+                fresh_players = copy.deepcopy(self.selected_players)  # Ensure players are fresh each run
+                simulation = CombatSimulation(fresh_players)  # Pass fresh copies
+            
+                # Suppress prints during simulation
+                original_stdout = sys.stdout
+                sys.stdout = open(os.devnull, 'w')
+                try:
+                    winner = simulation.run_round()
+                finally:
+                    sys.stdout.close()
+                    sys.stdout = original_stdout  # Restore normal output
+            
+                self.results[winner] += 1
+                pbar.update(1)  # Update the progress bar
 
         self.display_results()
 
