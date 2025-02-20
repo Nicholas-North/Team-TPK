@@ -232,6 +232,6 @@ def create_classes():
     players.append(Player("Rogue", "Rogue", 12, 12, 12, 5, 1, 10, 16, 10, 12, 12, 10, 0, 0, 0))
 
     # Player 5 - Zombie
-    players.append(Player("Zombie", "Zombie", 200, 200, 8, 4, 1, 12, 6, 16, 2, 6, 4, 1, 0, 0))
+    players.append(Player("Zombie", "Zombie", 15, 15, 8, 4, 1, 14, 6, 16, 2, 6, 4, 1, 0, 0))
 
     return players
