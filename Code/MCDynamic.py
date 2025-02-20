@@ -46,7 +46,7 @@ class Player:
         self.melee_attack_dict = {"Melee Attack": (1, 6)}
 
 class MonteCarloSimulation:
-    def __init__(self, num_simulations=5000):
+    def __init__(self, num_simulations=10000):
         self.num_simulations = num_simulations
         self.results = defaultdict(int)
         self.players = create_classes()
@@ -65,9 +65,9 @@ class MonteCarloSimulation:
                 team2_indices = input("Select players for Team 2 (comma-separated numbers): ").split(',')
                 team2_indices = [int(i.strip()) - 1 for i in team2_indices]
                 
-                if any(i in team1_indices for i in team2_indices):
-                    print("A player cannot be in both teams!")
-                    continue
+                #if any(i in team1_indices for i in team2_indices):
+                   # print("A player cannot be in both teams!")
+                    #continue
                 
                 if all(0 <= i < len(self.players) for i in team1_indices + team2_indices):
                     team1 = [self.players[i] for i in team1_indices]
