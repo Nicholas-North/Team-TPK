@@ -97,7 +97,7 @@ def initialize_templates() -> List[Template]:
 
 # Player class definition
 class Player:
-    def __init__(self, name="", player_class="", hit_points=0, hit_point_max = 0, armor_class=0, movement_speed=0, level=1, strength_score=10, dexterity_score=10, constitution_score=10, intelligence_score=10, wisdom_score=10, charisma_score=10, multi_attack=0, can_heal=0, num_heals=0):
+    def __init__(self, name="", player_class="", hit_points=0, hit_point_max = 0, armor_class=0, movement_speed=0, level=1, strength_score=10, dexterity_score=10, constitution_score=10, intelligence_score=10, wisdom_score=10, charisma_score=10, multi_attack=0, can_heal=0, num_heals=0, num_dice = 0, dice_size =0, main_score = 0, sneak_attack = 0):
         self.name = player_class  # Set the name to the class by default
         self.player_class = player_class
         self.hit_points = hit_points
@@ -113,7 +113,11 @@ class Player:
         self.charisma_score = charisma_score
         self.multi_attack = multi_attack 
         self.can_heal = can_heal
-        self.num_heals = num_heals  
+        self.num_heals = num_heals
+        self.num_dice = num_dice
+        self.dice_size = dice_size  
+        self.main_score = main_score
+        self.sneak_attack = sneak_attack
         self.melee_attack_dict = {
             "Melee Attack": (1, 6)  # Example melee attack with 1d6 damage
         }
@@ -127,111 +131,117 @@ class Player:
 class Classes:
     def __init__(self):
         
-        self.templates = initialize_templates()
+      self.templates = initialize_templates()
 
         
-        self.players = [Player(), Player(), Player(), Player(), Player()]
+   #     self.players = [Player(), Player(), Player(), Player(), Player()]
         
         
         
-        self.players[0].name = "Fighter"
-        self.players[0].player_class = "Fighter"
-        self.players[0].hit_points = 18
-        self.players[0].hit_point_max = 18
-        self.players[0].armor_class = 15
-        self.players[0].movement_speed = 6
-        self.players[0].level = 1
-        self.players[0].strength_score = 16
-        self.players[0].dexterity_score = 12
-        self.players[0].constitution_score = 14
-        self.players[0].intelligence_score = 10
-        self.players[0].wisdom_score = 8
-        self.players[0].charisma_score = 10
-        self.players[0].multi_attack = 0
-        self.players[0].can_heal = 0
+    #    self.players[0].name = "Fighter"
+     #   self.players[0].player_class = "Fighter"
+      #  self.players[0].hit_points = 18
+       # self.players[0].hit_point_max = 18
+       # self.players[0].armor_class = 15
+       # self.players[0].movement_speed = 6
+       # self.players[0].level = 1
+       # self.players[0].strength_score = 16
+       # self.players[0].dexterity_score = 12
+       # self.players[0].constitution_score = 14
+       # self.players[0].intelligence_score = 10
+       # self.players[0].wisdom_score = 8
+       # self.players[0].charisma_score = 10
+       # self.players[0].multi_attack = 0
+       # self.players[0].can_heal = 0
         
         
         
-        self.players[1].name = "Wizard"
-        self.players[1].player_class = "Wizard"
-        self.players[1].hit_points = 10
-        self.players[1].hit_point_max = 10
-        self.players[1].armor_class = 12
-        self.players[1].movement_speed = 5
-        self.players[1].level = 1
-        self.players[1].strength_score = 8
-        self.players[1].dexterity_score = 14
-        self.players[1].constitution_score = 10
-        self.players[1].intelligence_score = 16
-        self.players[1].wisdom_score = 12
-        self.players[1].charisma_score = 10
-        self.players[1].can_heal = 0
+        #self.players[1].name = "Wizard"
+        #self.players[1].player_class = "Wizard"
+        #self.players[1].hit_points = 10
+        #self.players[1].hit_point_max = 10
+        #self.players[1].armor_class = 12
+        #self.players[1].movement_speed = 5
+        #self.players[1].level = 1
+        #self.players[1].strength_score = 8
+        #self.players[1].dexterity_score = 14
+        #self.players[1].constitution_score = 10
+        #self.players[1].intelligence_score = 16
+        #self.players[1].wisdom_score = 12
+        #self.players[1].charisma_score = 10
+        #self.players[1].can_heal = 0
         
         
         
         
-        self.players[2].name = "Cleric"
-        self.players[2].player_class = "Cleric"
-        self.players[2].hit_points = 14
-        self.players[2].hit_point_max = 14
-        self.players[2].armor_class = 12
-        self.players[2].movement_speed = 5
-        self.players[2].level = 1
-        self.players[2].strength_score = 12
-        self.players[2].dexterity_score = 10
-        self.players[2].constitution_score = 10
-        self.players[2].intelligence_score = 12
-        self.players[2].wisdom_score = 12
-        self.players[2].charisma_score = 16
-        self.players[2].can_heal = 1
-        self.players[2].num_heals = 2
+        #self.players[2].name = "Cleric"
+        #self.players[2].player_class = "Cleric"
+        #self.players[2].hit_points = 14
+        #self.players[2].hit_point_max = 14
+        #self.players[2].armor_class = 12
+        #self.players[2].movement_speed = 5
+        #self.players[2].level = 1
+        #self.players[2].strength_score = 12
+        #self.players[2].dexterity_score = 10
+        #self.players[2].constitution_score = 10
+        #self.players[2].intelligence_score = 12
+        #self.players[2].wisdom_score = 12
+        #self.players[2].charisma_score = 16
+        #self.players[2].can_heal = 1
+        #self.players[2].num_heals = 2
         
-        self.players[3].name = "Rogue"
-        self.players[3].player_class = "Rogue"
-        self.players[3].hit_points = 12
-        self.players[3].hit_point_max = 12
-        self.players[3].armor_class = 12
-        self.players[3].movement_speed = 5
-        self.players[3].level = 1
-        self.players[3].strength_score = 10
-        self.players[3].dexterity_score = 16
-        self.players[3].constitution_score = 10
-        self.players[3].intelligence_score = 12
-        self.players[3].wisdom_score = 12
-        self.players[3].charisma_score = 10
-        self.players[3].can_heal = 0
+        #self.players[3].name = "Rogue"
+        #self.players[3].player_class = "Rogue"
+        #self.players[3].hit_points = 12
+        #self.players[3].hit_point_max = 12
+        #self.players[3].armor_class = 12
+        #self.players[3].movement_speed = 5
+        #self.players[3].level = 1
+        #self.players[3].strength_score = 10
+        #self.players[3].dexterity_score = 16
+        #self.players[3].constitution_score = 10
+        #self.players[3].intelligence_score = 12
+        #self.players[3].wisdom_score = 12
+        #self.players[3].charisma_score = 10
+        #self.players[3].can_heal = 0
         
-        self.players[4].name = "Zombie"
-        self.players[4].player_class = "Zombie"
-        self.players[4].hit_points = 22
-        self.players[4].hit_point_max = 22
-        self.players[4].armor_class = 8
-        self.players[4].movement_speed = 4
-        self.players[4].level = 1
-        self.players[4].strength_score = 12
-        self.players[4].dexterity_score = 6
-        self.players[4].constitution_score = 16
-        self.players[4].intelligence_score = 2
-        self.players[4].wisdom_score = 6
-        self.players[4].charisma_score = 4
-        self.players[4].can_heal = 0
+        #self.players[4].name = "Zombie"
+        #self.players[4].player_class = "Zombie"
+        #self.players[4].hit_points = 22
+        #self.players[4].hit_point_max = 22
+        #self.players[4].armor_class = 8
+        #self.players[4].movement_speed = 4
+        #self.players[4].level = 1
+        #self.players[4].strength_score = 12
+        #self.players[4].dexterity_score = 6
+        #self.players[4].constitution_score = 16
+        #self.players[4].intelligence_score = 2
+        #self.players[4].wisdom_score = 6
+        #self.players[4].charisma_score = 4
+        #self.players[4].can_heal = 0
         
 def create_classes():
     players = []
 
     # Player 1 - Fighter
-    players.append(Player("Fighter", "Fighter", 14, 18, 15, 6, 1, 16, 12, 14, 10, 8, 10, 1, 0, 0))
+    players.append(Player("lvl 1 Fighter", "lvl 1 Fighter", 14, 18, 15, 6, 1, 16, 12, 14, 10, 8, 10, 0, 0, 0, 1, 10, 16, 0))
 
     # Player 2 - Wizard
-    players.append(Player("Wizard", "Wizard", 4, 10, 12, 5, 1, 8, 14, 10, 16, 12, 10, 0, 0, 0))
+    players.append(Player("lvl 1 Wizard", "lvl 1 Wizard", 4, 10, 12, 5, 1, 8, 14, 10, 16, 12, 10, 0, 0, 0, 1, 10, 16, 0))
 
     # Player 3 - Cleric
-    players.append(Player("Cleric", "Cleric", 8, 14, 12, 5, 1, 12, 10, 10, 12, 12, 16, 0, 1, 2))
+    players.append(Player("lvl 1 Cleric", "lvl 1 Cleric", 8, 14, 12, 5, 1, 12, 10, 10, 12, 12, 16, 0, 1, 2, 1, 8, 16, 0))
 
     # Player 4 - Rogue
-    players.append(Player("Rogue", "Rogue", 12, 12, 12, 5, 1, 10, 16, 10, 12, 12, 10, 0, 0, 0))
+    players.append(Player("lvl 1 Rogue", "lvl 1 Rogue", 12, 12, 12, 5, 1, 10, 16, 10, 12, 12, 10, 0, 0, 0, 1, 4, 16, 1))
 
     # Player 5 - Zombie
-    players.append(Player("Zombie", "Zombie", 15, 15, 8, 4, 1, 14, 6, 16, 2, 6, 4, 1, 0, 0))
+    players.append(Player("Zombie", "Zombie", 15, 15, 8, 4, 1, 14, 6, 16, 2, 6, 4, 1, 0, 0, 1, 8, 14, 0))
+    
+    players.append(Player("Tarrasque", "Tarrasque", 697, 697, 25, 12, 30, 30, 12, 30, 4, 12, 12, 3, 0, 0, 4, 8, 30, 0))
+    
+    players.append(Player("Owlbear", "Owlbear", 59, 59, 13, 8, 3, 20, 12, 17, 3, 12, 7, 1, 0, 0, 2, 8, 20, 0))
+    
+    
 
     return players
