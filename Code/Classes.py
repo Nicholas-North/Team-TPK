@@ -97,7 +97,7 @@ def initialize_templates() -> List[Template]:
 
 # Player class definition
 class Player:
-    def __init__(self, name="", player_class="", hit_points=0, hit_point_max = 0, armor_class=0, movement_speed=0, level=1, strength_score=10, dexterity_score=10, constitution_score=10, intelligence_score=10, wisdom_score=10, charisma_score=10, multi_attack=0, can_heal=0, num_heals=0, num_dice = 0, dice_size =0, main_score = 0, sneak_attack = 0):
+    def __init__(self, name="", player_class="", hit_points=0, hit_point_max = 0, armor_class=0, movement_speed=0, level=1, strength_score=10, dexterity_score=10, constitution_score=10, intelligence_score=10, wisdom_score=10, charisma_score=10, multi_attack=0, can_heal=0, num_heals=0, num_dice = 0, dice_size =0, main_score = 0, sneak_attack = 0, prof = 0, save_dc = 0, aoe_slots = 0, aoe_num_dice = 0, aoe_dice_size = 0):
         self.name = player_class  # Set the name to the class by default
         self.player_class = player_class
         self.hit_points = hit_points
@@ -118,6 +118,11 @@ class Player:
         self.dice_size = dice_size  
         self.main_score = main_score
         self.sneak_attack = sneak_attack
+        self.prof = prof
+        self.save_dc = save_dc
+        self.aoe_slots = aoe_slots
+        self.aoe_num_dice = aoe_num_dice 
+        self.aoe_dice_size = aoe_dice_size
         self.melee_attack_dict = {
             "Melee Attack": (1, 6)  # Example melee attack with 1d6 damage
         }
@@ -222,25 +227,29 @@ class Classes:
         
 def create_classes():
     players = []
+    
+    # self, name="", player_class="", hit_points=0, hit_point_max = 0, armor_class=0, movement_speed=0, level=1, strength_score=10, dexterity_score=10, constitution_score=10, intelligence_score=10, wisdom_score=10, charisma_score=10, multi_attack=0, can_heal=0, num_heals=0, num_dice = 0, dice_size =0, main_score = 0, sneak_attack = 0, prof = 0, save_dc = 0, aoe_slots = 0, aoe_num_dice = 0, aoe_dice_size = 0)
 
     # Player 1 - Fighter
-    players.append(Player("lvl 1 Fighter", "lvl 1 Fighter", 14, 18, 15, 6, 1, 16, 12, 14, 10, 8, 10, 0, 0, 0, 1, 10, 16, 0))
+    players.append(Player("lvl 1 Fighter", "lvl 1 Fighter", 14, 14, 15, 6, 1, 16, 12, 14, 10, 8, 10, 0, 0, 0, 1, 10, 16, 0, 1, 0, 0, 0, 0))
 
     # Player 2 - Wizard
-    players.append(Player("lvl 1 Wizard", "lvl 1 Wizard", 4, 10, 12, 5, 1, 8, 14, 10, 16, 12, 10, 0, 0, 0, 1, 10, 16, 0))
+    players.append(Player("lvl 1 Wizard", "lvl 1 Wizard", 8, 8, 12, 5, 1, 8, 14, 10, 16, 12, 10, 0, 0, 0, 1, 10, 16, 0, 1, 0, 0, 0, 0))
 
     # Player 3 - Cleric
-    players.append(Player("lvl 1 Cleric", "lvl 1 Cleric", 8, 14, 12, 5, 1, 12, 10, 10, 12, 12, 16, 0, 1, 2, 1, 8, 16, 0))
+    players.append(Player("lvl 1 Cleric", "lvl 1 Cleric", 10, 10, 12, 5, 1, 12, 10, 10, 12, 12, 16, 0, 1, 2, 1, 8, 16, 0, 1, 0, 0, 0, 0))
 
     # Player 4 - Rogue
-    players.append(Player("lvl 1 Rogue", "lvl 1 Rogue", 12, 12, 12, 5, 1, 10, 16, 10, 12, 12, 10, 0, 0, 0, 1, 4, 16, 1))
+    players.append(Player("lvl 1 Rogue", "lvl 1 Rogue", 10, 10, 12, 5, 1, 10, 16, 10, 12, 12, 10, 0, 0, 0, 1, 4, 16, 1, 1, 0, 0, 0, 0))
 
     # Player 5 - Zombie
-    players.append(Player("Zombie", "Zombie", 15, 15, 8, 4, 1, 14, 6, 16, 2, 6, 4, 1, 0, 0, 1, 8, 14, 0))
+    players.append(Player("Zombie", "Zombie", 15, 15, 8, 4, 1, 14, 6, 16, 2, 6, 4, 1, 0, 0, 1, 8, 14, 0, 1, 0, 0, 0, 0))
     
-    players.append(Player("Tarrasque", "Tarrasque", 697, 697, 25, 12, 30, 30, 12, 30, 4, 12, 12, 3, 0, 0, 4, 8, 30, 0))
+    players.append(Player("Tarrasque", "Tarrasque", 697, 697, 25, 12, 30, 30, 12, 30, 4, 12, 12, 3, 0, 0, 4, 8, 30, 0, 5, 20, 0, 0, 0))
     
-    players.append(Player("Owlbear", "Owlbear", 59, 59, 13, 8, 3, 20, 12, 17, 3, 12, 7, 1, 0, 0, 2, 8, 20, 0))
+    players.append(Player("Owlbear", "Owlbear", 59, 59, 13, 8, 3, 20, 12, 17, 3, 12, 7, 1, 0, 0, 2, 8, 20, 0, 3, 0, 0, 0, 0))
+    
+    players.append(Player("lvl 3 Fighter", "lvl 3 Fighter", 26, 26, 15, 6, 3, 16, 12, 14, 10, 8, 10, 0, 0, 0, 2, 6, 16, 0, 2, 0, 0, 0, 0))
     
     
 

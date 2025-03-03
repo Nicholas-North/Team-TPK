@@ -12,7 +12,7 @@ class ActionType(Enum):
     BonusAction = 3
 
 class MonteCarloSimulation:
-    def __init__(self, num_simulations=100000):
+    def __init__(self, num_simulations=10000):
         self.num_simulations = num_simulations
         self.results = defaultdict(int)
         self.players = create_classes()
