@@ -26,12 +26,13 @@ def run_simulator(batch_id, encounter_id, players):
         # Pass players directly to the simulation
         simulation = MonteCarloSimulation(num_simulations=10000, players=players)
         simulation.run_simulation()
+        team1_wins, team2_wins = simulation.display_results()
 
         print(f"Simulation completed for BatchID: {batch_id}, EncounterID: {encounter_id}")
-        return True  # Success
+        return True, team1_wins/100, team2_wins/100 # Success
     except Exception as e:
         print(f"Error in simulation for BatchID: {batch_id}, EncounterID: {encounter_id}: {e}")
-        return False  # Failure
+        return False, None, None  # Failure
 
 
 # Database connection function
@@ -68,6 +69,27 @@ def update_batch_status(connection, batch_id, status):
     cursor.execute(query, (status, batch_id))
     connection.commit()
 
+def get_account_id(connection, encounter_id):
+    cursor = connection.cursor()
+    query = """
+        SELECT accountID
+        FROM encounter.encounter
+        WHERE encounterID = ?
+    """
+    cursor.execute(query, (encounter_id,))
+    row = cursor.fetchone()
+    return row[0] if row else None
+
+# Function to insert into encounterHistory
+def update_encounter_history(connection, history_id, encounter_id, account_id, team1_wins, team2_wins):
+    cursor = connection.cursor()
+    query = """
+        INSERT INTO encounter.encounterHistory (historyID, encounterID, accountID, team1Wins, team2Wins)
+        VALUES (?, ?, ?, ?, ?)
+    """
+    cursor.execute(query, (history_id, encounter_id, account_id, team1_wins, team2_wins))
+    connection.commit()
+
 # Main batch processor function
 def batch_processor():
     print("Batch Processor started. Waiting for enqueued batches...")
@@ -93,12 +115,25 @@ def batch_processor():
                 update_batch_status(connection, batch_id, 'in progress')
 
                 # Run the simulator with fetched players
-                if run_simulator(batch_id, encounter_id, players):
+                simulator_results, team1_wins, team2_wins = run_simulator(batch_id, encounter_id, players)
+                
+                if simulator_results:
                     update_batch_status(connection, batch_id, 'complete')
                     print(f"BatchID: {batch_id} marked as complete.")
                 else:
                     update_batch_status(connection, batch_id, 'failed')
                     print(f"BatchID: {batch_id} failed during simulation.")
+
+                # Get accountID associated with the encounterID
+                account_id = get_account_id(connection, encounter_id)
+                if not account_id:
+                    print(f"Error: No accountID found for EncounterID: {encounter_id}")
+                    update_batch_status(connection, batch_id, 'failed')
+                    continue
+
+                # Update encounterHistory with simulation results
+                history_id = encounter_id
+                update_encounter_history(connection, history_id, encounter_id, account_id, team1_wins, team2_wins)
 
         except Exception as e:
             print(f"Error occurred: {e}")
