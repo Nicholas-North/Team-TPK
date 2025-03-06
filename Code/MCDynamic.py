@@ -48,10 +48,16 @@ class MonteCarloSimulation:
         self.display_results()
 
     def display_results(self):
+    # Retrieve wins from the results dictionary (defaulting to 0 if not present)
+        friends_wins = self.results.get("Friends Win", 0)
+        foes_wins = self.results.get("Foes Win", 0)
+    
         print("\nFinal Results:")
-        for team, wins in self.results.items():
-            print(f"{team}: {wins} wins")
-
+        print(f"Friends: {friends_wins} wins")
+        print(f"Foes: {foes_wins} wins")
+    
+    # Return the win counts so you can send them back to the database
+        return friends_wins, foes_wins
 class CombatSimulation:
     def __init__(self, friends, foes):
         self.friends = friends
