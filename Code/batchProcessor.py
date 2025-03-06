@@ -84,7 +84,7 @@ def get_account_id(connection, encounter_id):
 def update_encounter_history(connection, batch_id, encounter_id, account_id, team1_wins, team2_wins):
     cursor = connection.cursor()
     query = """
-        INSERT INTO encounter.encounterHistory (historyID, encounterID, accountID, team1Wins, team2Wins)
+        INSERT INTO encounter.encounterHistory (batchID, encounterID, accountID, team1Wins, team2Wins)
         VALUES (?, ?, ?, ?, ?)
     """
     cursor.execute(query, (batch_id, encounter_id, account_id, team1_wins, team2_wins))
@@ -100,8 +100,8 @@ def batch_processor():
             # Fetch enqueued batches
             enqueued_batches = fetch_enqueued_batches(connection)
             if not enqueued_batches:
-                print("No enqueued batches found. Sleeping for 15 seconds...")
-                time.sleep(15)
+                print("No enqueued batches found. Sleeping for 5 seconds...")
+                time.sleep(5)
                 continue
 
             for batch in enqueued_batches:
