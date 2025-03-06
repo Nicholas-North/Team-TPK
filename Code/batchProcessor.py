@@ -1,3 +1,6 @@
+# Import MonteCarloSimulation
+from MCDynamic import MonteCarloSimulation  # Adjust import based on actual file name
+from Classes import fetch_characters
 import time
 import random
 import pyodbc
@@ -8,12 +11,28 @@ DB_NAME = 'teamTPK'
 DB_USER = 'admin'
 DB_PASSWORD = 'teamtpk4vr!'
 
-# Simulator function (mock implementation)
-def run_simulator(batch_id, encounter_id):
-    print(f"Running simulator for BatchID: {batch_id}, EncounterID: {encounter_id}")
-    time.sleep(random.randint(1, 5))  # Simulate processing time
-    print(f"Simulator completed for BatchID: {batch_id}, EncounterID: {encounter_id}")
-    return True  # Simulate success
+# Simulator function using MonteCarloSimulation
+def run_simulator(batch_id, encounter_id, players):
+    print(f"Running Monte Carlo Simulation for BatchID: {batch_id}, EncounterID: {encounter_id}")
+
+    try:
+        if not players:
+            print(f"ERROR: No players found for EncounterID: {encounter_id}")
+            return False
+        
+        for char in players:
+            print(f"Character: {char.characterName}, Class: {char.characterClass}, FriendFoe: {char.friendFoe}")
+
+        # Pass players directly to the simulation
+        simulation = MonteCarloSimulation(num_simulations=10000, players=players)
+        simulation.run_simulation()
+
+        print(f"Simulation completed for BatchID: {batch_id}, EncounterID: {encounter_id}")
+        return True  # Success
+    except Exception as e:
+        print(f"Error in simulation for BatchID: {batch_id}, EncounterID: {encounter_id}: {e}")
+        return False  # Failure
+
 
 # Database connection function
 def get_db_connection():
@@ -22,7 +41,6 @@ def get_db_connection():
 
 # Function to fetch enqueued batches
 def fetch_enqueued_batches(connection):
-
     cursor = connection.cursor()
     query = """
         SELECT batchID, encounterID
@@ -42,7 +60,6 @@ def update_batch_status(connection, batch_id, status):
             WHERE batchID = ?
         """
     else:
-        # Update only the status
         query = """
             UPDATE batch.batch
             SET batchStatus = ?
@@ -56,43 +73,39 @@ def batch_processor():
     print("Batch Processor started. Waiting for enqueued batches...")
     while True:
         try:
-            # Connect to the database
             connection = get_db_connection()
 
             # Fetch enqueued batches
             enqueued_batches = fetch_enqueued_batches(connection)
             if not enqueued_batches:
                 print("No enqueued batches found. Sleeping for 15 seconds...")
-                time.sleep(15) 
+                time.sleep(15)
                 continue
 
-            # Process each enqueued batch
             for batch in enqueued_batches:
                 batch_id, encounter_id = batch
+
+                # Fetch players for this encounter
+                players = fetch_characters(encounter_id)  # Fetch players once and pass them
 
                 # Update batch status to 'in progress'
                 print(f"Processing BatchID: {batch_id}, EncounterID: {encounter_id}")
                 update_batch_status(connection, batch_id, 'in progress')
 
-                # Run the simulator
-                if run_simulator(batch_id, encounter_id):
-                    # Update batch status to 'complete' on success
+                # Run the simulator with fetched players
+                if run_simulator(batch_id, encounter_id, players):
                     update_batch_status(connection, batch_id, 'complete')
                     print(f"BatchID: {batch_id} marked as complete.")
                 else:
-                    # Handle failure (e.g., update status to 'failed')
                     update_batch_status(connection, batch_id, 'failed')
                     print(f"BatchID: {batch_id} failed during simulation.")
 
         except Exception as e:
             print(f"Error occurred: {e}")
         finally:
-            # Close the database connection
             if 'connection' in locals():
                 connection.close()
 
-        # Sleep for a short time before checking again
         time.sleep(1)
-
 if __name__ == "__main__":
     batch_processor()

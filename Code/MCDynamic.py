@@ -3,7 +3,7 @@ import copy
 from enum import Enum
 from typing import List
 from collections import defaultdict
-from Classes import create_classes
+from Classes import fetch_characters
 from tqdm import tqdm
 
 class ActionType(Enum):
@@ -12,39 +12,37 @@ class ActionType(Enum):
     BonusAction = 3
 
 class MonteCarloSimulation:
-    def __init__(self, num_simulations=10000):
+    def __init__(self, num_simulations, players):
         self.num_simulations = num_simulations
         self.results = defaultdict(int)
-        self.players = create_classes()
-        self.team1, self.team2 = self.select_players()
+        self.players = players
+        self.friends, self.foes = self.select_players()
     
+        print(f"Monte Carlo Simulation initialized with {len(self.players)} players.")
+        for player in self.players:
+            print(player)
+            
     def select_players(self):
-        print("Available Players:")
-        for i, player in enumerate(self.players):
-            print(f"{i + 1}: {player.name} ({player.player_class})")
-        
-        while True:
-            try:
-                team1_indices = input("Select players for Team 1 (comma-separated numbers): ").split(',')
-                team1_indices = [int(i.strip()) - 1 for i in team1_indices]
-                
-                team2_indices = input("Select players for Team 2 (comma-separated numbers): ").split(',')
-                team2_indices = [int(i.strip()) - 1 for i in team2_indices]
-                
-                if all(0 <= i < len(self.players) for i in team1_indices + team2_indices):
-                    team1 = [self.players[i] for i in team1_indices]
-                    team2 = [self.players[i] for i in team2_indices]
-                    return team1, team2
-                else:
-                    print("Invalid selection, please choose valid player numbers.")
-            except ValueError:
-                print("Invalid input. Please enter numbers only.")
+        """Automatically assigns players to Friends or Foes based on player.friendFoe (0 = Friend, 1 = Foe)."""
+        friends = [player for player in self.players if player.friendFoe == 0]  # Friends
+        foes = [player for player in self.players if player.friendFoe == 1]  # Foes
 
+        # Display teams
+        print("\n=== Friends ===")
+        for player in friends:
+            print(f"{player.characterName} ({player.characterClass})")
+
+        print("\n=== Foes ===")
+        for player in foes:
+            print(f"{player.characterName} ({player.characterClass})")
+
+        return friends, foes
+    
     def run_simulation(self):
         for _ in tqdm(range(self.num_simulations), desc="Simulating Battles"):
-            fresh_team1 = copy.deepcopy(self.team1)
-            fresh_team2 = copy.deepcopy(self.team2)
-            simulation = CombatSimulation(fresh_team1, fresh_team2)
+            fresh_friends = copy.deepcopy(self.friends)
+            fresh_foes = copy.deepcopy(self.foes)
+            simulation = CombatSimulation(fresh_friends, fresh_foes)
             winner = simulation.run_round()
             self.results[winner] += 1
         self.display_results()
@@ -55,55 +53,49 @@ class MonteCarloSimulation:
             print(f"{team}: {wins} wins")
 
 class CombatSimulation:
-    def __init__(self, team1, team2):
-        self.team1 = team1
-        self.team2 = team2
-        self.original_stats = {p.name: {"hit_points": p.hit_points, "num_heals": p.num_heals} for p in team1 + team2}
+    def __init__(self, friends, foes):
+        self.friends = friends
+        self.foes = foes
+        self.original_stats = {p.characterName: {"hp": p.hp, "numHeals": p.numHeals} for p in friends + foes}
         
-        # Sort turn order by dexterity_score
-        self.turn_order = sorted(team1 + team2, key=lambda p: p.dexterity_score, reverse=True)
+        # Sort turn order by dexScore
+        self.turn_order = sorted(friends + foes, key=lambda p: p.dexScore, reverse=True)
 
     def reset_players(self):
-        for player in self.team1 + self.team2:
-            player.hit_points = self.original_stats[player.name]["hit_points"]
-            player.num_heals = self.original_stats[player.name]["num_heals"]
+        for player in self.friends + self.foes:
+            player.hp = self.original_stats[player.characterName]["hp"]
+            player.numHeals = self.original_stats[player.characterName]["numHeals"]
 
     def run_round(self):
         self.reset_players()
-        while any(p.hit_points > 0 for p in self.team1) and any(p.hit_points > 0 for p in self.team2):
+        while any(p.hp > 0 for p in self.friends) and any(p.hp > 0 for p in self.foes):
             for player in self.turn_order:
-                if player.hit_points > 0:
-                    enemy_team = self.team2 if player in self.team1 else self.team1
-                    if any(p.hit_points > 0 for p in enemy_team):
-                        target = random.choice([p for p in enemy_team if p.hit_points > 0])
+                if player.hp > 0:
+                    enemy_team = self.foes if player in self.friends else self.friends
+                    if any(p.hp > 0 for p in enemy_team):
+                        target = random.choice([p for p in enemy_team if p.hp > 0])
                         self.perform_actions(player, target)
-                        if all(p.hit_points <= 0 for p in enemy_team):
-                            return "Team 1 Wins" if enemy_team == self.team2 else "Team 2 Wins"
+                        if all(p.hp <= 0 for p in enemy_team):
+                            return "Friends Win" if enemy_team == self.foes else "Foes Win"
 
     def perform_actions(self, player, opponent):
         """Performs attacks based on multiattack and adds strength_score/2 to rolls and damage."""
-        num_attacks = max(1, player.multi_attack)  # Ensure at least one attack
+        num_attacks = max(1, player.attackCount)  # Ensure at least one attack
         for _ in range(num_attacks):
-            attack_roll = self.roll_dice(1, 20) + ((player.main_score - 10) // 2)  # Use main ability modifier
+            attack_roll = self.roll_dice(1, 20) + ((player.mainScore - 10) // 2)  # Use main ability modifier
             
-            
-            
-            
-            if attack_roll >= opponent.armor_class:
-                damage = sum(self.roll_dice(1, player.dice_size) for _ in range(player.num_dice))  # Roll multiple dice
-                damage += ((player.main_score - 10) // 2)  # Add main modifier to damage
-                opponent.hit_points -= damage
-                
-                
+            if attack_roll >= opponent.ac:
+                damage = sum(self.roll_dice(1, player.diceSize) for _ in range(player.numDice))  # Roll multiple dice
+                damage += ((player.mainScore - 10) // 2)  # Add main modifier to damage
+                opponent.hp -= damage
 
-        if player.can_heal and player.num_heals > 0 and player.hit_points < player.hit_point_max:
+        if player.canHeal and player.numHeals > 0 and player.hp < player.hpMax:
             heal_amount = self.roll_dice(1, 8)
-            player.hit_points = min(player.hit_point_max, player.hit_points + heal_amount)
-            player.num_heals -= 1
-            print(f"{player.name} heals for {heal_amount} HP, now at {player.hit_points}/{player.hit_point_max} HP.")
+            player.hp = min(player.hpMax, player.hp + heal_amount)
+            player.numHeals -= 1
 
-    def roll_dice(self, num_dice, dice_size):
-        return sum(random.randint(1, dice_size) for _ in range(num_dice))
+    def roll_dice(self, numDice, diceSize):
+        return sum(random.randint(1, diceSize) for _ in range(numDice))
 
-monte_carlo = MonteCarloSimulation()
-monte_carlo.run_simulation()
+#monte_carlo = MonteCarloSimulation()
+#monte_carlo.run_simulation()

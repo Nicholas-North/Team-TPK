@@ -1,6 +1,14 @@
 import random
 from enum import Enum
 from typing import List, Tuple
+import pyodbc
+
+
+# Database connection details
+DB_SERVER = 'database-1.c16m0yos4c9g.us-east-2.rds.amazonaws.com,1433'
+DB_NAME = 'teamTPK'
+DB_USER = 'admin'
+DB_PASSWORD = 'teamtpk4vr!'
 
 
 class ActionType(Enum):
@@ -97,46 +105,64 @@ def initialize_templates() -> List[Template]:
 
 # Player class definition
 class Player:
-    def __init__(self, name="", player_class="", hit_points=0, hit_point_max = 0, armor_class=0, movement_speed=0, level=1, strength_score=10, dexterity_score=10, constitution_score=10, intelligence_score=10, wisdom_score=10, charisma_score=10, multi_attack=0, can_heal=0, num_heals=0, num_dice = 0, dice_size =0, main_score = 0, sneak_attack = 0, prof = 0, save_dc = 0, aoe_slots = 0, aoe_num_dice = 0, aoe_dice_size = 0):
-        self.name = player_class  # Set the name to the class by default
-        self.player_class = player_class
-        self.hit_points = hit_points
-        self.hit_point_max = hit_point_max
-        self.armor_class = armor_class
-        self.movement_speed = movement_speed
-        self.level = level
-        self.strength_score = strength_score
-        self.dexterity_score = dexterity_score
-        self.constitution_score = constitution_score
-        self.intelligence_score = intelligence_score
-        self.wisdom_score = wisdom_score
-        self.charisma_score = charisma_score
-        self.multi_attack = multi_attack 
-        self.can_heal = can_heal
-        self.num_heals = num_heals
-        self.num_dice = num_dice
-        self.dice_size = dice_size  
-        self.main_score = main_score
-        self.sneak_attack = sneak_attack
-        self.prof = prof
-        self.save_dc = save_dc
-        self.aoe_slots = aoe_slots
-        self.aoe_num_dice = aoe_num_dice 
-        self.aoe_dice_size = aoe_dice_size
-        self.melee_attack_dict = {
-            "Melee Attack": (1, 6)  # Example melee attack with 1d6 damage
-        }
+    def __init__(self, characterID, accountID, characterName, characterClass, ancestry, hp, hpMax, ac, movementSpeed, charLevel, mainScore,
+                 strScore, dexScore, conScore, intScore, wisScore, chaScore, attackCount, canHeal, numHeals,
+                 proficiencyBonus, strSaveProf, dexSaveProf, conSaveProf, intSaveProf, wisSaveProf, chaSaveProf,
+                 spellLevel1, spellLevel2, spellLevel3, spellLevel4, spellLevel5, friendFoe, numDice, diceSize, xloc, yloc):
+        self.characterID = characterID
+        self.accountID = accountID
+        self.characterName = characterName
+        self.characterClass = characterClass
+        self.ancestry = ancestry
+        self.hp = hp
+        self.hpMax = hpMax
+        self.ac = ac
+        self.movementSpeed = movementSpeed
+        self.charLevel = charLevel
+        self.mainScore = mainScore
+        self.strScore = strScore
+        self.dexScore = dexScore
+        self.conScore = conScore
+        self.intScore = intScore
+        self.wisScore = wisScore
+        self.chaScore = chaScore
+        self.attackCount = attackCount
+        self.canHeal = canHeal
+        self.numHeals = numHeals
+        self.proficiencyBonus = proficiencyBonus
+        self.strSaveProf = strSaveProf
+        self.dexSaveProf = dexSaveProf
+        self.conSaveProf = conSaveProf
+        self.intSaveProf = intSaveProf
+        self.wisSaveProf = wisSaveProf
+        self.chaSaveProf = chaSaveProf
+        self.spellLevel1 = spellLevel1
+        self.spellLevel2 = spellLevel2
+        self.spellLevel3 = spellLevel3
+        self.spellLevel4 = spellLevel4
+        self.spellLevel5 = spellLevel5
+        self.friendFoe = friendFoe
+        self.numDice = numDice
+        self.diceSize = diceSize
+        self.xloc = xloc  # X-coordinate from encounterPosition
+        self.yloc = yloc  # Y-coordinate from encounterPosition
+
         
         self.templates = []  # List of templates the player can use
+        
+    def __repr__(self):
+        return (f"Player(characterID={self.characterID}, characterName={self.characterName}, "
+                f"class={self.characterClass}, hp={self.hp}, hpMax={self.hpMax}, ac={self.ac}, "
+                f"xloc={self.xloc}, yloc={self.yloc})")
 
     def add_template(self, template: Template):
         self.templates.append(template)
 
 # Combat Simulation class definition
-class Classes:
-    def __init__(self):
+#class Classes:
+    #def __init__(self):
         
-      self.templates = initialize_templates()
+      #self.templates = initialize_templates()
 
         
    #     self.players = [Player(), Player(), Player(), Player(), Player()]
@@ -224,33 +250,127 @@ class Classes:
         #self.players[4].wisdom_score = 6
         #self.players[4].charisma_score = 4
         #self.players[4].can_heal = 0
-        
-def create_classes():
-    players = []
+        # 
+        #  
+# def create_classes():
+#     players = []
     
-    # self, name="", player_class="", hit_points=0, hit_point_max = 0, armor_class=0, movement_speed=0, level=1, strength_score=10, dexterity_score=10, constitution_score=10, intelligence_score=10, wisdom_score=10, charisma_score=10, multi_attack=0, can_heal=0, num_heals=0, num_dice = 0, dice_size =0, main_score = 0, sneak_attack = 0, prof = 0, save_dc = 0, aoe_slots = 0, aoe_num_dice = 0, aoe_dice_size = 0)
+#     # self, name="", player_class="", hit_points=0, hit_point_max = 0, armor_class=0, movement_speed=0, level=1, strength_score=10, dexterity_score=10, constitution_score=10, intelligence_score=10, wisdom_score=10, charisma_score=10, multi_attack=0, can_heal=0, num_heals=0, num_dice = 0, dice_size =0, main_score = 0, sneak_attack = 0, prof = 0, save_dc = 0, aoe_slots = 0, aoe_num_dice = 0, aoe_dice_size = 0)
 
-    # Player 1 - Fighter
-    players.append(Player("lvl 1 Fighter", "lvl 1 Fighter", 14, 14, 15, 6, 1, 16, 12, 14, 10, 8, 10, 0, 0, 0, 1, 10, 16, 0, 1, 0, 0, 0, 0))
+#     # Player 1 - Fighter
+#     players.append(Player("lvl 1 Fighter", "lvl 1 Fighter", 14, 14, 15, 6, 1, 16, 12, 14, 10, 8, 10, 0, 0, 0, 1, 10, 16, 0, 1, 0, 0, 0, 0))
 
-    # Player 2 - Wizard
-    players.append(Player("lvl 1 Wizard", "lvl 1 Wizard", 8, 8, 12, 5, 1, 8, 14, 10, 16, 12, 10, 0, 0, 0, 1, 10, 16, 0, 1, 0, 0, 0, 0))
+#     # Player 2 - Wizard
+#     players.append(Player("lvl 1 Wizard", "lvl 1 Wizard", 8, 8, 12, 5, 1, 8, 14, 10, 16, 12, 10, 0, 0, 0, 1, 10, 16, 0, 1, 0, 0, 0, 0))
 
-    # Player 3 - Cleric
-    players.append(Player("lvl 1 Cleric", "lvl 1 Cleric", 10, 10, 12, 5, 1, 12, 10, 10, 12, 12, 16, 0, 1, 2, 1, 8, 16, 0, 1, 0, 0, 0, 0))
+#     # Player 3 - Cleric
+#     players.append(Player("lvl 1 Cleric", "lvl 1 Cleric", 10, 10, 12, 5, 1, 12, 10, 10, 12, 12, 16, 0, 1, 2, 1, 8, 16, 0, 1, 0, 0, 0, 0))
 
-    # Player 4 - Rogue
-    players.append(Player("lvl 1 Rogue", "lvl 1 Rogue", 10, 10, 12, 5, 1, 10, 16, 10, 12, 12, 10, 0, 0, 0, 1, 4, 16, 1, 1, 0, 0, 0, 0))
+#     # Player 4 - Rogue
+#     players.append(Player("lvl 1 Rogue", "lvl 1 Rogue", 10, 10, 12, 5, 1, 10, 16, 10, 12, 12, 10, 0, 0, 0, 1, 4, 16, 1, 1, 0, 0, 0, 0))
 
-    # Player 5 - Zombie
-    players.append(Player("Zombie", "Zombie", 15, 15, 8, 4, 1, 14, 6, 16, 2, 6, 4, 1, 0, 0, 1, 8, 14, 0, 1, 0, 0, 0, 0))
+#     # Player 5 - Zombie
+#     players.append(Player("Zombie", "Zombie", 15, 15, 8, 4, 1, 14, 6, 16, 2, 6, 4, 1, 0, 0, 1, 8, 14, 0, 1, 0, 0, 0, 0))
     
-    players.append(Player("Tarrasque", "Tarrasque", 697, 697, 25, 12, 30, 30, 12, 30, 4, 12, 12, 3, 0, 0, 4, 8, 30, 0, 5, 20, 0, 0, 0))
+#     players.append(Player("Tarrasque", "Tarrasque", 697, 697, 25, 12, 30, 30, 12, 30, 4, 12, 12, 3, 0, 0, 4, 8, 30, 0, 5, 20, 0, 0, 0))
     
-    players.append(Player("Owlbear", "Owlbear", 59, 59, 13, 8, 3, 20, 12, 17, 3, 12, 7, 1, 0, 0, 2, 8, 20, 0, 3, 0, 0, 0, 0))
+#     players.append(Player("Owlbear", "Owlbear", 59, 59, 13, 8, 3, 20, 12, 17, 3, 12, 7, 1, 0, 0, 2, 8, 20, 0, 3, 0, 0, 0, 0))
     
-    players.append(Player("lvl 3 Fighter", "lvl 3 Fighter", 26, 26, 15, 6, 3, 16, 12, 14, 10, 8, 10, 0, 0, 0, 2, 6, 16, 0, 2, 0, 0, 0, 0))
+#     players.append(Player("lvl 3 Fighter", "lvl 3 Fighter", 26, 26, 15, 6, 3, 16, 12, 14, 10, 8, 10, 0, 0, 0, 2, 6, 16, 0, 2, 0, 0, 0, 0))
     
     
 
-    return players
+#     return players
+
+
+# Function to fetch all characters and their positions for a specific encounterID
+def fetch_characters(encounter_id):
+    try:
+        # Establish a connection
+        connection_string = (
+            "DRIVER={ODBC Driver 17 for SQL Server};"
+            f"SERVER={DB_SERVER};"
+            f"DATABASE={DB_NAME};"
+            f"UID={DB_USER};"
+            f"PWD={DB_PASSWORD};"
+        )
+        connection = pyodbc.connect(connection_string)
+        cursor = connection.cursor()
+
+        query = """
+            SELECT c.characterID, c.accountID, c.characterName, c.characterClass, c.ancestry, c.hp, c.hpMax, c.ac, c.movementSpeed, c.charLevel, c.mainScore,
+                   c.strScore, c.dexScore, c.conScore, c.intScore, c.wisScore, c.chaScore, c.attackCount, c.canHeal, c.numHeals,
+                   c.proficiencyBonus, c.strSaveProf, c.dexSaveProf, c.conSaveProf, c.intSaveProf, c.wisSaveProf, c.chaSaveProf,
+                   c.spellLevel1, c.spellLevel2, c.spellLevel3, c.spellLevel4, c.spellLevel5, c.friendFoe, c.numDice, c.diceSize,
+                   ep.xloc, ep.yloc
+            FROM character.character c
+            INNER JOIN encounter.encounterPosition ep ON c.characterID = ep.characterID
+            WHERE ep.encounterID = ?
+        """
+        cursor.execute(query, (encounter_id,))
+        rows = cursor.fetchall()
+
+        # Create a list of Player objects
+        players = []
+        for row in rows:
+            player = Player(
+                characterID=row.characterID,
+                accountID=row.accountID,
+                characterName=row.characterName,
+                characterClass=row.characterClass,
+                ancestry=row.ancestry,
+                hp=row.hp,
+                hpMax=row.hpMax,
+                ac=row.ac,
+                movementSpeed=row.movementSpeed,
+                charLevel=row.charLevel,
+                mainScore=row.mainScore,
+                strScore=row.strScore,
+                dexScore=row.dexScore,
+                conScore=row.conScore,
+                intScore=row.intScore,
+                wisScore=row.wisScore,
+                chaScore=row.chaScore,
+                attackCount=row.attackCount,
+                canHeal=row.canHeal,
+                numHeals=row.numHeals,
+                proficiencyBonus=row.proficiencyBonus,
+                strSaveProf=row.strSaveProf,
+                dexSaveProf=row.dexSaveProf,
+                conSaveProf=row.conSaveProf,
+                intSaveProf=row.intSaveProf,
+                wisSaveProf=row.wisSaveProf,
+                chaSaveProf=row.chaSaveProf,
+                spellLevel1=row.spellLevel1,
+                spellLevel2=row.spellLevel2,
+                spellLevel3=row.spellLevel3,
+                spellLevel4=row.spellLevel4,
+                spellLevel5=row.spellLevel5,
+                friendFoe=row.friendFoe,
+                numDice=row.numDice,
+                diceSize=row.diceSize,
+                xloc=row.xloc,  # X-coordinate from encounterPosition
+                yloc=row.yloc   # Y-coordinate from encounterPosition
+            )
+            players.append(player)
+
+        return players
+
+    except pyodbc.Error as e:
+        print(f"Database error occurred: {e}")
+        return []
+    finally:
+        if 'connection' in locals():
+            connection.close()
+
+# Test the function
+# encounter_id = 1000  # Replace with the encounterID you want to fetch
+# players = fetch_characters(encounter_id)
+
+# if players:
+#     print(f"Fetched {len(players)} characters with positions for encounterID: {encounter_id}")
+#     for player in players:
+#         print(player)
+# else:
+#     print(f"No characters found for encounterID: {encounter_id}")
+
