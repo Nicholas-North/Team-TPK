@@ -33,7 +33,7 @@ class MonteCarloSimulation:
             print(player)
             
     def select_players(self):
-        """Automatically assigns players to Friends or Foes based on player.friendFoe (0 = Friend, 1 = Foe)."""
+        # Automatically assigns players to Friends or Foes based on player.friendFoe (0 = Friend, 1 = Foe)
         friends = [player for player in self.players if player.friendFoe == 0]  # Friends
         foes = [player for player in self.players if player.friendFoe == 1]  # Foes
 
@@ -114,31 +114,45 @@ class CombatSimulation:
         self.reset_players()
         while any(p.hp > 0 for p in self.friends) and any(p.hp > 0 for p in self.foes):
             for player in self.turn_order:
-                if player.hp > 0:
+                if player.hp <= player.hpMax/2: # If Player is Bloodied, set flag
+                    player.bloodied = 1
+                if player.hp > 0: # If Player is Alive
                     enemy_team = self.foes if player in self.friends else self.friends
                     if any(p.hp > 0 for p in enemy_team):
-                        target = random.choice([p for p in enemy_team if p.hp > 0])
+                        bloodied_enemies = [p for p in enemy_team if p.hp > 0 and p.hp <= p.hpMax / 2] # Check if there are any bloodied enemies
+                        if bloodied_enemies:
+                            target = random.choice(bloodied_enemies)
+                        else:
+                            target = random.choice([p for p in enemy_team if p.hp > 0]) # If no bloodied enemies, choose a random target
                         self.perform_actions(player, target)
                         if all(p.hp <= 0 for p in enemy_team):
                             return "Friends Win" if enemy_team == self.foes else "Foes Win"
 
     def perform_actions(self, player, opponent):
-        """Allow the player to choose and perform an ability."""
+        # Allow the player to choose and perform an ability
         abilities = self.player_abilities.get(player.characterID, [])
         if not abilities:
             return
 
-        # Choose a random ability (for simulation purposes)
-        chosen_ability = random.choice(abilities)
+        # Determine if there is a bloodied ally and if the player has a healing ability
+        ally_team = self.friends if player in self.friends else self.foes
+        bloodied_allies = [ally for ally in ally_team + [player] if ally.hp > 0 and ally.hp <= ally.hpMax / 2]
+        healing_abilities = [ability for ability in abilities if ability.healTag == 1]
 
-        # Perform the chosen ability
-        if chosen_ability.healTag == 1:
-            self.perform_heal(player, chosen_ability)
+        # If there is a bloodied ally and a healing ability is available, prioritize healing
+        if bloodied_allies and healing_abilities and (player.numHeals > 0):
+            target_ally = random.choice(bloodied_allies)
+            chosen_ability = random.choice(healing_abilities)
+            self.perform_heal(target_ally, chosen_ability)
         else:
+            # If no bloodied allies or no healing abilities, proceed with attacking the opponent
+            attack_abilities = [ability for ability in abilities if ability.healTag == 0]
+            if attack_abilities:
+                chosen_ability = random.choice(attack_abilities)
             self.perform_attack(player, opponent, chosen_ability)
 
     def perform_attack(self, player, opponent, ability):
-        """Perform an attack based on the chosen ability."""
+        # Perform an attack based on the chosen ability
         attack_roll = self.roll_dice(1, 20) + ((player.mainScore - 10) // 2)  # Use main ability modifier
         
         if attack_roll >= opponent.ac:
@@ -147,11 +161,10 @@ class CombatSimulation:
             opponent.hp -= damage
 
     def perform_heal(self, player, ability):
-        """Perform a heal based on the chosen ability."""
-        if player.numHeals > 0:
-            heal_amount = sum(self.roll_dice(ability.firstNumDice, ability.firstDiceSize) for _ in range(1))
-            player.hp = min(player.hpMax, player.hp + heal_amount)
-            player.numHeals -= 1
+        # Perform a heal based on the chosen ability
+        heal_amount = sum(self.roll_dice(ability.firstNumDice, ability.firstDiceSize) for _ in range(1))
+        player.hp = min(player.hpMax, player.hp + heal_amount)
+        player.numHeals -= 1
 
     def roll_dice(self, numDice, diceSize):
         return sum(random.randint(1, diceSize) for _ in range(numDice))
