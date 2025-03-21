@@ -5,6 +5,7 @@ from typing import List
 from collections import defaultdict
 from tqdm import tqdm
 import pyodbc
+from multiprocessing import Pool
 
 def create_db_connection():
     DB_SERVER = 'database-1.c16m0yos4c9g.us-east-2.rds.amazonaws.com,1433'
@@ -25,13 +26,26 @@ class MonteCarloSimulation:
         self.results = defaultdict(int)
         self.players = players
         self.friends, self.foes = self.select_players()
-        self.db_connection = create_db_connection()
+        
+        # Fetch all player abilities before starting multiprocessing
         self.player_abilities = self.fetch_all_player_abilities()
-    
-        print(f"Monte Carlo Simulation initialized with {len(self.players)} players.")
-        for player in self.players:
-            print(player)
+        
+        # Precompute original stats for resetting players
+        self.original_stats = {}
+        for p in self.friends + self.foes:
+            # Calculate numHeals based on abilities with healTag == 1
+            numHeals = sum(1 for ability in self.player_abilities.get(p.characterID, []) if ability.healTag == 1)
             
+            self.original_stats[p.characterName] = {
+                "hp": p.hp, 
+                "numHeals": numHeals,  # Updated to be calculated based on healTag
+                "spellLevel1": p.spellLevel1, 
+                "spellLevel2": p.spellLevel2, 
+                "spellLevel3": p.spellLevel3, 
+                "spellLevel4": p.spellLevel4, 
+                "spellLevel5": p.spellLevel5
+            }
+
     def select_players(self):
         # Automatically assigns players to Friends or Foes based on player.friendFoe (0 = Friend, 1 = Foe)
         friends = [player for player in self.players if player.friendFoe == 0]  # Friends
@@ -49,26 +63,39 @@ class MonteCarloSimulation:
         return friends, foes
     
     def fetch_all_player_abilities(self):
-        cursor = self.db_connection.cursor()
+        db_connection = create_db_connection()  # Create a temporary connection
+        cursor = db_connection.cursor()
         abilities = {}
-        for player in self.players:
-            cursor.execute("""
-                SELECT abilityID, abilityName, meleeRangedAOE, healTag, firstNumDice, firstDiceSize, firstDamageType,
-                       secondNumDice, secondDiceSize, secondDamageType, rangeOne, rangeTwo, radius, spellLevel, saveType, actionType
-                FROM character.abilityModel
-                WHERE abilityID IN (
-                    SELECT abilityID FROM character.characterAbility WHERE characterID = ?
-                )
-            """, player.characterID)
-            abilities[player.characterID] = cursor.fetchall()
+        cursor.execute("""
+            SELECT ca.characterID, am.abilityID, am.abilityName, am.meleeRangedAOE, am.healTag, 
+                am.firstNumDice, am.firstDiceSize, am.firstDamageType, am.secondNumDice, 
+                am.secondDiceSize, am.secondDamageType, am.rangeOne, am.rangeTwo, 
+                am.radius, am.spellLevel, am.saveType, am.actionType
+            FROM character.abilityModel am
+            JOIN character.characterAbility ca ON am.abilityID = ca.abilityID
+        """)
+        for row in cursor.fetchall():
+            characterID = row.characterID
+            if characterID not in abilities:
+                abilities[characterID] = []
+            abilities[characterID].append(row)
+        db_connection.close()  # Close the connection after fetching data
         return abilities
 
     def run_simulation(self):
-        for _ in tqdm(range(self.num_simulations), desc="Simulating Battles"):
-            fresh_friends = copy.deepcopy(self.friends)
-            fresh_foes = copy.deepcopy(self.foes)
-            simulation = CombatSimulation(fresh_friends, fresh_foes, self.player_abilities)
-            winner = simulation.run_round()
+        # Prepare data for multiprocessing
+        simulation_data = {
+            "friends": self.friends,
+            "foes": self.foes,
+            "player_abilities": self.player_abilities,
+            "original_stats": self.original_stats
+        }
+
+        # Use multiprocessing to parallelize simulations
+        with Pool() as pool:
+            results = pool.map(run_single_simulation, [simulation_data] * self.num_simulations)
+        
+        for winner in results:
             self.results[winner] += 1
         self.display_results()
 
@@ -80,12 +107,30 @@ class MonteCarloSimulation:
         # Return the win counts so you can send them back to the database
         return friends_wins, foes_wins
 
+def run_single_simulation(simulation_data):
+    friends = simulation_data["friends"]
+    foes = simulation_data["foes"]
+    player_abilities = simulation_data["player_abilities"]
+    original_stats = simulation_data["original_stats"]
+
+    # Reset players
+    for player in friends + foes:
+        player.hp = original_stats[player.characterName]["hp"]
+        player.numHeals = original_stats[player.characterName]["numHeals"]
+        player.spellLevel1 = original_stats[player.characterName]["spellLevel1"]
+        player.spellLevel2 = original_stats[player.characterName]["spellLevel2"]
+        player.spellLevel3 = original_stats[player.characterName]["spellLevel3"]
+        player.spellLevel4 = original_stats[player.characterName]["spellLevel4"]
+        player.spellLevel5 = original_stats[player.characterName]["spellLevel5"]
+
+    simulation = CombatSimulation(friends, foes, player_abilities)
+    return simulation.run_round()
+    
 class CombatSimulation:
     def __init__(self, friends, foes, player_abilities):
         self.friends = friends
         self.foes = foes
         self.player_abilities = player_abilities  # Use pre-fetched abilities
-        self.original_stats = {p.characterName: {"hp": p.hp, "numHeals": p.numHeals, "spellLevel1": p.spellLevel1, "spellLevel2": p.spellLevel2, "spellLevel3": p.spellLevel3, "spellLevel4": p.spellLevel4, "spellLevel5": p.spellLevel5} for p in friends + foes}
         
         # Sort turn order by dexScore
         self.turn_order = self.roll_initiative(friends + foes)
@@ -102,88 +147,73 @@ class CombatSimulation:
         sorted_players = sorted(initiative_rolls, key=lambda x: x[1], reverse=True)
         return [player for player, _ in sorted_players]
 
-    def reset_players(self):
-        for player in self.friends + self.foes:
-            player.hp = self.original_stats[player.characterName]["hp"]
-            player.numHeals = self.original_stats[player.characterName]["numHeals"]
-            player.spellLevel1 = self.original_stats[player.characterName]["spellLevel1"]
-            player.spellLevel2 = self.original_stats[player.characterName]["spellLevel2"]
-            player.spellLevel3 = self.original_stats[player.characterName]["spellLevel3"]
-            player.spellLevel4 = self.original_stats[player.characterName]["spellLevel4"]
-            player.spellLevel5 = self.original_stats[player.characterName]["spellLevel5"]
-
     def run_round(self):
-        self.reset_players()
+        max_iterations = 1000  # Prevent infinite loops
+        iteration = 0
         while any(p.hp > 0 for p in self.friends) and any(p.hp > 0 for p in self.foes):
+            iteration += 1
+            if iteration > max_iterations:
+                return "Stalemate"
             for player in self.turn_order:
-                if player.hp <= player.hpMax/2: # If Player is Bloodied, set flag
-                    player.bloodied = 1
-                if player.hp > 0: # If Player is Alive
+                if player.hp > 0:  # If Player is Alive
                     enemy_team = self.foes if player in self.friends else self.friends
-                    if any(p.hp > 0 for p in enemy_team):
-                        bloodied_enemies = [p for p in enemy_team if p.hp > 0 and p.hp <= p.hpMax / 2] # Check if there are any bloodied enemies
-                        if bloodied_enemies:
-                            target = random.choice(bloodied_enemies)
-                        else:
-                            target = random.choice([p for p in enemy_team if p.hp > 0]) # If no bloodied enemies, choose a random target
+                    alive_enemies = [p for p in enemy_team if p.hp > 0]
+                    if alive_enemies:
+                        bloodied_enemies = [p for p in alive_enemies if p.hp <= p.hpMax / 2]
+                        target = random.choice(bloodied_enemies) if bloodied_enemies else random.choice(alive_enemies)
                         self.perform_actions(player, target)
                         if all(p.hp <= 0 for p in enemy_team):
                             return "Friends Win" if enemy_team == self.foes else "Foes Win"
 
     def perform_actions(self, player, opponent):
-        # Allow the player to choose and perform an ability
         abilities = self.player_abilities.get(player.characterID, [])
         if not abilities:
+            return
+
+        # Precompute usable abilities
+        usable_abilities = []
+        for ability in abilities:
+            if ability.spellLevel is None or ability.spellLevel == 0:
+                usable_abilities.append(ability)
+            elif ability.spellLevel is not None and self.has_spell_slot(player, ability.spellLevel):
+                usable_abilities.append(ability)
+
+        if not usable_abilities:
             return
 
         # Determine if there is a bloodied ally and if the player has a healing ability
         ally_team = self.friends if player in self.friends else self.foes
         bloodied_allies = [ally for ally in ally_team + [player] if ally.hp > 0 and ally.hp <= ally.hpMax / 2]
-        healing_abilities = [ability for ability in abilities if ability.healTag == 1]
-        attack_abilities = [ability for ability in abilities if ability.healTag == 0]
+        healing_abilities = [ability for ability in usable_abilities if ability.healTag == 1]
 
-        # If there is a bloodied ally and a healing ability is available, prioritize healing
+        # Prioritize "Second Wind" for self-healing
+        if player.hp <= player.hpMax / 2:
+            second_wind = next((ability for ability in healing_abilities if ability.abilityName.lower() == 'second wind'), None)
+            if second_wind and player.numHeals > 0:
+                self.perform_heal(player, player, second_wind)
+                return  
+
+        # If there are bloodied allies and healing abilities available, prioritize healing them
         if bloodied_allies and healing_abilities and (player.numHeals > 0):
-            if player.hp <= player.hpMax / 2:
-                for ability in healing_abilities:
-                    if ability.abilityName.lower() == 'second wind':
-                        self.perform_heal(player, ability)  # Use "Second Wind" to heal the player
-                        break
-            target_ally = random.choice(bloodied_allies)
-            chosen_ability = random.choice(healing_abilities)
-            self.perform_heal(target_ally, chosen_ability)
-        else:
-            # If no bloodied allies or no healing abilities, proceed with attacking the opponent
-            if attack_abilities:
-                usable_abilities = []
-                for ability in attack_abilities:
-                    if ability.spellLevel is None or ability.spellLevel == 0:
-                        usable_abilities.append(ability)
-                    elif ability.spellLevel is not None:
-                        if self.has_spell_slot(player, ability.spellLevel):
-                            usable_abilities.append(ability)
+            # Filter out "Second Wind" from healing abilities to prevent it from being used on allies
+            healing_abilities = [ability for ability in healing_abilities if ability.abilityName.lower() != 'second wind']
+            if healing_abilities:
+                target_ally = random.choice(bloodied_allies)
+                chosen_ability = random.choice(healing_abilities)
+                # Check if the ability requires a spell slot and expend it
+                if chosen_ability.spellLevel is not None and chosen_ability.spellLevel > 0:
+                    self.expend_spell_slot(player, chosen_ability.spellLevel)
+                self.perform_heal(player, target_ally, chosen_ability)
+                return 
 
-                if usable_abilities:
-                    chosen_ability = random.choice(usable_abilities)
-                    # Check if the ability requires a spell slot and expend it
-                    if chosen_ability.spellLevel is not None and chosen_ability.spellLevel > 0:
-                        self.expend_spell_slot(player, chosen_ability.spellLevel)
-                    self.perform_attack(player, opponent, chosen_ability)
-
-    def has_spell_slot(self, player, spell_level):
-        # Check if the player has an available spell slot of the required level or higher
-        for level in range(spell_level, 6):  # Check levels from spell_level up to 5
-            if level == 1 and player.spellLevel1 is not None and player.spellLevel1 > 0:
-                return True
-            elif level == 2 and player.spellLevel2 is not None and player.spellLevel2 > 0:
-                return True
-            elif level == 3 and player.spellLevel3 is not None and player.spellLevel3 > 0:
-                return True
-            elif level == 4 and player.spellLevel4 is not None and player.spellLevel4 > 0:
-                return True
-            elif level == 5 and player.spellLevel5 is not None and player.spellLevel5 > 0:
-                return True
-        return False
+        # If no bloodied allies or no healing abilities, proceed with attacking the opponent
+        attack_abilities = [ability for ability in usable_abilities if ability.healTag == 0]
+        if attack_abilities:
+            chosen_ability = random.choice(attack_abilities)
+            # Check if the ability requires a spell slot and expend it
+            if chosen_ability.spellLevel is not None and chosen_ability.spellLevel > 0:
+                self.expend_spell_slot(player, chosen_ability.spellLevel)
+            self.perform_attack(player, opponent, chosen_ability)
 
     def expend_spell_slot(self, player, spell_level):
         # Expend the appropriate spell slot based on the spell level
@@ -201,15 +231,67 @@ class CombatSimulation:
                     player.spellLevel5 -= 1
                 return
 
-    def perform_heal(self, player, ability):
+    def has_spell_slot(self, player, spell_level):
+        # Check if the player has an available spell slot of the required level or higher
+        for level in range(spell_level, 6):  # Check levels from spell_level up to 5
+            if level == 1 and player.spellLevel1 is not None and player.spellLevel1 > 0:
+                return True
+            elif level == 2 and player.spellLevel2 is not None and player.spellLevel2 > 0:
+                return True
+            elif level == 3 and player.spellLevel3 is not None and player.spellLevel3 > 0:
+                return True
+            elif level == 4 and player.spellLevel4 is not None and player.spellLevel4 > 0:
+                return True
+            elif level == 5 and player.spellLevel5 is not None and player.spellLevel5 > 0:
+                return True
+        return False
+
+    def perform_heal(self, player, ally, ability):
         # Perform a heal based on the chosen ability
-        heal_amount = sum(self.roll_dice(ability.firstNumDice, ability.firstDiceSize) for _ in range(1))
-        player.hp = min(player.hpMax, player.hp + heal_amount)
-        player.numHeals -= 1
+        heal_type = ability.meleeRangedAOE.lower()
+
+        if heal_type == 'melee':
+            # Melee heal: single target, must be in melee range
+            if ((abs(player.xloc) - ally.xloc) <= 1 and abs(player.yloc - ally.yloc) <= 1):
+                heal_amount = sum(self.roll_dice(ability.firstNumDice, ability.firstDiceSize) for _ in range(1))
+                if ability.secondNumDice is not None:
+                    heal_amount += sum(self.roll_dice(ability.secondNumDice, ability.secondDiceSize) for _ in range(1))  # Roll additional dice
+                heal_amount += ((player.mainScore - 10) // 2)
+                ally.hp = min(ally.hpMax, ally.hp + heal_amount)
+                ''' print(f"{player.characterName} heals {ally.characterName} for {heal_amount} using {ability.abilityName}!") '''
+                player.numHeals -= 1
+
+        elif heal_type == 'ranged':
+            # Ranged heal: single target, must be within range
+            distance = self.calculate_distance(player.xloc, player.yloc, ally.xloc, ally.yloc)
+            if distance <= ability.rangeOne:
+                heal_amount = sum(self.roll_dice(ability.firstNumDice, ability.firstDiceSize) for _ in range(1))
+                if ability.secondNumDice is not None:
+                    heal_amount += sum(self.roll_dice(ability.secondNumDice, ability.secondDiceSize) for _ in range(1))  # Roll additional dice
+                heal_amount += ((player.mainScore - 10) // 2)
+                ally.hp = min(ally.hpMax, ally.hp + heal_amount)
+                ''' print(f"{player.characterName} heals {ally.characterName} for {heal_amount} using {ability.abilityName}!") '''
+                player.numHeals -= 1
+
+        elif heal_type == 'aoe':
+            # AOE heal: heals allies within the given radius
+            ally_team = self.friends if player in self.friends else self.foes  # Determine ally team
+            for ally in ally_team:
+                distance = self.calculate_distance(player.xloc, player.yloc, ally.xloc, ally.yloc)
+                if distance <= ability.radius:
+                    heal_amount = sum(self.roll_dice(ability.firstNumDice, ability.firstDiceSize) for _ in range(1)) 
+                    if ability.secondNumDice is not None:
+                        heal_amount += sum(self.roll_dice(ability.secondNumDice, ability.secondDiceSize) for _ in range(1))  # Roll additional dice
+                    heal_amount += ((player.mainScore - 10) // 2)
+                    ally.hp = min(ally.hpMax, ally.hp + heal_amount)
+                    ''' print(f"{player.characterName} heals {ally.characterName} for {heal_amount} using {ability.abilityName}!") '''
+                    player.numHeals -= 1
+        else:
+            print(f"Unknown heal type: {heal_type}")
 
     def perform_attack(self, player, opponent, ability):
         # Perform an attack based on the chosen ability
-        attack_type = ability.meleeRangedAOE.lower()  # Get the attack type (melee, ranged, or AOE)
+        attack_type = ability.meleeRangedAOE.lower() 
 
         if attack_type == 'melee':
             # Melee attack: single target, must be in melee range
@@ -237,8 +319,7 @@ class CombatSimulation:
                 if enemy.hp > 0:  # Only target alive enemies
                     distance = self.calculate_distance(player.xloc, player.yloc, enemy.xloc, enemy.yloc)
                     if distance <= ability.radius:
-                        if ability.saveType:  # If the AOE requires a saving throw
-                            # Determine the appropriate saving throw modifier based on ability.saveType
+                        if ability.saveType: 
                             save_modifier = self.get_save_modifier(enemy, ability.saveType)
                             save_roll = self.roll_dice(1, 20) + save_modifier  # Enemy's saving throw
                             if save_roll >= ((player.mainScore - 10) // 2) + 10:  # Enemy succeeds on the save
