@@ -1,8 +1,7 @@
-# Import MonteCarloSimulation
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from MCDynamic import MonteCarloSimulation  # Adjust import based on actual file name
 from Classes import fetch_characters
 import time
-import random
 import pyodbc
 
 # Database connection details
@@ -18,7 +17,7 @@ def run_simulator(batch_id, encounter_id, players):
     try:
         if not players:
             print(f"ERROR: No players found for EncounterID: {encounter_id}")
-            return False
+            return False, None, None
         
         for char in players:
             print(f"Character: {char.characterName}, Class: {char.characterClass}, FriendFoe: {char.friendFoe}")
@@ -28,12 +27,16 @@ def run_simulator(batch_id, encounter_id, players):
         simulation.run_simulation()
         team1_wins, team2_wins = simulation.display_results()
 
+        print("\nFinal Results:")
+        print(f"Friends: {team1_wins} wins")
+        print(f"Foes: {team2_wins} wins")
+
         print(f"Simulation completed for BatchID: {batch_id}, EncounterID: {encounter_id}")
-        return True, team1_wins/100, team2_wins/100 # Success
+        return True, team1_wins / 100, team2_wins / 100  # Success
+    
     except Exception as e:
         print(f"Error in simulation for BatchID: {batch_id}, EncounterID: {encounter_id}: {e}")
         return False, None, None  # Failure
-
 
 # Database connection function
 def get_db_connection():
@@ -90,6 +93,45 @@ def update_encounter_history(connection, batch_id, encounter_id, account_id, tea
     cursor.execute(query, (batch_id, encounter_id, account_id, team1_wins, team2_wins))
     connection.commit()
 
+# Function to process a single batch
+def process_batch(batch):
+    batch_id, encounter_id = batch
+    connection = get_db_connection()
+
+    try:
+        # Fetch players for this encounter
+        players = fetch_characters(encounter_id)  # Fetch players once and pass them
+
+        # Update batch status to 'in progress'
+        print(f"Processing BatchID: {batch_id}, EncounterID: {encounter_id}")
+        update_batch_status(connection, batch_id, 'in progress')
+
+        # Run the simulator with fetched players
+        simulator_results, team1_wins, team2_wins = run_simulator(batch_id, encounter_id, players)
+        
+        if simulator_results:
+            update_batch_status(connection, batch_id, 'complete')
+            print(f"BatchID: {batch_id} marked as complete.")
+        else:
+            update_batch_status(connection, batch_id, 'failed')
+            print(f"BatchID: {batch_id} failed during simulation.")
+
+        # Get accountID associated with the encounterID
+        account_id = get_account_id(connection, encounter_id)
+        if not account_id:
+            print(f"Error: No accountID found for EncounterID: {encounter_id}")
+            update_batch_status(connection, batch_id, 'failed')
+            return
+
+        # Update encounterHistory with simulation results
+        update_encounter_history(connection, batch_id, encounter_id, account_id, team1_wins, team2_wins)
+
+    except Exception as e:
+        print(f"Error processing BatchID: {batch_id}: {e}")
+        update_batch_status(connection, batch_id, 'failed')
+    finally:
+        connection.close()
+
 # Main batch processor function
 def batch_processor():
     print("Batch Processor started. Waiting for enqueued batches...")
@@ -104,36 +146,15 @@ def batch_processor():
                 time.sleep(5)
                 continue
 
-            for batch in enqueued_batches:
-                batch_id, encounter_id = batch
-
-                # Fetch players for this encounter
-                players = fetch_characters(encounter_id)  # Fetch players once and pass them
-
-                # Update batch status to 'in progress'
-                print(f"Processing BatchID: {batch_id}, EncounterID: {encounter_id}")
-                update_batch_status(connection, batch_id, 'in progress')
-
-                # Run the simulator with fetched players
-                simulator_results, team1_wins, team2_wins = run_simulator(batch_id, encounter_id, players)
-                
-                if simulator_results:
-                    update_batch_status(connection, batch_id, 'complete')
-                    print(f"BatchID: {batch_id} marked as complete.")
-                else:
-                    update_batch_status(connection, batch_id, 'failed')
-                    print(f"BatchID: {batch_id} failed during simulation.")
-
-                # Get accountID associated with the encounterID
-                account_id = get_account_id(connection, encounter_id)
-                if not account_id:
-                    print(f"Error: No accountID found for EncounterID: {encounter_id}")
-                    update_batch_status(connection, batch_id, 'failed')
-                    continue
-
-                # Update encounterHistory with simulation results
-                
-                update_encounter_history(connection, batch_id, encounter_id, account_id, team1_wins, team2_wins)
+            # Use ProcessPoolExecutor to process batches in parallel
+            with ProcessPoolExecutor() as executor:
+                futures = {executor.submit(process_batch, batch): batch for batch in enqueued_batches}
+                for future in as_completed(futures):
+                    batch = futures[future]
+                    try:
+                        future.result()  # Ensure the process completed successfully
+                    except Exception as e:
+                        print(f"Error processing batch {batch}: {e}")
 
         except Exception as e:
             print(f"Error occurred: {e}")
@@ -142,5 +163,6 @@ def batch_processor():
                 connection.close()
 
         time.sleep(1)
+
 if __name__ == "__main__":
     batch_processor()
