@@ -1,11 +1,10 @@
 import random
-import copy
 from enum import Enum
-from typing import List
 from collections import defaultdict
-from tqdm import tqdm
 import pyodbc
 from multiprocessing import Pool
+import copy
+from multiprocessing import Manager
 
 def create_db_connection():
     DB_SERVER = 'database-1.c16m0yos4c9g.us-east-2.rds.amazonaws.com,1433'
@@ -43,7 +42,8 @@ class MonteCarloSimulation:
                 "spellLevel2": p.spellLevel2, 
                 "spellLevel3": p.spellLevel3, 
                 "spellLevel4": p.spellLevel4, 
-                "spellLevel5": p.spellLevel5
+                "spellLevel5": p.spellLevel5,
+                "deathSaves": {'success': 0, 'failure': 0}
             }
 
     def select_players(self):
@@ -83,6 +83,10 @@ class MonteCarloSimulation:
         return abilities
 
     def run_simulation(self):
+        # Use a Manager to create thread-safe data structures
+        manager = Manager()
+        results = manager.list()  # Thread-safe list to store results
+
         # Prepare data for multiprocessing
         simulation_data = {
             "friends": self.friends,
@@ -93,8 +97,9 @@ class MonteCarloSimulation:
 
         # Use multiprocessing to parallelize simulations
         with Pool() as pool:
-            results = pool.map(run_single_simulation, [simulation_data] * self.num_simulations)
-        
+            pool.starmap(run_single_simulation, [(simulation_data, results) for _ in range(self.num_simulations)])
+
+        # Aggregate results
         for winner in results:
             self.results[winner] += 1
         self.display_results()
@@ -107,13 +112,14 @@ class MonteCarloSimulation:
         # Return the win counts so you can send them back to the database
         return friends_wins, foes_wins
 
-def run_single_simulation(simulation_data):
-    friends = simulation_data["friends"]
-    foes = simulation_data["foes"]
+def run_single_simulation(simulation_data, results):
+    # Deep copy the players to avoid data bleed
+    friends = copy.deepcopy(simulation_data["friends"])
+    foes = copy.deepcopy(simulation_data["foes"])
     player_abilities = simulation_data["player_abilities"]
     original_stats = simulation_data["original_stats"]
 
-    # Reset players
+    # Reset players using the deep-copied data
     for player in friends + foes:
         player.hp = original_stats[player.characterName]["hp"]
         player.numHeals = original_stats[player.characterName]["numHeals"]
@@ -122,9 +128,11 @@ def run_single_simulation(simulation_data):
         player.spellLevel3 = original_stats[player.characterName]["spellLevel3"]
         player.spellLevel4 = original_stats[player.characterName]["spellLevel4"]
         player.spellLevel5 = original_stats[player.characterName]["spellLevel5"]
+        player.deathSaves = {'success': 0, 'failure': 0}
 
     simulation = CombatSimulation(friends, foes, player_abilities)
-    return simulation.run_round()
+    winner = simulation.run_round()
+    results.append(winner)  # Store the result in the shared list
     
 class CombatSimulation:
     def __init__(self, friends, foes, player_abilities):
@@ -132,21 +140,28 @@ class CombatSimulation:
         self.foes = foes
         self.player_abilities = player_abilities  # Use pre-fetched abilities
         
-        # Sort turn order by dexScore
-        self.turn_order = self.roll_initiative(friends + foes)
+        # Sort turn order by initiative (include both friends and foes)
+        self.turn_order, self.initiative_rolls = self.roll_initiative(friends + foes)
+        self.print_initiative_order()
 
     def roll_initiative(self, players):
-        initiative_rolls = []
+        initiative_rolls = {}
         for player in players:
             roll = self.roll_dice(1, 20)  # Roll 1d20
             dex_modifier = (player.dexScore - 10) // 2  # Calculate Dexterity modifier
             initiative = roll + dex_modifier
-            initiative_rolls.append((player, initiative))
+            initiative_rolls[player] = initiative
 
         # Sort players by initiative in descending order
-        sorted_players = sorted(initiative_rolls, key=lambda x: x[1], reverse=True)
-        return [player for player, _ in sorted_players]
-
+        sorted_players = sorted(initiative_rolls.keys(), key=lambda x: initiative_rolls[x], reverse=True)
+        return sorted_players, initiative_rolls
+    
+    def print_initiative_order(self):
+        print("Initiative Order:")
+        for i, player in enumerate(self.turn_order):
+            print(f"{i + 1}. {player.characterName} (Initiative: {self.initiative_rolls[player]})")
+        print("\n")
+    
     def run_round(self):
         max_iterations = 1000  # Prevent infinite loops
         iteration = 0
@@ -154,6 +169,8 @@ class CombatSimulation:
             iteration += 1
             if iteration > max_iterations:
                 return "Stalemate"
+            
+            # Iterate through the turn_order list once per round
             for player in self.turn_order:
                 if player.hp > 0:  # If Player is Alive
                     enemy_team = self.foes if player in self.friends else self.friends
@@ -163,12 +180,75 @@ class CombatSimulation:
                         target = random.choice(bloodied_enemies) if bloodied_enemies else random.choice(alive_enemies)
                         self.perform_actions(player, target)
                         if all(p.hp <= 0 for p in enemy_team):
-                            return "Friends Win" if enemy_team == self.foes else "Foes Win"
+                            if enemy_team == self.foes:
+                                print("Friends Win! :D\n")
+                                return "Friends Win"
+                            else:
+                                print("Foes Win :(\n")
+                                return "Foes Win"
+                    else:
+                        print(f"No alive enemies for {player.characterName} to target.")
+                elif player.hp == 0 and player in self.friends:  # If Player is Unconscious (only for friends)
+                    can_take_turn = self.handle_death_saves(player)
+                    if can_take_turn:
+                        # Allow the player to take their turn
+                        enemy_team = self.foes if player in self.friends else self.friends
+                        alive_enemies = [p for p in enemy_team if p.hp > 0]
+                        if alive_enemies:
+                            bloodied_enemies = [p for p in alive_enemies if p.hp <= p.hpMax / 2]
+                            target = random.choice(bloodied_enemies) if bloodied_enemies else random.choice(alive_enemies)
+                            self.perform_actions(player, target)
+                            if all(p.hp <= 0 for p in enemy_team):
+                                if enemy_team == self.foes:
+                                    print("Friends Win! :D\n")
+                                    return "Friends Win"
+                                else:
+                                    print("Foes Win :(\n")
+                                    return "Foes Win"
+                else:
+                    print(f"{player.characterName} is unconscious or dead and cannot take a turn.")
+            # End of round
+            print("End of round.\n")
+                            
+    def handle_death_saves(self, player):
+        # Perform a death save
+        death_save_roll = self.roll_dice(1, 20)
+        if death_save_roll == 20:
+            # Critical success: regain 1 HP
+            player.hp = 1
+            player.deathSaves = {'success': 0, 'failure': 0}
+            print(f"{player.characterName} critically succeeds on a death save and regains 1 HP!")
+            return True  # Indicate that the player can take their turn
+        elif death_save_roll >= 10:
+            # Success
+            player.deathSaves['success'] += 1
+            print(f"{player.characterName} succeeds on a death save! (Successes: {player.deathSaves['success']}, Failures: {player.deathSaves['failure']})")
+        elif death_save_roll == 1:
+            # Critical failure: count as two failures
+            player.deathSaves['failure'] += 2
+            print(f"{player.characterName} critically fails on a death save! (Successes: {player.deathSaves['success']}, Failures: {player.deathSaves['failure']})")
+        else:
+            # Failure
+            player.deathSaves['failure'] += 1
+            print(f"{player.characterName} fails on a death save! (Successes: {player.deathSaves['success']}, Failures: {player.deathSaves['failure']})")
+
+        # Check if the player has stabilized or died
+        if player.deathSaves['success'] >= 3:
+            player.hp = 1  # Stabilized
+            player.deathSaves = {'success': 0, 'failure': 0}
+            print(f"{player.characterName} has stabilized!")
+        elif player.deathSaves['failure'] >= 3:
+            player.hp = -1  # Dead
+            print(f"{player.characterName} has died...")
+        return False  # Indicate that the player cannot take their turn
 
     def perform_actions(self, player, opponent):
         abilities = self.player_abilities.get(player.characterID, [])
         if not abilities:
             return
+        
+        action_used = False
+        bonus_action_used = False
 
         # Precompute usable abilities
         usable_abilities = []
@@ -183,15 +263,21 @@ class CombatSimulation:
 
         # Determine if there is a bloodied ally and if the player has a healing ability
         ally_team = self.friends if player in self.friends else self.foes
-        bloodied_allies = [ally for ally in ally_team + [player] if ally.hp > 0 and ally.hp <= ally.hpMax / 2]
+        bloodied_allies = [ally for ally in ally_team + [player] if ally.hp >= 0 and ally.hp <= ally.hpMax / 2]
         healing_abilities = [ability for ability in usable_abilities if ability.healTag == 1]
+        attack_abilities = [ability for ability in usable_abilities if ability.healTag == 0]
+
+        # Seperate usable abilities into action and bonus actions
+        action_abilities = [ability for ability in attack_abilities if ability.actionType.lower() == "action"]
+        bonus_action_abilities = [ability for ability in attack_abilities if ability.actionType.lower() == "bonus"]
 
         # Prioritize "Second Wind" for self-healing
         if player.hp <= player.hpMax / 2:
             second_wind = next((ability for ability in healing_abilities if ability.abilityName.lower() == 'second wind'), None)
-            if second_wind and player.numHeals > 0:
+            if second_wind and player.numHeals > 0 and not bonus_action_used:
                 self.perform_heal(player, player, second_wind)
-                return  
+                bonus_action_used = True
+                player.numHeals -= 1  
 
         # If there are bloodied allies and healing abilities available, prioritize healing them
         if bloodied_allies and healing_abilities and (player.numHeals > 0):
@@ -200,20 +286,34 @@ class CombatSimulation:
             if healing_abilities:
                 target_ally = random.choice(bloodied_allies)
                 chosen_ability = random.choice(healing_abilities)
-                # Check if the ability requires a spell slot and expend it
-                if chosen_ability.spellLevel is not None and chosen_ability.spellLevel > 0:
-                    self.expend_spell_slot(player, chosen_ability.spellLevel)
-                self.perform_heal(player, target_ally, chosen_ability)
-                return 
+                if chosen_ability.actionType.lower() == "bonus" and not bonus_action_used:
+                    if chosen_ability.spellLevel is not None and chosen_ability.spellLevel > 0:
+                        self.expend_spell_slot(player, chosen_ability.spellLevel)
+                    self.perform_heal(player, target_ally, chosen_ability)
+                    bonus_action_used = True
+
+                elif chosen_ability.actionType.lower() == "action" and not action_used:
+                    if chosen_ability.spellLevel is not None and chosen_ability.spellLevel > 0:
+                        self.expend_spell_slot(player, chosen_ability.spellLevel)
+                    self.perform_heal(player, target_ally, chosen_ability)
+                    action_used = True
 
         # If no bloodied allies or no healing abilities, proceed with attacking the opponent
-        attack_abilities = [ability for ability in usable_abilities if ability.healTag == 0]
-        if attack_abilities:
-            chosen_ability = random.choice(attack_abilities)
+        if bonus_action_abilities and not bonus_action_used:
+            chosen_ability = random.choice(bonus_action_abilities)
             # Check if the ability requires a spell slot and expend it
             if chosen_ability.spellLevel is not None and chosen_ability.spellLevel > 0:
                 self.expend_spell_slot(player, chosen_ability.spellLevel)
             self.perform_attack(player, opponent, chosen_ability)
+            bonus_action_used = True
+
+        if action_abilities and not action_used:
+            chosen_ability = random.choice(action_abilities)
+            # Check if the ability requires a spell slot and expend it
+            if chosen_ability.spellLevel is not None and chosen_ability.spellLevel > 0:
+                self.expend_spell_slot(player, chosen_ability.spellLevel)
+            self.perform_attack(player, opponent, chosen_ability)
+            action_used = True
 
     def expend_spell_slot(self, player, spell_level):
         # Expend the appropriate spell slot based on the spell level
@@ -257,8 +357,11 @@ class CombatSimulation:
                 if ability.secondNumDice is not None:
                     heal_amount += sum(self.roll_dice(ability.secondNumDice, ability.secondDiceSize) for _ in range(1))  # Roll additional dice
                 heal_amount += ((player.mainScore - 10) // 2)
+                oldHp = ally.hp
                 ally.hp = min(ally.hpMax, ally.hp + heal_amount)
-                ''' print(f"{player.characterName} heals {ally.characterName} for {heal_amount} using {ability.abilityName}!") '''
+                if ally.hp > 0 and ally.deathSaves:  # Reset death saves if healed
+                    ally.deathSaves = {'success': 0, 'failure': 0}
+                print(f"{player.characterName} heals {ally.characterName} for {heal_amount} using {ability.abilityName}! Health goes from {oldHp} to {ally.hp}") 
                 player.numHeals -= 1
 
         elif heal_type == 'ranged':
@@ -269,8 +372,11 @@ class CombatSimulation:
                 if ability.secondNumDice is not None:
                     heal_amount += sum(self.roll_dice(ability.secondNumDice, ability.secondDiceSize) for _ in range(1))  # Roll additional dice
                 heal_amount += ((player.mainScore - 10) // 2)
+                oldHp = ally.hp
                 ally.hp = min(ally.hpMax, ally.hp + heal_amount)
-                ''' print(f"{player.characterName} heals {ally.characterName} for {heal_amount} using {ability.abilityName}!") '''
+                if ally.hp > 0 and ally.deathSaves:  # Reset death saves if healed
+                    ally.deathSaves = {'success': 0, 'failure': 0}
+                print(f"{player.characterName} heals {ally.characterName} for {heal_amount} using {ability.abilityName}! Health goes from {oldHp} to {ally.hp}") 
                 player.numHeals -= 1
 
         elif heal_type == 'aoe':
@@ -283,8 +389,11 @@ class CombatSimulation:
                     if ability.secondNumDice is not None:
                         heal_amount += sum(self.roll_dice(ability.secondNumDice, ability.secondDiceSize) for _ in range(1))  # Roll additional dice
                     heal_amount += ((player.mainScore - 10) // 2)
+                    oldHp = ally.hp
                     ally.hp = min(ally.hpMax, ally.hp + heal_amount)
-                    ''' print(f"{player.characterName} heals {ally.characterName} for {heal_amount} using {ability.abilityName}!") '''
+                    if ally.hp > 0 and ally.deathSaves:  # Reset death saves if healed
+                        ally.deathSaves = {'success': 0, 'failure': 0}
+                    print(f"{player.characterName} heals {ally.characterName} for {heal_amount} using {ability.abilityName}! Health goes from {oldHp} to {ally.hp}") 
                     player.numHeals -= 1
         else:
             print(f"Unknown heal type: {heal_type}")
@@ -299,7 +408,12 @@ class CombatSimulation:
                 attack_roll = self.roll_dice(1, 20) + ((player.mainScore - 10) // 2)  # Use main ability modifier
                 if attack_roll >= opponent.ac:
                     damage = self.calculate_damage(ability, player)
+                    oldHp = opponent.hp
                     opponent.hp -= damage
+                    if opponent.hp < 0: opponent.hp = 0
+                    print(f"{player.characterName} attacks {opponent.characterName} for {damage} using {ability.abilityName}! Health goes from {oldHp} to {opponent.hp}")
+                else:
+                    print(f"{player.characterName} misses {opponent.characterName} using {ability.abilityName}!") 
 
         elif attack_type == 'ranged':
             # Ranged attack: single target, must be within range
@@ -308,12 +422,19 @@ class CombatSimulation:
                 attack_roll = self.roll_dice(1, 20) + ((player.mainScore - 10) // 2)  # Use main ability modifier
                 if attack_roll >= opponent.ac:
                     damage = self.calculate_damage(ability, player)
+                    oldHp = opponent.hp
                     opponent.hp -= damage
+                    if opponent.hp < 0: opponent.hp = 0
+                    print(f"{player.characterName} attacks {opponent.characterName} for {damage} using {ability.abilityName}! Health goes from {oldHp} to {opponent.hp}")
+                else:
+                    print(f"{player.characterName} misses {opponent.characterName} using {ability.abilityName}!")  
 
         elif attack_type == 'aoe':
             # AOE attack: targets enemies, but allies in the radius are also affected
             enemy_team = self.foes if player in self.friends else self.friends  # Determine enemy team
             ally_team = self.friends if player in self.friends else self.foes  # Determine ally team
+
+            base_damage = self.calculate_damage(ability, player)
 
             for enemy in enemy_team:
                 if enemy.hp > 0:  # Only target alive enemies
@@ -323,16 +444,19 @@ class CombatSimulation:
                             save_modifier = self.get_save_modifier(enemy, ability.saveType)
                             save_roll = self.roll_dice(1, 20) + save_modifier  # Enemy's saving throw
                             if save_roll >= ((player.mainScore - 10) // 2) + 10:  # Enemy succeeds on the save
-                                damage = self.calculate_damage(ability, player) // 2  # Half damage on save
+                                damage = base_damage // 2  # Half damage on save
                             else:  # Enemy fails the save
-                                damage = self.calculate_damage(ability, player)
+                                damage = base_damage
                         else:  # No saving throw required
-                            damage = self.calculate_damage(ability, player)
+                            damage = base_damage
+                        oldHp = enemy.hp
                         enemy.hp -= damage
+                        if enemy.hp < 0: enemy.hp = 0
+                        print(f"{player.characterName} attacks {enemy.characterName} for {damage} using {ability.abilityName}! Health goes from {oldHp} to {enemy.hp}") 
 
             # Then, check for allies in the radius and apply effects if necessary
             for ally in ally_team:
-                if ally.hp > 0:  # Only target alive allies
+                if ally.hp > 0 and ally != player:  # Only target alive allies
                     distance = self.calculate_distance(player.xloc, player.yloc, ally.xloc, ally.yloc)
                     if distance <= ability.radius:
                         if ability.saveType:  # If the AOE requires a saving throw
@@ -340,12 +464,15 @@ class CombatSimulation:
                             save_modifier = self.get_save_modifier(ally, ability.saveType)
                             save_roll = self.roll_dice(1, 20) + save_modifier  # Ally's saving throw
                             if save_roll >= ((player.mainScore - 10) // 2) + 10:  # Ally succeeds on the save
-                                damage = self.calculate_damage(ability, player) // 2  # Half damage on save
+                                damage = base_damage // 2  # Half damage on save
                             else:  # Ally fails the save
-                                damage = self.calculate_damage(ability, player)
+                                damage = base_damage
                         else:  # No saving throw required
-                            damage = self.calculate_damage(ability, player)
+                            damage = base_damage
+                        oldHp = ally.hp
                         ally.hp -= damage
+                        if ally.hp < 0: ally.hp = 0
+                        print(f"Oops! {player.characterName} attacks {ally.characterName} for {damage} using {ability.abilityName}! Health goes from {oldHp} to {ally.hp}") 
 
         else:
             print(f"Unknown attack type: {attack_type}")
