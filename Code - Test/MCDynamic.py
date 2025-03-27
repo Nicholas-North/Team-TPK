@@ -561,7 +561,7 @@ class CombatSimulation:
         print(f"{player.characterName} moves towards {target.characterName}. Now at ({player.xloc}, {player.yloc}).")
 
     def move_away(self, player, target, max_movement):
-        """Moves the player away from the target."""
+       
         dx = player.xloc - target.xloc
         dy = player.yloc - target.yloc
         step_x = 1 if dx > 0 else -1 if dx < 0 else 0
