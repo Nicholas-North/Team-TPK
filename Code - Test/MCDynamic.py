@@ -155,12 +155,14 @@ def run_single_simulation(simulation_data, results):
     results.append(winner)  # Store the result in the shared list
     
 class CombatSimulation:
+    GRID_SIZE = 15 
     def __init__(self, friends, foes, player_abilities):
         self.friends = friends
         self.foes = foes
         self.player_abilities = player_abilities  # Use pre-fetched abilities
         
         # Sort turn order by initiative (include both friends and foes)
+        self.initialize_positions()
         self.turn_order, self.initiative_rolls = self.roll_initiative(friends + foes)
         self.print_initiative_order()
 
@@ -175,6 +177,18 @@ class CombatSimulation:
         # Sort players by initiative in descending order
         sorted_players = sorted(initiative_rolls.keys(), key=lambda x: initiative_rolls[x], reverse=True)
         return sorted_players, initiative_rolls
+   
+    def initialize_positions(self):
+        """Randomly assign each character a starting position on the grid."""
+        occupied_positions = set()
+        for player in self.friends + self.foes:
+            while True:
+                x = random.randint(0, self.GRID_SIZE - 1)
+                y = random.randint(0, self.GRID_SIZE - 1)
+                if (x, y) not in occupied_positions:
+                    player.xloc, player.yloc = x, y
+                    occupied_positions.add((x, y))
+                    break
     
     def print_initiative_order(self):
         print("Initiative Order:")
@@ -193,6 +207,7 @@ class CombatSimulation:
             # Iterate through the turn_order list once per round
             for player in self.turn_order:
                 if player.hp > 0:  # If Player is Alive
+                    self.move_character(player)
                     enemy_team = self.foes if player in self.friends else self.friends
                     alive_enemies = [p for p in enemy_team if p.hp > 0]
                     if alive_enemies:
@@ -417,6 +432,29 @@ class CombatSimulation:
                     player.numHeals -= 1
         else:
             print(f"Unknown heal type: {heal_type}")
+            
+            
+            
+    def move_character(self, player):
+        
+        enemy_team = self.foes if player in self.friends else self.friends
+        target = self.find_closest_enemy(player, enemy_team)
+        
+        if not target:
+            return  # No enemies left
+        
+        distance = self.calculate_distance(player.xloc, player.yloc, target.xloc, target.yloc)
+        max_movement = player.movementSpeed // 5  # Speed in feet, grid is 5 ft per square
+        
+        if player.hp >= 0 and player.hp <= player.hpMax / 2:
+            if distance < 5:  
+                self.move_away(player, target, max_movement)
+            else:
+                print(f"{player.characterName} stays at range.")
+        else:  
+            self.move_towards(player, target, max_movement)
+            
+                    
 
     def perform_attack(self, player, opponent, ability):
         # Perform an attack based on the chosen ability
@@ -500,6 +538,43 @@ class CombatSimulation:
     def calculate_distance(self, x1, y1, x2, y2):
         # Calculate the distance between two points using Euclidean distance
         return ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
+    
+    def find_closest_enemy(self, player, enemy_team):
+        alive_enemies = [enemy for enemy in enemy_team if enemy.hp > 0]
+        if not alive_enemies:
+            return None
+        return min(alive_enemies, key=lambda enemy: self.calculate_distance(player.xloc, player.yloc, enemy.xloc, enemy.yloc))
+
+    
+    def move_towards(self, player, target, max_movement):
+        dx = target.xloc - player.xloc
+        dy = target.yloc - player.yloc
+        step_x = 1 if dx > 0 else -1 if dx < 0 else 0
+        step_y = 1 if dy > 0 else -1 if dy < 0 else 0
+        
+        for _ in range(max_movement):
+            if self.calculate_distance(player.xloc + step_x, player.yloc + step_y, target.xloc, target.yloc) < self.calculate_distance(player.xloc, player.yloc, target.xloc, target.yloc):
+                player.xloc += step_x
+                player.yloc += step_y
+            else:
+                break  
+        print(f"{player.characterName} moves towards {target.characterName}. Now at ({player.xloc}, {player.yloc}).")
+
+    def move_away(self, player, target, max_movement):
+        """Moves the player away from the target."""
+        dx = player.xloc - target.xloc
+        dy = player.yloc - target.yloc
+        step_x = 1 if dx > 0 else -1 if dx < 0 else 0
+        step_y = 1 if dy > 0 else -1 if dy < 0 else 0
+        
+        for _ in range(max_movement):
+            new_x = player.xloc + step_x
+            new_y = player.yloc + step_y
+            if 0 <= new_x < self.GRID_SIZE and 0 <= new_y < self.GRID_SIZE:
+                player.xloc = new_x
+                player.yloc = new_y
+        print(f"{player.characterName} moves away from {target.characterName}. Now at ({player.xloc}, {player.yloc}).")
+
 
     def calculate_damage(self, ability, player):
         # Calculate damage for an ability
