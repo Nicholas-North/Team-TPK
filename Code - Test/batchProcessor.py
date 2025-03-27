@@ -23,7 +23,7 @@ def run_simulator(batch_id, encounter_id, players):
             print(f"Character: {char.characterName}, Class: {char.characterClass}, FriendFoe: {char.friendFoe}")
 
         # Pass players directly to the simulation
-        simulation = MonteCarloSimulation(num_simulations=10000, players=players)
+        simulation = MonteCarloSimulation(num_simulations=10000, players=players, encounter_id=encounter_id)
         simulation.run_simulation()
         team1_wins, team2_wins = simulation.display_results()
 

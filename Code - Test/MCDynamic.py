@@ -20,12 +20,12 @@ class ActionType(Enum):
     BonusAction = 3
 
 class MonteCarloSimulation:
-    def __init__(self, num_simulations, players):
+    def __init__(self, num_simulations, players, encounter_id):
         self.num_simulations = num_simulations
         self.results = defaultdict(int)
         self.players = players
         self.friends, self.foes = self.select_players()  
-        self.grid_xdim, self.grid_ydim = self.fetch_encounter_dimensions()
+        self.grid_xdim, self.grid_ydim = self.fetch_encounter_dimensions(encounter_id)
 
         # Fetch all player abilities before starting multiprocessing
         self.player_abilities = self.fetch_all_player_abilities()
@@ -63,12 +63,16 @@ class MonteCarloSimulation:
 
         return friends, foes
     
-    def fetch_encounter_dimensions(self):
+    def fetch_encounter_dimensions(self, encounter_id):
        # Fetch grid dimensions
         db_connection = create_db_connection()
         cursor = db_connection.cursor()
         try:
-            cursor.execute("SELECT xdim, ydim FROM encounter.encounter LIMIT 1")
+            query = """
+                SELECT xdim, ydim FROM encounter.encounter 
+                WHERE encounter.encounterID = ?
+            """
+            cursor.execute(query, (encounter_id))
             result = cursor.fetchone()
             if result:
                 return result.xdim, result.ydim
