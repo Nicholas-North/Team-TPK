@@ -24,8 +24,9 @@ class MonteCarloSimulation:
         self.num_simulations = num_simulations
         self.results = defaultdict(int)
         self.players = players
-        self.friends, self.foes = self.select_players()
-        
+        self.friends, self.foes = self.select_players()  
+        self.grid_xdim, self.grid_ydim = self.fetch_encounter_dimensions()
+
         # Fetch all player abilities before starting multiprocessing
         self.player_abilities = self.fetch_all_player_abilities()
         
@@ -62,6 +63,21 @@ class MonteCarloSimulation:
 
         return friends, foes
     
+    def fetch_encounter_dimensions(self):
+       # Fetch grid dimensions
+        db_connection = create_db_connection()
+        cursor = db_connection.cursor()
+        try:
+            cursor.execute("SELECT xdim, ydim FROM encounter.encounter LIMIT 1")
+            result = cursor.fetchone()
+            if result:
+                return result.xdim, result.ydim
+            else:
+                # Return default dimensions if no encounter found
+                return 15, 15  # Default grid size
+        finally:
+            db_connection.close()
+
     def fetch_all_player_abilities(self):
         db_connection = create_db_connection()  # Create a temporary connection
         cursor = db_connection.cursor()
