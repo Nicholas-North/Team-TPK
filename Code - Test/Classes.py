@@ -108,7 +108,8 @@ class Player:
     def __init__(self, characterID, accountID, characterName, characterClass, ancestry, hp, hpMax, ac, movementSpeed, charLevel, mainScore,
                  strScore, dexScore, conScore, intScore, wisScore, chaScore, attackCount, canHeal, numHeals,
                  proficiencyBonus, strSaveProf, dexSaveProf, conSaveProf, intSaveProf, wisSaveProf, chaSaveProf,
-                 spellLevel1, spellLevel2, spellLevel3, spellLevel4, spellLevel5, friendFoe, numDice, diceSize, xloc, yloc, bloodied, deathSaves):
+                 spellLevel1, spellLevel2, spellLevel3, spellLevel4, spellLevel5, friendFoe, numDice, diceSize, xloc, yloc, 
+                 bloodied, deathSaves, hasAdvantage, hasDisadvantage):
         self.characterID = characterID
         self.accountID = accountID
         self.characterName = characterName
@@ -148,7 +149,8 @@ class Player:
         self.yloc = yloc  # Y-coordinate from encounterPosition
         self.bloodied = bloodied
         self.deathSaves = deathSaves
-
+        self.hasAdvantage = hasAdvantage
+        self.hasDisadvantage = hasDisadvantage
         
         self.templates = []  # List of templates the player can use
         
@@ -229,7 +231,9 @@ def fetch_characters(encounter_id):
                 xloc=row.xloc,  # X-coordinate from encounterPosition
                 yloc=row.yloc,   # Y-coordinate from encounterPosition
                 bloodied=0,
-                deathSaves=0
+                deathSaves=0,
+                hasAdvantage=False,
+                hasDisadvantage=False
             )
             players.append(player)
 
