@@ -25,16 +25,17 @@ def run_simulator(batch_id, encounter_id, players):
         # Pass players directly to the simulation
         simulation = MonteCarloSimulation(num_simulations=10000, players=players, encounter_id=encounter_id)
         simulation.run_simulation()
-        team1_wins, team2_wins, round_counts = simulation.display_results()
+        team1_wins, team2_wins, round_counts, overall_mvp = simulation.display_results()
         round_counts = round(round_counts, 2)
 
         print("\nFinal Results:")
         print(f"Friends: {team1_wins} wins")
         print(f"Foes: {team2_wins} wins")
         print(f"Average number of rounds: {round_counts}")
+        print(f"Overall Team MVP: {overall_mvp}")
 
-        print(f"Simulation completed for BatchID: {batch_id}, EncounterID: {encounter_id}")
-        return True, team1_wins / 100, team2_wins / 100, round_counts  # Success
+        print(f"\nSimulation completed for BatchID: {batch_id}, EncounterID: {encounter_id}")
+        return True, team1_wins / 100, team2_wins / 100, round_counts, overall_mvp  # Success
     
     except Exception as e:
         print(f"Error in simulation for BatchID: {batch_id}, EncounterID: {encounter_id}: {e}")
@@ -86,13 +87,13 @@ def get_account_id(connection, encounter_id):
     return row[0] if row else None
 
 # Function to insert into encounterHistory
-def update_encounter_history(connection, batch_id, encounter_id, account_id, team1_wins, team2_wins, round_counts):
+def update_encounter_history(connection, batch_id, encounter_id, account_id, team1_wins, team2_wins, round_counts, overall_mvp):
     cursor = connection.cursor()
     query = """
-        INSERT INTO encounter.encounterHistory (batchID, encounterID, accountID, team1Wins, team2Wins, roundCounts)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO encounter.encounterHistory (batchID, encounterID, accountID, team1Wins, team2Wins, roundCounts, overallMVP)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     """
-    cursor.execute(query, (batch_id, encounter_id, account_id, team1_wins, team2_wins, round_counts))
+    cursor.execute(query, (batch_id, encounter_id, account_id, team1_wins, team2_wins, round_counts, overall_mvp))
     connection.commit()
 
 # Function to process a single batch
@@ -109,7 +110,7 @@ def process_batch(batch):
         update_batch_status(connection, batch_id, 'in progress')
 
         # Run the simulator with fetched players
-        simulator_results, team1_wins, team2_wins, round_counts = run_simulator(batch_id, encounter_id, players)
+        simulator_results, team1_wins, team2_wins, round_counts, overall_mvp = run_simulator(batch_id, encounter_id, players)
         
         if simulator_results:
             update_batch_status(connection, batch_id, 'complete')
@@ -126,7 +127,7 @@ def process_batch(batch):
             return
 
         # Update encounterHistory with simulation results
-        update_encounter_history(connection, batch_id, encounter_id, account_id, team1_wins, team2_wins, round_counts)
+        update_encounter_history(connection, batch_id, encounter_id, account_id, team1_wins, team2_wins, round_counts, overall_mvp)
 
     except Exception as e:
         print(f"Error processing BatchID: {batch_id}: {e}")

@@ -27,19 +27,21 @@ class MonteCarloSimulation:
         self.players = players
         self.friends, self.foes = self.select_players()  
         self.grid_xdim, self.grid_ydim = self.fetch_encounter_dimensions(encounter_id)
+        
+        # Initialize MVP tracking
+        self.mvp_points = defaultdict(int)  # Tracks total points across all simulations
+        self.mvp_counts = defaultdict(int)  # Tracks how many times each player was MVP
 
-        # Fetch all player abilities before starting multiprocessing
+        # Fetch all player abilities
         self.player_abilities = self.fetch_all_player_abilities()
         
         # Precompute original stats for resetting players
         self.original_stats = {}
         for p in self.friends + self.foes:
-            # Calculate numHeals based on abilities with healTag == 1
             numHeals = sum(1 for ability in self.player_abilities.get(p.characterID, []) if ability.healTag == 1)
-            
             self.original_stats[p.characterName] = {
                 "hp": p.hp, 
-                "numHeals": numHeals,  # Updated to be calculated based on healTag
+                "numHeals": numHeals,
                 "spellLevel1": p.spellLevel1, 
                 "spellLevel2": p.spellLevel2, 
                 "spellLevel3": p.spellLevel3, 
@@ -47,7 +49,6 @@ class MonteCarloSimulation:
                 "spellLevel5": p.spellLevel5,
                 "deathSaves": {'success': 0, 'failure': 0}
             }
-
     def select_players(self):
         # Automatically assigns players to Friends or Foes based on player.friendFoe (0 = Friend, 1 = Foe)
         friends = [player for player in self.players if player.friendFoe == 0]  # Friends
@@ -106,12 +107,11 @@ class MonteCarloSimulation:
         return abilities
 
     def run_simulation(self):
-        # Use a Manager to create thread-safe data structures
         manager = Manager()
-        results = manager.list()  # Thread-safe list to store results
+        results = manager.list()
         round_counts = manager.list()
+        mvp_points_list = manager.list()
 
-        # Prepare data for multiprocessing
         simulation_data = {
             "friends": self.friends,
             "foes": self.foes,
@@ -121,9 +121,10 @@ class MonteCarloSimulation:
             "grid_ydim": self.grid_ydim
         }
 
-        # Use multiprocessing to parallelize simulations
         with Pool() as pool:
-            pool.starmap(run_single_simulation, [(simulation_data, results, round_counts) for _ in range(self.num_simulations)])
+            pool.starmap(run_single_simulation, 
+                        [(simulation_data, results, round_counts, mvp_points_list) 
+                         for _ in range(self.num_simulations)])
 
         # Aggregate results
         for winner in results:
@@ -131,17 +132,34 @@ class MonteCarloSimulation:
 
         if round_counts:
             self.total_rounds = sum(round_counts) / len(round_counts)
+            
+        # Aggregate MVP points
+        for mvp_dict in mvp_points_list:
+            for player_name, points in mvp_dict.items():
+                self.mvp_points[player_name] += points
+                
+        # Determine MVP for this batch of simulations
+        if self.mvp_points:
+            max_points = max(self.mvp_points.values())
+            mvps = [name for name, points in self.mvp_points.items() if points == max_points]
+            for mvp in mvps:
+                self.mvp_counts[mvp] += 1
+                
         self.display_results()
+
 
     def display_results(self):
         # Retrieve wins from the results dictionary (defaulting to 0 if not present)
         friends_wins = self.results.get("Friends Win", 0)
         foes_wins = self.results.get("Foes Win", 0)
 
-        # Return the win counts so you can send them back to the database
-        return friends_wins, foes_wins, self.total_rounds
+        # Determine overall MVP (player with most MVP counts)
+        overall_mvp =  max(self.mvp_counts.items(), key=lambda x: x[1])[0] if self.mvp_counts else None
 
-def run_single_simulation(simulation_data, results, round_counts):
+        # Return the win counts so you can send them back to the database
+        return friends_wins, foes_wins, self.total_rounds, overall_mvp
+
+def run_single_simulation(simulation_data, results, round_counts, mvp_points_list):
     # Deep copy the players to avoid data bleed
     friends = copy.deepcopy(simulation_data["friends"])
     foes = copy.deepcopy(simulation_data["foes"])
@@ -162,9 +180,10 @@ def run_single_simulation(simulation_data, results, round_counts):
         player.deathSaves = {'success': 0, 'failure': 0}
 
     simulation = CombatSimulation(friends, foes, player_abilities, grid_xdim, grid_ydim)
-    winner, numRounds = simulation.run_round()
+    winner, numRounds, mvp_points = simulation.run_round()
     results.append(winner)
     round_counts.append(numRounds)
+    mvp_points_list.append(mvp_points)
 
 class CombatSimulation:
     def __init__(self, friends, foes, player_abilities, grid_xdim=15, grid_ydim=15):
@@ -173,10 +192,19 @@ class CombatSimulation:
         self.player_abilities = player_abilities
         self.grid_xdim = grid_xdim
         self.grid_ydim = grid_ydim
+        self.mvp_points = defaultdict(int) 
         
         self.initialize_positions()
         self.turn_order, self.initiative_rolls = self.roll_initiative(friends + foes)
         self.print_initiative_order()
+
+    def award_mvp_point(self, player):
+        if player in self.friends:  # Only award to friendly players
+            self.mvp_points[player.characterName] += 1
+
+    def take_mvp_point(self, player):
+        if player in self.friends:  # Only take from friendly players
+            self.mvp_points[player.characterName] -= 1      
 
     def roll_initiative(self, players):
         initiative_rolls = {}
@@ -217,7 +245,8 @@ class CombatSimulation:
         while any(p.hp > 0 for p in self.friends) and any(p.hp > 0 for p in self.foes):
             iteration += 1
             if iteration > max_iterations:
-                return "Stalemate", 0
+                mvp_name = max(self.mvp_points.items(), key=lambda x: x[1])[0] if self.mvp_points else None
+                return "Stalemate", 0, {mvp_name: 1} if mvp_name else {}
             
             # Iterate through the turn_order list once per round
             for player in self.turn_order:
@@ -227,14 +256,20 @@ class CombatSimulation:
                     if alive_enemies:
                         bloodied_enemies = [p for p in alive_enemies if p.hp <= p.hpMax / 2]
                         target = random.choice(bloodied_enemies) if bloodied_enemies else random.choice(alive_enemies)
-                        self.perform_actions(player, target)
-                        if all(p.hp <= 0 for p in enemy_team):
+                        action_result = self.perform_actions(player, target)
+                        if action_result in ["Friends Win", "Foes Win"]:
+                            mvp_name = max(self.mvp_points.items(), key=lambda x: x[1])[0] if self.mvp_points else None
+                            if action_result == "Friends Win": print("Friends Win! :D \n")
+                            elif action_result == "Foes Win": print("Foes Win :( \n")
+                            return action_result, iteration, dict(self.mvp_points)
+                        elif all(p.hp <= 0 for p in enemy_team):
+                            mvp_name = max(self.mvp_points.items(), key=lambda x: x[1])[0] if self.mvp_points else None
                             if enemy_team == self.foes:
-                                print("Friends Win! :D\n")
-                                return "Friends Win", iteration
+                                print("Friends Win! :D \n")
+                                return "Friends Win", iteration, dict(self.mvp_points)
                             else:
-                                print("Foes Win :(\n")
-                                return "Foes Win", iteration
+                                print("Foes Win! :( \n")
+                                return "Foes Win", iteration, dict(self.mvp_points)
                     else:
                         print(f"No alive enemies for {player.characterName} to target.")
                 elif player.hp == 0 and player in self.friends:  # If Player is Unconscious (only for friends)
@@ -246,14 +281,16 @@ class CombatSimulation:
                         if alive_enemies:
                             bloodied_enemies = [p for p in alive_enemies if p.hp <= p.hpMax / 2]
                             target = random.choice(bloodied_enemies) if bloodied_enemies else random.choice(alive_enemies)
-                            self.perform_actions(player, target)
-                            if all(p.hp <= 0 for p in enemy_team):
+                            action_result = self.perform_actions(player, target)
+                            if action_result in ["Friends Win", "Foes Win"]:
+                                mvp_name = max(self.mvp_points.items(), key=lambda x: x[1])[0] if self.mvp_points else None
+                                return action_result, iteration, dict(self.mvp_points)
+                            elif all(p.hp <= 0 for p in enemy_team):
+                                mvp_name = max(self.mvp_points.items(), key=lambda x: x[1])[0] if self.mvp_points else None
                                 if enemy_team == self.foes:
-                                    print("Friends Win! :D\n")
-                                    return "Friends Win", iteration
+                                    return "Friends Win", iteration, dict(self.mvp_points)
                                 else:
-                                    print("Foes Win :(\n")
-                                    return "Foes Win", iteration
+                                    return "Foes Win", iteration, dict(self.mvp_points)
                 else:
                     print(f"{player.characterName} is unconscious or dead and cannot take a turn.")
             # End of round
@@ -294,7 +331,9 @@ class CombatSimulation:
     def perform_actions(self, player, opponent):
 
         # Move the current player
-        self.move_character(player)
+        move_result = self.move_character(player)
+        if move_result in ["Friends Win", "Foes Win"]:
+            return move_result
 
         # Check if the player is flanking and give advantage if so
         if (not player.hasAdvantage and not player.hasDisadvantage and self.check_flanking(player, opponent)):
@@ -372,7 +411,7 @@ class CombatSimulation:
                 # Calculate average enemy perception (passive Perception)
                 active_enemies = [e for e in (self.foes if player in self.friends else self.friends) if e.hp > 0]
                 if active_enemies:
-                    avg_perception = sum((e.wisScore - 10) // 2 + 10 for e in active_enemies) / len(active_enemies)
+                    avg_perception = sum((e.wisScore - 10) // 2 + 10 for e in active_enemies) // len(active_enemies)
                     stealth_roll = self.roll_dice(1, 20) + ((player.dexScore - 10) // 2)  # Dexterity (Stealth) check
                     
                     if stealth_roll > avg_perception:
@@ -452,6 +491,8 @@ class CombatSimulation:
                 ally.hp = min(ally.hpMax, ally.hp + heal_amount)
                 if ally.hp > 0 and ally.deathSaves:  # Reset death saves if healed
                     ally.deathSaves = {'success': 0, 'failure': 0}
+                if oldHp == 0:
+                    self.award_mvp_point(player)
                 print(f"{player.characterName} heals {ally.characterName} for {heal_amount} using {ability.abilityName}! Health goes from {oldHp} to {ally.hp}") 
                 player.numHeals -= 1
 
@@ -467,6 +508,8 @@ class CombatSimulation:
                 ally.hp = min(ally.hpMax, ally.hp + heal_amount)
                 if ally.hp > 0 and ally.deathSaves:  # Reset death saves if healed
                     ally.deathSaves = {'success': 0, 'failure': 0}
+                if oldHp == 0:
+                    self.award_mvp_point(player)
                 print(f"{player.characterName} heals {ally.characterName} for {heal_amount} using {ability.abilityName}! Health goes from {oldHp} to {ally.hp}") 
                 player.numHeals -= 1
 
@@ -484,6 +527,8 @@ class CombatSimulation:
                     ally.hp = min(ally.hpMax, ally.hp + heal_amount)
                     if ally.hp > 0 and ally.deathSaves:  # Reset death saves if healed
                         ally.deathSaves = {'success': 0, 'failure': 0}
+                    if oldHp == 0:
+                        self.award_mvp_point(player)
                     print(f"{player.characterName} heals {ally.characterName} for {heal_amount} using {ability.abilityName}! Health goes from {oldHp} to {ally.hp}") 
                     player.numHeals -= 1
         else:
@@ -493,6 +538,22 @@ class CombatSimulation:
     def move_character(self, player):
         
         enemy_team = self.foes if player in self.friends else self.friends
+        ally_team = self.friends if player in self.friends else self.foes
+        
+        # Check if player is the last conscious member of their team
+        conscious_allies = [ally for ally in ally_team if ally != player and ally.hp > 0]
+        if not conscious_allies and player in self.friends:  # Player is the last conscious member
+            
+            # 50/50 chance to flee or make final stand
+            if random.random() < 0.5:  # Flee
+                print(f"{player.characterName} chooses to flee from combat!")
+                player.hp = 0  # Mark as dead/fled
+                # Return the appropriate win condition
+                if player in self.friends:
+                    return "Foes Win"
+                else:
+                    return "Friends Win"
+                    
         target = self.find_closest_enemy(player, enemy_team)
         
         if not target:
@@ -501,7 +562,9 @@ class CombatSimulation:
         distance = self.calculate_distance(player.xloc, player.yloc, target.xloc, target.yloc)
         max_movement = player.movementSpeed // 5  # Speed in feet, grid is 5 ft per square
         if player in self.friends:
-            if player.hp >= 0 and player.hp <= player.hpMax / 2:
+            if not conscious_allies:
+                self.move_towards(player, target, max_movement)
+            elif player.hp >= 0 and player.hp <= player.hpMax / 4:
                 if distance < 5:  
                     self.move_away(player, target, max_movement)
                 else:
@@ -511,7 +574,6 @@ class CombatSimulation:
         # Men go in        
         elif player in self.foes:
             self.move_towards(player, target, max_movement)
-
 
 
     def perform_attack(self, player, opponent, ability):
@@ -540,6 +602,8 @@ class CombatSimulation:
                     oldHp = opponent.hp
                     opponent.hp -= damage
                     if opponent.hp < 0: opponent.hp = 0
+                    if opponent.hp == 0:
+                        self.award_mvp_point(player)
                     print(f"{player.characterName} attacks {opponent.characterName} for {damage} using {ability.abilityName}! Health goes from {oldHp} to {opponent.hp}")
                 else:
                     print(f"{player.characterName} misses {opponent.characterName} using {ability.abilityName}!") 
@@ -567,6 +631,8 @@ class CombatSimulation:
                     oldHp = opponent.hp
                     opponent.hp -= damage
                     if opponent.hp < 0: opponent.hp = 0
+                    if opponent.hp == 0:
+                        self.award_mvp_point(player)
                     print(f"{player.characterName} attacks {opponent.characterName} for {damage} using {ability.abilityName}! Health goes from {oldHp} to {opponent.hp}")
                 else:
                     print(f"{player.characterName} misses {opponent.characterName} using {ability.abilityName}!")
@@ -590,6 +656,8 @@ class CombatSimulation:
                     oldHp = opponent.hp
                     opponent.hp -= damage
                     if opponent.hp < 0: opponent.hp = 0
+                    if opponent.hp == 0:
+                        self.award_mvp_point(player)
                     print(f"{player.characterName} attacks {opponent.characterName} for {damage} using {ability.abilityName} at long range! Health goes from {oldHp} to {opponent.hp}")
                 else:
                     print(f"{player.characterName} misses {opponent.characterName} using {ability.abilityName} at long range!")
@@ -617,6 +685,8 @@ class CombatSimulation:
                         oldHp = enemy.hp
                         enemy.hp -= damage
                         if enemy.hp < 0: enemy.hp = 0
+                        if enemy.hp == 0:
+                            self.award_mvp_point(player)
                         print(f"{player.characterName} attacks {enemy.characterName} for {damage} using {ability.abilityName}! Health goes from {oldHp} to {enemy.hp}") 
 
             # Then, check for allies in the radius and apply effects if necessary
@@ -637,6 +707,8 @@ class CombatSimulation:
                         oldHp = ally.hp
                         ally.hp -= damage
                         if ally.hp < 0: ally.hp = 0
+                        if ally.hp == 0:
+                            self.take_mvp_point(player)
                         print(f"Oops! {player.characterName} attacks {ally.characterName} for {damage} using {ability.abilityName}! Health goes from {oldHp} to {ally.hp}") 
 
         else:
@@ -726,8 +798,7 @@ class CombatSimulation:
         potential_flankers = [
             ally for ally in ally_team 
             if ally != player and ally.hp > 0 and 
-            abs(ally.xloc - opponent.xloc) <= 1 and 
-            abs(ally.yloc - opponent.yloc) <= 1
+            self.calculate_distance(ally.xloc, ally.yloc, opponent.xloc, opponent.yloc) <= 1.5  # 1.5 covers diagonal distances
         ]
         
         for ally in potential_flankers:
@@ -737,11 +808,21 @@ class CombatSimulation:
             ally_dx = ally.xloc - opponent.xloc
             ally_dy = ally.yloc - opponent.yloc
             
-            # Check if player and ally are on opposite sides
-            # Either x-axis opposite or y-axis opposite
-            if ((player_dx * ally_dx < 0 and abs(player_dy) <= 1 and abs(ally_dy) <= 1) or   # Opposite x
-                (player_dy * ally_dy < 0 and abs(player_dx) <= 1 and abs(ally_dx) <= 1) or   # Opposite y
-                (player_dx * ally_dx < 0 and player_dy * ally_dy < 0)):                      # Opposite diagonal
+            # Normalize to -1, 0, or 1 for direction
+            norm_player_dx = 0 if player_dx == 0 else (1 if player_dx > 0 else -1)
+            norm_player_dy = 0 if player_dy == 0 else (1 if player_dy > 0 else -1)
+            norm_ally_dx = 0 if ally_dx == 0 else (1 if ally_dx > 0 else -1)
+            norm_ally_dy = 0 if ally_dy == 0 else (1 if ally_dy > 0 else -1)
+            
+            # Check for opposite sides (180°)
+            if (norm_player_dx == -norm_ally_dx and norm_player_dy == -norm_ally_dy):
+                return True
+                
+            # Check for perpendicular flanking (90°)
+            if ((abs(norm_player_dx) == 1 and abs(norm_ally_dy) == 1 and 
+                norm_player_dx == -norm_ally_dy) or
+                (abs(norm_player_dy) == 1 and abs(norm_ally_dx) == 1 and 
+                norm_player_dy == -norm_ally_dx)):
                 return True
         
         return False
