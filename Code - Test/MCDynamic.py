@@ -180,7 +180,10 @@ def run_single_simulation(simulation_data, results, round_counts, mvp_points_lis
         player.deathSaves = {'success': 0, 'failure': 0}
 
     simulation = CombatSimulation(friends, foes, player_abilities, grid_xdim, grid_ydim)
-    winner, numRounds, mvp_points = simulation.run_round()
+    result = simulation.run_round()
+    if result is None:
+        result = ("Stalemate", 0, {})
+    winner, numRounds, mvp_points = result
     results.append(winner)
     round_counts.append(numRounds)
     mvp_points_list.append(mvp_points)
@@ -245,8 +248,7 @@ class CombatSimulation:
         while any(p.hp > 0 for p in self.friends) and any(p.hp > 0 for p in self.foes):
             iteration += 1
             if iteration > max_iterations:
-                mvp_name = max(self.mvp_points.items(), key=lambda x: x[1])[0] if self.mvp_points else None
-                return "Stalemate", 0, {mvp_name: 1} if mvp_name else {}
+                return ("Stalemate", 0, dict(self.mvp_points))
             
             # Iterate through the turn_order list once per round
             for player in self.turn_order:
@@ -258,12 +260,10 @@ class CombatSimulation:
                         target = random.choice(bloodied_enemies) if bloodied_enemies else random.choice(alive_enemies)
                         action_result = self.perform_actions(player, target)
                         if action_result in ["Friends Win", "Foes Win"]:
-                            mvp_name = max(self.mvp_points.items(), key=lambda x: x[1])[0] if self.mvp_points else None
                             if action_result == "Friends Win": print("Friends Win! :D \n")
                             elif action_result == "Foes Win": print("Foes Win :( \n")
                             return action_result, iteration, dict(self.mvp_points)
                         elif all(p.hp <= 0 for p in enemy_team):
-                            mvp_name = max(self.mvp_points.items(), key=lambda x: x[1])[0] if self.mvp_points else None
                             if enemy_team == self.foes:
                                 print("Friends Win! :D \n")
                                 return "Friends Win", iteration, dict(self.mvp_points)
@@ -283,10 +283,8 @@ class CombatSimulation:
                             target = random.choice(bloodied_enemies) if bloodied_enemies else random.choice(alive_enemies)
                             action_result = self.perform_actions(player, target)
                             if action_result in ["Friends Win", "Foes Win"]:
-                                mvp_name = max(self.mvp_points.items(), key=lambda x: x[1])[0] if self.mvp_points else None
                                 return action_result, iteration, dict(self.mvp_points)
                             elif all(p.hp <= 0 for p in enemy_team):
-                                mvp_name = max(self.mvp_points.items(), key=lambda x: x[1])[0] if self.mvp_points else None
                                 if enemy_team == self.foes:
                                     return "Friends Win", iteration, dict(self.mvp_points)
                                 else:
@@ -295,6 +293,7 @@ class CombatSimulation:
                     print(f"{player.characterName} is unconscious or dead and cannot take a turn.")
             # End of round
             print("End of round.\n")
+        return "Stalemate", iteration, dict(self.mvp_points)
                             
     def handle_death_saves(self, player):
         # Perform a death save
@@ -342,7 +341,7 @@ class CombatSimulation:
 
         abilities = self.player_abilities.get(player.characterID, [])
         if not abilities:
-            return
+            return None
         
         action_used = False
         bonus_action_used = False
@@ -356,7 +355,30 @@ class CombatSimulation:
                 usable_abilities.append(ability)
 
         if not usable_abilities:
-            return
+            return None
+        
+        # Check if player has any valid targets in range
+        enemy_team = self.foes if player in self.friends else self.friends
+        alive_enemies = [e for e in enemy_team if e.hp > 0]
+        if not alive_enemies:
+            return None
+
+        # Find closest enemy and check range
+        closest_enemy = self.find_closest_enemy(player, enemy_team)
+        distance = self.calculate_distance(player.xloc, player.yloc, closest_enemy.xloc, closest_enemy.yloc)
+        
+        # Check if any abilities are in range
+        has_ability_in_range = any(
+            self.is_ability_in_range(player, closest_enemy, ability) 
+            for ability in abilities
+            if ability.actionType.lower() in ["action", "bonus"]
+        )
+
+        # If no abilities in range and not in melee, use Dash action
+        if not has_ability_in_range and distance > 1.5 and not self.check_flanking(player, closest_enemy):
+            print(f"{player.characterName} is out of range and uses Dash!")
+            self.move_character(player)  # Move again with doubled speed
+            action_used = True
 
         # Determine if there is a bloodied ally and if the player has a healing ability
         ally_team = self.friends if player in self.friends else self.foes
@@ -416,9 +438,9 @@ class CombatSimulation:
                     
                     if stealth_roll > avg_perception:
                         player.hasAdvantage = True
-                        print(f"{player.characterName} successfully hides (Stealth: {stealth_roll} vs Perception: {avg_perception:.1f}) and gains advantage!")
+                        print(f"{player.characterName} successfully hides (Stealth: {stealth_roll} vs Perception: {avg_perception}) and gains advantage!")
                     else:
-                        print(f"{player.characterName} fails to hide (Stealth: {stealth_roll} vs Perception: {avg_perception:.1f})")
+                        print(f"{player.characterName} fails to hide (Stealth: {stealth_roll} vs Perception: {avg_perception})")
             else:
                 # Check if the ability requires a spell slot and expend it
                 if chosen_ability.spellLevel is not None and chosen_ability.spellLevel > 0:
@@ -557,7 +579,7 @@ class CombatSimulation:
         target = self.find_closest_enemy(player, enemy_team)
         
         if not target:
-            return  # No enemies left
+            return None # No enemies left
         
         distance = self.calculate_distance(player.xloc, player.yloc, target.xloc, target.yloc)
         max_movement = player.movementSpeed // 5  # Speed in feet, grid is 5 ft per square
@@ -579,24 +601,35 @@ class CombatSimulation:
     def perform_attack(self, player, opponent, ability):
         # Perform an attack based on the chosen ability
         attack_type = ability.meleeRangedAOE.lower() 
+        is_critical = False
 
         if attack_type == 'melee':
             # Melee attack: single target, must be in melee range
             distance = self.calculate_distance(player.xloc, player.yloc, opponent.xloc, opponent.yloc)
             if distance <= 1.5:
                 if player.hasAdvantage and not player.hasDisadvantage:
-                    attack_roll = self.roll_with_advantage() + ((player.mainScore - 10) // 2)
+                    attack_roll = self.roll_with_advantage()
                 elif player.hasDisadvantage and not player.hasAdvantage:
-                    attack_roll = self.roll_with_disadvantage() + ((player.mainScore - 10) // 2)
+                    attack_roll = self.roll_with_disadvantage()
                 else:  # Normal roll or both advantage and disadvantage cancel out
-                    attack_roll = self.roll_dice(1, 20) + ((player.mainScore - 10) // 2)
+                    attack_roll = self.roll_dice(1, 20) 
+
+                if attack_roll == 20:
+                    is_critical = True
+                
+                attack_roll += ((player.mainScore - 10) // 2)
 
                 if attack_roll >= opponent.ac:
-                    damage = self.calculate_damage(ability, player)
+                    if is_critical == True:
+                        damage = self.calculate_crit(ability, player)
+                        print(f"Wowza!! {player.characterName} lands a critical attack!!")
+                    else:
+                        damage = self.calculate_damage(ability, player)
                     # Checks to see if the player has sneak attack
                     if (self.has_sneak_attack(player) and (player.hasAdvantage or self.is_ally_adjacent_to_enemy(player, opponent))):
                         sneak_attack_dice = max(1, (player.charLevel) // 2)  # Ensure at least 1 die
                         sneak_damage = self.roll_dice(sneak_attack_dice, 6)
+                        if is_critical: sneak_damage += self.roll_dice(sneak_attack_dice, 6) # Sneak attack damage also doubled on a crit
                         damage += sneak_damage
                         print(f"{player.characterName} lands a Sneak Attack for an additional {sneak_damage} damage!")
                     oldHp = opponent.hp
@@ -613,18 +646,28 @@ class CombatSimulation:
             distance = self.calculate_distance(player.xloc, player.yloc, opponent.xloc, opponent.yloc)
             if distance <= (ability.rangeOne // 5):
                 if player.hasAdvantage and not player.hasDisadvantage:
-                    attack_roll = self.roll_with_advantage() + ((player.mainScore - 10) // 2)
+                    attack_roll = self.roll_with_advantage()
                 elif player.hasDisadvantage and not player.hasAdvantage:
-                    attack_roll = self.roll_with_disadvantage() + ((player.mainScore - 10) // 2)
+                    attack_roll = self.roll_with_disadvantage()
                 else:  # Normal roll or both advantage and disadvantage cancel out
-                    attack_roll = self.roll_dice(1, 20) + ((player.mainScore - 10) // 2)
+                    attack_roll = self.roll_dice(1, 20) 
+
+                if attack_roll == 20:
+                    is_critical = True
+
+                attack_roll += ((player.mainScore - 10) // 2)
 
                 if attack_roll >= opponent.ac:
-                    damage = self.calculate_damage(ability, player)
+                    if is_critical == True:
+                        damage = self.calculate_crit(ability, player)
+                        print(f"Wowza!! {player.characterName} lands a critical attack!!")
+                    else:
+                        damage = self.calculate_damage(ability, player)
                     # Checks to see if the player has sneak attack
                     if (self.has_sneak_attack(player) and (player.hasAdvantage or self.is_ally_adjacent_to_enemy(player, opponent))):
                         sneak_attack_dice = max(1, (player.charLevel) // 2)  # Ensure at least 1 die
                         sneak_damage = self.roll_dice(sneak_attack_dice, 6)
+                        if is_critical: sneak_damage += self.roll_dice(sneak_attack_dice, 6) # Sneak attack damage also doubled on a crit
                         damage += sneak_damage
                         print(f"{player.characterName} lands a Sneak Attack for an additional {sneak_damage} damage!")
                         
@@ -640,16 +683,26 @@ class CombatSimulation:
             elif ability.rangeTwo is not None and (distance <= (ability.rangeTwo // 5)):
                 player.hasDisadvantage = True
                 if player.hasAdvantage:
-                    attack_roll = self.roll_dice(1, 20) + ((player.mainScore - 10) // 2) # If player has advantage, cancels out
+                    attack_roll = self.roll_dice(1, 20) # If player has advantage, cancels out
                 else:
-                    attack_roll = self.roll_with_disadvantage() + ((player.mainScore - 10) // 2) # Attacks at long range with disadvantage
+                    attack_roll = self.roll_with_disadvantage() # Attacks at long range with disadvantage
+
+                if attack_roll == 20:
+                    is_critical = True
+
+                attack_roll += ((player.mainScore - 10) // 2)    
 
                 if attack_roll >= opponent.ac:
-                    damage = self.calculate_damage(ability, player)
+                    if is_critical == True:
+                        damage = self.calculate_crit(ability, player)
+                        print(f"Wowza!! {player.characterName} lands a critical attack!!")
+                    else:
+                        damage = self.calculate_damage(ability, player)
                     # Checks to see if the player has sneak attack
                     if (self.has_sneak_attack(player) and self.is_ally_adjacent_to_enemy(player, opponent)):
                         sneak_attack_dice = max(1, (player.charLevel) // 2)  # Ensure at least 1 die
                         sneak_damage = self.roll_dice(sneak_attack_dice, 6)
+                        if is_critical: sneak_damage += self.roll_dice(sneak_attack_dice, 6) # Sneak attack damage also doubled on a crit
                         damage += sneak_damage
                         print(f"{player.characterName} lands a Sneak Attack for an additional {sneak_damage} damage!")
                         
@@ -723,6 +776,21 @@ class CombatSimulation:
         if not alive_enemies:
             return None
         return min(alive_enemies, key=lambda enemy: self.calculate_distance(player.xloc, player.yloc, enemy.xloc, enemy.yloc))
+    
+    def is_ability_in_range(self, player, target, ability):
+        distance = self.calculate_distance(player.xloc, player.yloc, target.xloc, target.yloc)
+        attack_type = ability.meleeRangedAOE.lower()
+
+        if attack_type == 'melee':
+            return distance <= 1.5  # 5ft melee range
+        elif attack_type == 'ranged':
+            if distance <= (ability.rangeOne // 5):  # Normal range
+                return True
+            elif ability.rangeTwo and distance <= (ability.rangeTwo // 5):  # Long range
+                return True
+        elif attack_type == 'aoe':
+            return distance <= (ability.radius // 5)
+        return False
     
     def move_towards(self, player, target, max_movement):
         occupied_positions = {(p.xloc, p.yloc) for p in self.friends + self.foes if p != player}
@@ -832,6 +900,14 @@ class CombatSimulation:
         damage = sum(self.roll_dice(ability.firstNumDice, ability.firstDiceSize) for _ in range(1))  # Roll dice
         if ability.secondNumDice is not None:
             damage += sum(self.roll_dice(ability.secondNumDice, ability.secondDiceSize) for _ in range(1))  # Roll additional dice
+        damage += ((player.mainScore - 10) // 2)  # Add main modifier to damage
+        return damage
+    
+    def calculate_crit(self, ability, player):
+        self.award_mvp_point(player)
+        damage = sum(self.roll_dice(ability.firstNumDice * 2, ability.firstDiceSize) for _ in range(1))  # Roll dice
+        if ability.secondNumDice is not None:
+            damage += sum(self.roll_dice(ability.secondNumDice * 2, ability.secondDiceSize) for _ in range(1))  # Roll additional dice
         damage += ((player.mainScore - 10) // 2)  # Add main modifier to damage
         return damage
 
