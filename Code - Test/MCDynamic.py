@@ -229,7 +229,7 @@ class CombatSimulation:
         
         for player in self.friends + self.foes:
             attempts = 0
-            while attempts < 100:  # Prevent infinite loops
+            while attempts < 50:  # Prevent infinite loops
                 x = random.randint(1, self.grid_xdim)
                 y = random.randint(1, self.grid_ydim)
                 
@@ -247,7 +247,7 @@ class CombatSimulation:
                     
                 attempts += 1
             
-            if attempts >= 100:
+            if attempts >= 50:
                 # Fallback to any position if can't find valid one
                 while True:
                     x = random.randint(1, self.grid_xdim)
@@ -463,7 +463,20 @@ class CombatSimulation:
 
         # ===== OFFENSIVE ACTIONS =====
         # Get all offensive abilities
-        offensive_abilities = [a for a in usable_abilities if a.healTag == 0 and a.actionType.lower() in ["action", "bonus"]]
+        offensive_abilities = []
+        for a in usable_abilities:
+            if a.healTag == 0 and a.actionType.lower() in ["action", "bonus"]:
+                # Calculate damage potential (dice count * dice size)
+                damage_potential = 0
+                if a.firstNumDice is not None and a.firstDiceSize is not None:
+                    damage_potential += a.firstNumDice * a.firstDiceSize
+                if a.secondNumDice is not None and a.secondDiceSize is not None:
+                    damage_potential += a.secondNumDice * a.secondDiceSize
+                offensive_abilities.append((a, damage_potential))
+
+        # Sort abilities by damage potential (highest first)
+        offensive_abilities.sort(key=lambda x: x[1], reverse=True)
+        offensive_abilities = [a[0] for a in offensive_abilities]  # Remove damage scores
 
         # Check if any offensive abilities are in range
         has_offensive_in_range = any(
@@ -477,20 +490,32 @@ class CombatSimulation:
             move_result = self.move_character(player, target_enemy)
             if move_result in ["Friends Win", "Foes Win"]:
                 return move_result
+            if (player.xloc, player.yloc) != old_pos:
+                print(f"{player.characterName} moves toward enemy {target_enemy.characterName}")
+                return None
 
-        # Try bonus actions first
+        # Try bonus actions first (prioritizing higher damage)
         if not bonus_action_used:
             bonus_actions = [a for a in offensive_abilities if a.actionType.lower() == "bonus"]
             
             valid_bonus_actions = []
             for ability in bonus_actions:
                 if ability.abilityName.lower() == "hide":
-                    valid_bonus_actions.append(ability)
+                    # Keep Hide as valid option but with lower priority
+                    valid_bonus_actions.append((ability, 0))  # 0 damage potential
                 elif self.is_ability_in_range(player, target_enemy, ability):
-                    valid_bonus_actions.append(ability)
+                    # Calculate damage potential for sorting
+                    damage_potential = 0
+                    if ability.firstNumDice is not None and ability.firstDiceSize is not None:
+                        damage_potential += ability.firstNumDice * ability.firstDiceSize
+                    if ability.secondNumDice is not None and ability.secondDiceSize is not None:
+                        damage_potential += ability.secondNumDice * ability.secondDiceSize
+                    valid_bonus_actions.append((ability, damage_potential))
             
             if valid_bonus_actions:
-                chosen_ability = random.choice(valid_bonus_actions)
+                # Sort by damage potential (highest first)
+                valid_bonus_actions.sort(key=lambda x: x[1], reverse=True)
+                chosen_ability = valid_bonus_actions[0][0]  # Take highest damage option
                 
                 # Handle Hide action separately
                 if chosen_ability.abilityName.lower() == "hide":
@@ -516,14 +541,24 @@ class CombatSimulation:
                 
                 bonus_action_used = True
 
-        # Then standard actions
+        # Then standard actions (prioritizing higher damage)
         if not action_used:
-            actions = [a for a in offensive_abilities 
-                    if a.actionType.lower() == "action" and
-                    self.is_ability_in_range(player, target_enemy, a)]
+            actions = []
+            for ability in offensive_abilities:
+                if (ability.actionType.lower() == "action" and self.is_ability_in_range(player, target_enemy, ability)):
+                    # Calculate damage potential for sorting
+                    damage_potential = 0
+                    if ability.firstNumDice is not None and ability.firstDiceSize is not None:
+                        damage_potential += ability.firstNumDice * ability.firstDiceSize
+                    if ability.secondNumDice is not None and ability.secondDiceSize is not None:
+                        damage_potential += ability.secondNumDice * ability.secondDiceSize
+                    actions.append((ability, damage_potential))
             
             if actions:
-                chosen_ability = random.choice(actions)
+                # Sort by damage potential (highest first)
+                actions.sort(key=lambda x: x[1], reverse=True)
+                chosen_ability = actions[0][0]  # Take highest damage option
+                
                 if chosen_ability.spellLevel is not None and chosen_ability.spellLevel > 0:
                     self.expend_spell_slot(player, chosen_ability.spellLevel)
                 
@@ -799,7 +834,8 @@ class CombatSimulation:
             base_damage = self.calculate_damage(ability, player)
             
             # Get AOE shape if specified (default to sphere if not specified)
-            aoe_shape = getattr(ability, 'coneLineSphere', 'Sphere').lower()
+            if ability.coneLineSphere is not None:
+                aoe_shape = getattr(ability, 'coneLineSphere', 'Sphere').lower()
             
             # Check if target opponent is within range
             target_distance = self.calculate_distance(player.xloc, player.yloc, opponent.xloc, opponent.yloc)
@@ -951,6 +987,8 @@ class CombatSimulation:
     def is_ability_in_range(self, player, target, ability):
         distance = self.calculate_distance(player.xloc, player.yloc, target.xloc, target.yloc)
         attack_type = ability.meleeRangedAOE.lower()
+        if ability.coneLineSphere is not None:
+            aoe_shape = getattr(ability, 'coneLineSphere', 'sphere').lower()
 
         if attack_type == 'melee':
             return distance <= 1.5  # 5ft melee range
@@ -969,9 +1007,35 @@ class CombatSimulation:
                 return True
             return False
         
-        elif attack_type == 'aoe':
-            radius = ability.radius // 5 if ability.radius is not None else 0
-            return distance <= radius
+        if attack_type == 'aoe':
+            range_one = ability.rangeOne // 5 if ability.rangeOne is not None else 0
+            
+            # Check if within maximum range
+            if distance > range_one:
+                return False
+                
+            # Sphere AOE (radius around caster)
+            if aoe_shape == 'sphere':
+                radius = ability.radius // 5 if ability.radius is not None else 0
+                return distance <= radius
+                
+            # Cone AOE (60 degree arc)
+            elif aoe_shape == 'cone':
+                angle = self.calculate_angle(
+                    player.xloc, player.yloc,
+                    player.xloc + 1, player.yloc,  # Reference direction (east)
+                    target.xloc, target.yloc
+                )
+                return abs(angle) <= 30  # 30 degrees each side
+                
+            # Line AOE (straight path)
+            elif aoe_shape == 'line':
+                return self.is_in_line(
+                    player.xloc, player.yloc,
+                    player.xloc + (target.xloc - player.xloc) * 2,  # Extend line
+                    player.yloc + (target.yloc - player.yloc) * 2,
+                    target.xloc, target.yloc
+                )
     
     def move_towards(self, player, target, max_movement):
         occupied_positions = {(p.xloc, p.yloc) for p in self.friends + self.foes if p != player}
@@ -1032,7 +1096,7 @@ class CombatSimulation:
                 print(f"{player.characterName} moves towards {target.characterName}. Now at ({player.xloc}, {player.yloc}).")
             else:
                 break  # Can't get closer
-        
+
         # Return whether movement actually occurred
         return moved
 
@@ -1104,7 +1168,7 @@ class CombatSimulation:
                 print(f"{player.characterName} moves away from {target.characterName}. Now at ({player.xloc}, {player.yloc})")
             else:
                 break  # No valid movement
-        
+
         return moved
 
     def is_ally_adjacent_to_enemy(self, player, opponent):
