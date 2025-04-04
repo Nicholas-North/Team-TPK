@@ -7,6 +7,7 @@ from multiprocessing import Pool
 import copy
 from multiprocessing import Manager
 import math
+import time
 
 def create_db_connection():
     DB_SERVER = 'database-1.c16m0yos4c9g.us-east-2.rds.amazonaws.com,1433'
@@ -28,7 +29,7 @@ class MonteCarloSimulation:
         self.total_rounds = 0
         self.players = players
         self.friends, self.foes = self.select_players()  
-        self.grid_xdim, self.grid_ydim = self.fetch_encounter_dimensions(encounter_id)
+        self.grid_xdim, self.grid_ydim, self.randomPosition = self.fetch_encounter_dimensions(encounter_id)
         
         # Initialize MVP tracking
         self.mvp_points = defaultdict(int)  # Tracks total points across all simulations
@@ -51,6 +52,7 @@ class MonteCarloSimulation:
                 "spellLevel5": p.spellLevel5,
                 "deathSaves": {'success': 0, 'failure': 0}
             }
+
     def select_players(self):
         # Automatically assigns players to Friends or Foes based on player.friendFoe (0 = Friend, 1 = Foe)
         friends = [player for player in self.players if player.friendFoe == 0]  # Friends
@@ -73,17 +75,17 @@ class MonteCarloSimulation:
             db_connection = create_db_connection()
             cursor = db_connection.cursor()
             
-            query = "SELECT xdim, ydim FROM encounter.encounter WHERE encounterID = ?"
+            query = "SELECT xdim, ydim, randomPosition FROM encounter.encounter WHERE encounterID = ?"
             cursor.execute(query, (encounter_id,))  # Note the comma for single-element tuple
             
             result = cursor.fetchone()
             if result:
-                return result.xdim, result.ydim
-            return 15, 15  # Default dimensions if no result found
+                return result.xdim, result.ydim, bool(result.randomPosition)
+            return 15, 15, False  # Default dimensions if no result found
             
         except Exception as e:
             print(f"Error fetching encounter dimensions: {str(e)}")
-            return 15, 15  # Return defaults on error
+            return 15, 15, False  # Return defaults on error
         finally:
             if db_connection:
                 db_connection.close()
@@ -120,7 +122,8 @@ class MonteCarloSimulation:
             "player_abilities": self.player_abilities,
             "original_stats": self.original_stats,
             "grid_xdim": self.grid_xdim,
-            "grid_ydim": self.grid_ydim
+            "grid_ydim": self.grid_ydim,
+            "randomPosition": self.randomPosition 
         }
 
         with Pool() as pool:
@@ -146,7 +149,8 @@ class MonteCarloSimulation:
             mvps = [name for name, points in self.mvp_points.items() if points == max_points]
             for mvp in mvps:
                 self.mvp_counts[mvp] += 1
-                
+
+        print(f"Random Position value: {self.randomPosition}")        
         self.display_results()
 
 
@@ -169,6 +173,7 @@ def run_single_simulation(simulation_data, results, round_counts, mvp_points_lis
     original_stats = simulation_data["original_stats"]
     grid_xdim = simulation_data.get("grid_xdim", 15)  # Default to 15 if not provided
     grid_ydim = simulation_data.get("grid_ydim", 15)  # Default to 15 if not provided
+    randomPosition = simulation_data.get("randomPosition")
 
     # Reset players using the deep-copied data
     for player in friends + foes:
@@ -181,7 +186,7 @@ def run_single_simulation(simulation_data, results, round_counts, mvp_points_lis
         player.spellLevel5 = original_stats[player.characterName]["spellLevel5"]
         player.deathSaves = {'success': 0, 'failure': 0}
 
-    simulation = CombatSimulation(friends, foes, player_abilities, grid_xdim, grid_ydim)
+    simulation = CombatSimulation(friends, foes, player_abilities, grid_xdim, grid_ydim, randomPosition)
     result = simulation.run_round()
     if result is None:
         result = ("Stalemate", 0, {})
@@ -191,7 +196,7 @@ def run_single_simulation(simulation_data, results, round_counts, mvp_points_lis
     mvp_points_list.append(mvp_points)
 
 class CombatSimulation:
-    def __init__(self, friends, foes, player_abilities, grid_xdim=15, grid_ydim=15):
+    def __init__(self, friends, foes, player_abilities, grid_xdim=15, grid_ydim=15, randomPosition=False):
         self.friends = friends
         self.foes = foes
         self.player_abilities = player_abilities
@@ -199,7 +204,8 @@ class CombatSimulation:
         self.grid_ydim = grid_ydim
         self.mvp_points = defaultdict(int) 
         
-        self.initialize_positions()
+        if randomPosition == True:
+            self.initialize_positions()
         self.turn_order, self.initiative_rolls = self.roll_initiative(friends + foes)
         self.print_initiative_order()
 
@@ -270,22 +276,11 @@ class CombatSimulation:
     def run_round(self):
         max_iterations = 20  # Prevent infinite loops
         iteration = 0
-        friendHP = 0
-        foeHP = 0
+
         while any(p.hp > 0 for p in self.friends) and any(p.hp > 0 for p in self.foes):
             iteration += 1
             if iteration > max_iterations:
-                for p in self.friends:
-                    friendHP += p.hp
-                for p in self.foes:
-                    foeHP += p.hp
-
-                if foeHP > friendHP:
-                    print("Friends Win (by default) \n")
-                    return "Foes Win", iteration, dict(self.mvp_points)
-                else:
-                    print("Foes Win (by default) \n")
-                    return "Friends Win", iteration, dict(self.mvp_points)
+                return ("Stalemate", 0, dict(self.mvp_points))
             
             # Iterate through the turn_order list once per round
             for player in self.turn_order:
@@ -358,17 +353,7 @@ class CombatSimulation:
             print("End of round.\n")
 
         # Stalemate Handling
-        for p in self.friends:
-            friendHP += p.hp
-        for p in self.foes:
-            foeHP += p.hp
-
-        if foeHP > friendHP:
-            print("Friends Win (by default) \n")
-            return "Foes Win", iteration, dict(self.mvp_points)
-        else:
-            print("Foes Win (by default) \n")
-            return "Friends Win", iteration, dict(self.mvp_points)
+        return ("Stalemate", 0, dict(self.mvp_points))
                             
     def handle_death_saves(self, player):
         # Perform a death save
@@ -1358,19 +1343,28 @@ class CombatSimulation:
             ally for ally in ally_team 
             if ally != player and ally.hp > 0 and self.melee_range(ally, opponent)
         ]
+
+        if not potential_flankers:
+            return False
         
-        # Simplified flanking - any ally on opposite side gives advantage
+        # Check for strict opposite positioning
         for ally in potential_flankers:
-            # Calculate relative positions
-            player_angle = math.atan2(player.yloc - opponent.yloc, player.xloc - opponent.xloc)
-            ally_angle = math.atan2(ally.yloc - opponent.yloc, ally.xloc - opponent.xloc)
+            # Get grid deltas (relative positions to enemy)
+            player_dx = player.xloc - opponent.xloc
+            player_dy = player.yloc - opponent.yloc
+            ally_dx = ally.xloc - opponent.xloc
+            ally_dy = ally.yloc - opponent.yloc
             
-            # Check if angles are roughly opposite (within 90 degrees of 180 difference)
-            angle_diff = abs(player_angle - ally_angle)
-            angle_diff = min(angle_diff, 2 * math.pi - angle_diff)  # Get smallest angle
-            
-            if math.pi - math.pi/4 <= angle_diff <= math.pi + math.pi/4:  # 135-225 degree range
+            # Check if positions are directly opposite
+            if (player_dx == -ally_dx and player_dy == -ally_dy):
                 return True
+            
+            # For diagonal positions, check if they form a line through the enemy
+            if (abs(player_dx) == 1 and abs(player_dy) == 1 and 
+                abs(ally_dx) == 1 and abs(ally_dy) == 1):
+                # Check if the vectors point in opposite directions
+                if (player_dx == -ally_dx and player_dy == -ally_dy):
+                    return True
         
         return False
 
