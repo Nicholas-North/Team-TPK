@@ -105,12 +105,13 @@ def initialize_templates() -> List[Template]:
 
 # Player class definition
 class Player:
-    def __init__(self, characterID, accountID, characterName, characterClass, ancestry, hp, hpMax, ac, movementSpeed, charLevel, mainScore,
+    def __init__(self, characterID, uniqueCharacterID, accountID, characterName, characterClass, ancestry, hp, hpMax, ac, movementSpeed, charLevel, mainScore,
                  strScore, dexScore, conScore, intScore, wisScore, chaScore, attackCount, canHeal, numHeals,
                  proficiencyBonus, strSaveProf, dexSaveProf, conSaveProf, intSaveProf, wisSaveProf, chaSaveProf,
                  spellLevel1, spellLevel2, spellLevel3, spellLevel4, spellLevel5, friendFoe, numDice, diceSize, xloc, yloc, 
                  bloodied, deathSaves, hasAdvantage, hasDisadvantage):
         self.characterID = characterID
+        self.uniqueCharacterID = uniqueCharacterID
         self.accountID = accountID
         self.characterName = characterName
         self.characterClass = characterClass
@@ -163,7 +164,7 @@ class Player:
         self.templates.append(template)
 
 # Function to fetch all characters and their positions for a specific encounterID
-def fetch_characters(encounter_id):
+def fetch_characters(encounter_id, encounter_version):
     try:
         # Establish a connection
         connection_string = (
@@ -177,16 +178,17 @@ def fetch_characters(encounter_id):
         cursor = connection.cursor()
 
         query = """
-            SELECT c.characterID, c.accountID, c.characterName, c.characterClass, c.ancestry, c.hp, c.hpMax, c.ac, c.movementSpeed, c.charLevel, c.mainScore,
+            SELECT c.characterID, ep.uniqueCharacterID, c.accountID, c.characterName, c.characterClass, c.ancestry, c.hp, c.hpMax, c.ac, c.movementSpeed, c.charLevel, c.mainScore,
                    c.strScore, c.dexScore, c.conScore, c.intScore, c.wisScore, c.chaScore, c.attackCount, c.canHeal, c.numHeals,
                    c.proficiencyBonus, c.strSaveProf, c.dexSaveProf, c.conSaveProf, c.intSaveProf, c.wisSaveProf, c.chaSaveProf,
                    c.spellLevel1, c.spellLevel2, c.spellLevel3, c.spellLevel4, c.spellLevel5, c.friendFoe, c.numDice, c.diceSize,
                    ep.xloc, ep.yloc
             FROM character.character c
             INNER JOIN encounter.encounterPosition ep ON c.characterID = ep.characterID
-            WHERE ep.encounterID = ?
+            WHERE ep.encounterID = ? AND ep.encounterVersion = ?
+            ORDER BY ep.uniqueCharacterID
         """
-        cursor.execute(query, (encounter_id,))
+        cursor.execute(query, (encounter_id, encounter_version))
         rows = cursor.fetchall()
 
         # Create a list of Player objects
@@ -194,6 +196,7 @@ def fetch_characters(encounter_id):
         for row in rows:
             player = Player(
                 characterID=row.characterID,
+                uniqueCharacterID=row.uniqueCharacterID,
                 accountID=row.accountID,
                 characterName=row.characterName,
                 characterClass=row.characterClass,

@@ -31,6 +31,7 @@ def run_simulator(batch_id, encounter_id, players):
         print("\nFinal Results:")
         print(f"Friends: {team1_wins} wins")
         print(f"Foes: {team2_wins} wins")
+        print(f"Stalemates: {10000 - team1_wins + team2_wins}")
         print(f"Average number of rounds: {round_counts}")
         print(f"Overall Team MVP: {overall_mvp}")
 
@@ -50,7 +51,7 @@ def get_db_connection():
 def fetch_enqueued_batches(connection):
     cursor = connection.cursor()
     query = """
-        SELECT batchID, encounterID
+        SELECT batchID, encounterID, encounterVersion
         FROM batch.batch
         WHERE batchStatus = 'enqueued'
     """
@@ -87,23 +88,23 @@ def get_account_id(connection, encounter_id):
     return row[0] if row else None
 
 # Function to insert into encounterHistory
-def update_encounter_history(connection, batch_id, encounter_id, account_id, team1_wins, team2_wins, round_counts, overall_mvp):
+def update_encounter_history(connection, batch_id, encounter_id, encounter_version, account_id, team1_wins, team2_wins, stalemates, round_counts, overall_mvp):
     cursor = connection.cursor()
     query = """
-        INSERT INTO encounter.encounterHistory (batchID, encounterID, accountID, team1Wins, team2Wins, roundCounts, overallMVP)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO encounter.encounterHistory (batchID, encounterID, encounterVersion, accountID, team1Wins, team2Wins, stalemates, roundCounts, overallMVP)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
-    cursor.execute(query, (batch_id, encounter_id, account_id, team1_wins, team2_wins, round_counts, overall_mvp))
+    cursor.execute(query, (batch_id, encounter_id, encounter_version, account_id, team1_wins, team2_wins, stalemates, round_counts, overall_mvp))
     connection.commit()
 
 # Function to process a single batch
 def process_batch(batch):
-    batch_id, encounter_id = batch
+    batch_id, encounter_id, encounter_version = batch
     connection = get_db_connection()
 
     try:
         # Fetch players for this encounter
-        players = fetch_characters(encounter_id)  # Fetch players once and pass them
+        players = fetch_characters(encounter_id, encounter_version)  # Fetch players once and pass them
 
         # Update batch status to 'in progress'
         print(f"Processing BatchID: {batch_id}, EncounterID: {encounter_id}")
@@ -125,9 +126,11 @@ def process_batch(batch):
             print(f"Error: No accountID found for EncounterID: {encounter_id}")
             update_batch_status(connection, batch_id, 'failed')
             return
+        
+        stalemates = 100 - team1_wins + team2_wins
 
         # Update encounterHistory with simulation results
-        update_encounter_history(connection, batch_id, encounter_id, account_id, team1_wins, team2_wins, round_counts, overall_mvp)
+        update_encounter_history(connection, batch_id, encounter_id, encounter_version, account_id, team1_wins, team2_wins, stalemates, round_counts, overall_mvp)
 
     except Exception as e:
         print(f"Error processing BatchID: {batch_id}: {e}")
