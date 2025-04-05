@@ -1,4 +1,3 @@
-import heapq
 import random
 from enum import Enum
 from collections import defaultdict
@@ -7,7 +6,6 @@ from multiprocessing import Pool
 import copy
 from multiprocessing import Manager
 import math
-import time
 
 def create_db_connection():
     DB_SERVER = 'database-1.c16m0yos4c9g.us-east-2.rds.amazonaws.com,1433'
@@ -95,7 +93,7 @@ class MonteCarloSimulation:
         cursor = db_connection.cursor()
         abilities = {}
         cursor.execute("""
-            SELECT ca.characterID, am.abilityID, am.abilityName, am.meleeRangedAOE, am.healTag, 
+            SELECT ca.characterID, am.abilityID, am.abilityName, am.meleeRangedAOE, am.healTag, am.itemToHitBonus,
                 am.firstNumDice, am.firstDiceSize, am.firstDamageType, am.secondNumDice, 
                 am.secondDiceSize, am.secondDamageType, am.rangeOne, am.rangeTwo, 
                 am.radius, am.coneLineSphere, am.spellLevel, am.saveType, am.actionType
@@ -280,6 +278,7 @@ class CombatSimulation:
         while any(p.hp > 0 for p in self.friends) and any(p.hp > 0 for p in self.foes):
             iteration += 1
             if iteration > max_iterations:
+                print("Stalemate :/")
                 return ("Stalemate", 0, dict(self.mvp_points))
             
             # Iterate through the turn_order list once per round
@@ -353,6 +352,7 @@ class CombatSimulation:
             print("End of round.\n")
 
         # Stalemate Handling
+        print("Stalemate :/")
         return ("Stalemate", 0, dict(self.mvp_points))
                             
     def handle_death_saves(self, player):
@@ -385,8 +385,8 @@ class CombatSimulation:
             print(f"{player.characterName} has stabilized!")
         elif player.deathSaves['failure'] >= 3:
             player.hp = -1  # Dead
-            player.xloc = 10000
-            player.yloc = 10000
+            # player.xloc = 10000
+            # player.yloc = 10000
             print(f"{player.characterName} has died...")
         return False  # Indicate that the player cannot take their turn
 
@@ -434,7 +434,6 @@ class CombatSimulation:
 
         # 2. Priority healing for allies
         if (healing_abilities and injured_allies and player.numHeals > 0 and not (action_used and bonus_action_used)):
-            
             # Find all healable allies (in range of any healing ability)
             healable_allies = []
             for ally in injured_allies:
@@ -492,7 +491,9 @@ class CombatSimulation:
         offensive_abilities.sort(key=lambda x: x[1], reverse=True)
         offensive_abilities = [a[0] for a in offensive_abilities]  # Remove damage scores
 
-        has_melee_only = (len(offensive_abilities) > 0 and all(ab.meleeRangedAOE.lower() == 'melee' for ab in offensive_abilities))
+        melee_count = sum(1 for ab in offensive_abilities if ab.meleeRangedAOE.lower() == 'melee')
+        has_mostly_melee = (len(offensive_abilities) > 0 and melee_count > len(offensive_abilities) // 2)
+
 
         # Check if any offensive abilities are in range
         has_offensive_in_range = any(
@@ -500,8 +501,28 @@ class CombatSimulation:
             for ability in offensive_abilities
         )
 
-        # Move toward enemy if nothing is in range
-        if not has_offensive_in_range or (has_melee_only and not self.melee_range(player, target_enemy)):
+        # Check range conditions for optimal positioning
+        range_one_abilities = [a for a in offensive_abilities if a.rangeOne is not None and a.rangeOne > 0]
+        range_two_abilities = [a for a in offensive_abilities if a.rangeTwo is not None and a.rangeTwo > 0]
+
+        # Move to optimal range if needed
+        if (range_one_abilities and 
+            not any(self.is_ability_in_range(player, target_enemy, a) for a in range_one_abilities)):
+            # Move to be within rangeOne of at least one ability
+            old_pos = (player.xloc, player.yloc)
+            current_dist = self.calculate_distance(player.xloc, player.yloc, target_enemy.xloc, target_enemy.yloc)
+            max_range = max(a.rangeOne // 5 for a in range_one_abilities)
+            spaces_to_close = max(0, current_dist - max_range)
+            movement_amount = min(player.movementSpeed // 5, spaces_to_close)
+            self.move_towards(player, target_enemy, movement_amount)
+            if (player.xloc, player.yloc) != old_pos:
+                movement_used = True
+                # Check if we're now in range of any ability
+                if any(self.is_ability_in_range(player, target_enemy, a) for a in range_one_abilities):
+                    print(f"{player.characterName} moves into optimal attack range")
+
+        # Default movement if no range conditions apply or we're out of range
+        elif not has_offensive_in_range or (has_mostly_melee and not self.melee_range(player, target_enemy)):
             old_pos = (player.xloc, player.yloc)
             move_result = self.move_character(player, target_enemy)
             if move_result in ["Friends Win", "Foes Win"]:
@@ -574,6 +595,7 @@ class CombatSimulation:
         # Then standard actions (prioritizing higher damage)
         if not action_used:
             actions = []
+            recharge_actions = []
             
             # Check for Multiattack feature and get count
             multiattack_count = 1  # Default to 1 attack
@@ -581,7 +603,6 @@ class CombatSimulation:
                 if ability.abilityName.lower().startswith('multiattack'):
                     try:
                         multiattack_count = int(ability.abilityName.lower().split('multiattack')[-1].strip())
-                        print(f"{player.characterName} has Multiattack {multiattack_count}!")
                         break
                     except (ValueError, IndexError):
                         multiattack_count = 2
@@ -592,7 +613,7 @@ class CombatSimulation:
                 if (ability.actionType.lower() == "action" and (self.is_ability_in_range(player, target_enemy, ability) or self.melee_range(player, target_enemy)) and not ability.abilityName.lower().startswith('multiattack')):
                     
                     # Skip spell attacks if using Multiattack
-                    if multiattack_count > 1 and ability.spellLevel is not None:
+                    if multiattack_count > 1 and (ability.spellLevel is not None):
                         continue
                         
                     # Calculate damage potential
@@ -601,9 +622,37 @@ class CombatSimulation:
                         damage_potential += ability.firstNumDice * ability.firstDiceSize
                     if ability.secondNumDice is not None and ability.secondDiceSize is not None:
                         damage_potential += ability.secondNumDice * ability.secondDiceSize
-                    actions.append((ability, damage_potential))
+                    
+                    # Separate recharge abilities
+                    if "recharge" in ability.abilityName.lower():
+                        recharge_actions.append((ability, damage_potential))
+                    else:
+                        actions.append((ability, damage_potential))
             
-            if actions:
+            # Decide whether to use recharge ability or normal attacks
+            if recharge_actions:
+                # Sort recharge actions by damage potential
+                recharge_actions.sort(key=lambda x: x[1], reverse=True)
+                best_recharge = recharge_actions[0][0]
+                
+                # Roll for recharge (assuming 5-6 recharge like most abilities)
+                recharge_roll = self.roll_dice(1, 6)
+                if recharge_roll >= 5:  # Recharge succeeds
+                    print(f"{player.characterName} recharges {best_recharge.abilityName} (rolled {recharge_roll})!")
+                    if best_recharge.spellLevel is not None and best_recharge.spellLevel > 0:
+                        self.expend_spell_slot(player, best_recharge.spellLevel)
+                    
+                    if best_recharge.meleeRangedAOE.lower() == 'melee' and self.check_flanking(player, target_enemy):
+                        player.hasAdvantage = True
+                        print(f"{player.characterName} gains advantage from flanking!")
+
+                    self.perform_attack(player, target_enemy, best_recharge)
+                    action_used = True
+                else:
+                    print(f"{player.characterName} fails to recharge {best_recharge.abilityName} (rolled {recharge_roll})")
+                    # Fall through to normal attacks
+            
+            if not action_used and actions:
                 # Sort by damage potential (highest first)
                 actions.sort(key=lambda x: x[1], reverse=True)
                 chosen_ability = actions[0][0]
@@ -626,16 +675,16 @@ class CombatSimulation:
                     player.hasAdvantage = False
                 
                 action_used = True
-            else:
+            elif not action_used:
                 if self.melee_range(player, target_enemy):
                     print(f"{player.characterName} has no valid actions against {target_enemy.characterName} (in melee range)")
                 else:
-                    print(f"{player.characterName} has no valid actions against {target_enemy.characterName} (all out of range)")
+                    print(f"{player.characterName} has no valid actions against {target_enemy.characterName} (out of range)")
                     
-
         # Final fallback movement if nothing else worked
         if not action_used and not movement_used:
-            self.move_character(player, opponent)
+            old_pos = (player.xloc, player.yloc)
+            move_result = self.move_character(player, opponent)
             if move_result in ["Friends Win", "Foes Win"]:
                 return move_result
             if (player.xloc, player.yloc) != old_pos:
@@ -682,9 +731,12 @@ class CombatSimulation:
         abilities = self.player_abilities.get(player.characterID, [])
         return any(ability.abilityName.lower() == 'sneak attack' for ability in abilities)
 
+
+    # ===== PLAYER HEALING LOGIC =====
     def perform_heal(self, player, ally, ability):
         # Perform a heal based on the chosen ability
-        heal_type = ability.meleeRangedAOE.lower()
+        if ability.meleeRangedAOE.lower() is not None:
+            heal_type = ability.meleeRangedAOE.lower()
 
         if heal_type == 'melee':
             # Melee heal: single target, must be in melee range
@@ -723,62 +775,60 @@ class CombatSimulation:
         elif heal_type == 'aoe':
             # AOE heal: heals allies within the given radius
             ally_team = self.friends if player in self.friends else self.foes  # Determine ally team
-            for ally in ally_team:
-                distance = self.calculate_distance(player.xloc, player.yloc, ally.xloc, ally.yloc)
-                if distance <= (ability.radius // 5):
+            if ability.coneLineSphere is not None:
+                aoe_shape = getattr(ability, 'coneLineSphere', 'Sphere').lower()
+            
+            # Check if target opponent is within range
+            target_distance = self.calculate_distance(player.xloc, player.yloc, ally.xloc, ally.yloc)
+            if target_distance > (ability.rangeOne // 5):
+                print(f"{ally.characterName} is out of range for {ability.abilityName}!")
+                return
+            
+            if aoe_shape == 'sphere':
+                center_x, center_y = ally.xloc, ally.yloc
+
+            for friend in ally_team:
+                distance_to_player = self.calculate_distance(player.xloc, player.yloc, friend.xloc, friend.yloc)
+                in_aoe = False
+                    
+                if aoe_shape == 'sphere':
+                    distance_to_center = self.calculate_distance(center_x, center_y, ally.xloc, ally.yloc)
+                    if distance_to_center <= (ability.radius // 5):
+                        in_aoe = True
+                            
+                elif aoe_shape == 'cone':
+                    if distance_to_player <= (ability.rangeOne // 5):
+                        angle = self.calculate_angle(player.xloc, player.yloc, ally.xloc, ally.yloc, friend.xloc, friend.yloc)
+                        if abs(angle) <= 60:
+                            in_aoe = True
+                                
+                elif aoe_shape == 'line':
+                    if distance_to_player <= (ability.rangeOne // 5):
+                        if self.is_in_line(player.xloc, player.yloc, ally.xloc, ally.yloc, friend.xloc, friend.yloc):
+                            in_aoe = True
+                    
+                if in_aoe:
                     heal_amount = sum(self.roll_dice(ability.firstNumDice, ability.firstDiceSize) for _ in range(1)) 
                     if ability.secondNumDice is not None:
                         heal_amount += sum(self.roll_dice(ability.secondNumDice, ability.secondDiceSize) for _ in range(1))  # Roll additional dice
                     heal_amount += ((player.mainScore - 10) // 2)
-                    oldHp = ally.hp
-                    ally.hp = min(ally.hpMax, ally.hp + heal_amount)
-                    if ally.hp > 0 and ally.deathSaves:  # Reset death saves if healed
-                        ally.deathSaves = {'success': 0, 'failure': 0}
+                    oldHp = friend.hp
+                    friend.hp = min(friend.hpMax, friend.hp + heal_amount)
+                    if friend.hp > 0 and friend.deathSaves:  # Reset death saves if healed
+                        friend.deathSaves = {'success': 0, 'failure': 0}
                     if oldHp == 0:
                         self.award_mvp_point(player)
-                    print(f"{player.characterName} heals {ally.characterName} for {heal_amount} using {ability.abilityName}! Health goes from {oldHp} to {ally.hp}") 
+                    print(f"{player.characterName} heals {friend.characterName} for {heal_amount} using {ability.abilityName}! Health goes from {oldHp} to {friend.hp}") 
                     player.numHeals -= 1
         else:
             print(f"Unknown heal type: {heal_type}")
-                  
-            
-    def move_character(self, player, target_enemy):
-        ally_team = self.friends if player in self.friends else self.foes
-        
-        # Check if player is the last conscious member of their team
-        conscious_allies = [ally for ally in ally_team if ally != player and ally.hp > 0]
-        
-        # If no target enemy (shouldn't happen but defensive programming)
-        if not target_enemy:
-            return None
-        
-        old_x, old_y = player.xloc, player.yloc
-        distance = self.calculate_distance(player.xloc, player.yloc, target_enemy.xloc, target_enemy.yloc)
-        max_movement = player.movementSpeed // 5  # Speed in feet, grid is 5 ft per square
-        
-        # Determine movement strategy
-        if not conscious_allies and player in self.friends and player.hp <= player.hpMax / 3:
-            # Last conscious friend - 50/50 chance to flee or fight
-            if random.random() < 0.5:  # Flee
-                print(f"{player.characterName} chooses to flee from combat!")
-                player.hp = 0  # Mark as dead/fled
-                return "Foes Win" if player in self.friends else "Friends Win"
-            else:  # Fight to the end
-                self.move_towards(player, target_enemy, max_movement)
-        elif player.hp > 0 and player.hp <= player.hpMax / 4 and player in self.friends:  # Very low health
-            if distance < 5:  # If too close to enemy
-                self.move_away(player, target_enemy, max_movement)
-            else:
-                print(f"{player.characterName} stays at range.")
-        else:  # Normal behavior
-            self.move_towards(player, target_enemy, max_movement)
-        
-        return None
 
 
+    # ===== ATTACK LOGIC =====
     def perform_attack(self, player, opponent, ability):
         # Perform an attack based on the chosen ability
-        attack_type = ability.meleeRangedAOE.lower() 
+        if ability.meleeRangedAOE.lower() is not None:
+            attack_type = ability.meleeRangedAOE.lower() 
         is_critical = False
 
         if attack_type == 'melee':
@@ -795,7 +845,7 @@ class CombatSimulation:
                 if attack_roll == 20:
                     is_critical = True
                 
-                attack_roll += ((player.mainScore - 10) // 2)
+                attack_roll += ((player.mainScore - 10) // 2) + player.proficiencyBonus + ability.itemToHitBonus
 
                 if attack_roll >= opponent.ac:
                     if is_critical == True:
@@ -815,8 +865,8 @@ class CombatSimulation:
                     if opponent.hp < 0: opponent.hp = 0
                     if opponent.hp == 0:
                         self.award_mvp_point(player)
-                        opponent.xloc = 10000
-                        opponent.yloc = 10000
+                        # opponent.xloc = 10000
+                        # opponent.yloc = 10000
                     print(f"{player.characterName} attacks {opponent.characterName} for {damage} using {ability.abilityName}! Health goes from {oldHp} to {opponent.hp}")
                 else:
                     print(f"{player.characterName} misses {opponent.characterName} using {ability.abilityName}!") 
@@ -839,14 +889,14 @@ class CombatSimulation:
                 if attack_roll == 20:
                     is_critical = True
 
-                attack_roll += ((player.mainScore - 10) // 2)
+                attack_roll += ((player.mainScore - 10) // 2) + player.proficiencyBonus + ability.itemToHitBonus
 
                 if attack_roll >= opponent.ac:
                     if is_critical == True:
-                        damage = self.calculate_crit(ability, player)
+                        damage = self.calculate_crit(ability, player) + player.proficiencyBonus
                         print(f"Wowza!! {player.characterName} lands a critical attack!!")
                     else:
-                        damage = self.calculate_damage(ability, player)
+                        damage = self.calculate_damage(ability, player) + player.proficiencyBonus
                     # Checks to see if the player has sneak attack
                     if (self.has_sneak_attack(player) and ((player.hasAdvantage and not player.hasDisadvantage) or self.is_ally_adjacent_to_enemy(player, opponent))):
                         sneak_attack_dice = max(1, (player.charLevel) // 2)  # Ensure at least 1 die
@@ -874,14 +924,14 @@ class CombatSimulation:
                 if attack_roll == 20:
                     is_critical = True
 
-                attack_roll += ((player.mainScore - 10) // 2)    
+                attack_roll += ((player.mainScore - 10) // 2) + player.proficiencyBonus + ability.itemToHitBonus
 
                 if attack_roll >= opponent.ac:
                     if is_critical == True:
-                        damage = self.calculate_crit(ability, player)
+                        damage = self.calculate_crit(ability, player) + player.proficiencyBonus
                         print(f"Wowza!! {player.characterName} lands a critical attack!!")
                     else:
-                        damage = self.calculate_damage(ability, player)
+                        damage = self.calculate_damage(ability, player) + player.proficiencyBonus
                     # Checks to see if the player has sneak attack
                     if (self.has_sneak_attack(player) and self.is_ally_adjacent_to_enemy(player, opponent)):
                         sneak_attack_dice = max(1, (player.charLevel) // 2)  # Ensure at least 1 die
@@ -915,16 +965,19 @@ class CombatSimulation:
                 print(f"{opponent.characterName} is out of range for {ability.abilityName}!")
                 return
             
+            if aoe_shape == 'sphere':
+                center_x, center_y = opponent.xloc, opponent.yloc
+            
             # Process enemies
             for enemy in enemy_team:
                 if enemy.hp > 0:  # Only target alive enemies
-                    distance_to_target = self.calculate_distance(opponent.xloc, opponent.yloc, enemy.xloc, enemy.yloc)
                     distance_to_player = self.calculate_distance(player.xloc, player.yloc, enemy.xloc, enemy.yloc)
                     in_aoe = False
                     
                     if aoe_shape == 'sphere':
                         # Sphere centered on target opponent
-                        if distance_to_target <= (ability.radius // 5):
+                        distance_to_center = self.calculate_distance(center_x, center_y, opponent.xloc, opponent.yloc)
+                        if distance_to_center <= (ability.radius // 5):
                             in_aoe = True
                             
                     elif aoe_shape == 'cone':
@@ -962,12 +1015,12 @@ class CombatSimulation:
             # Process allies (similar logic but with different targeting)
             for ally in ally_team:
                 if ally.hp > 0 and ally != player:  # Only target alive allies
-                    distance_to_target = self.calculate_distance(opponent.xloc, opponent.yloc, ally.xloc, ally.yloc)
                     distance_to_player = self.calculate_distance(player.xloc, player.yloc, ally.xloc, ally.yloc)
                     in_aoe = False
                     
                     if aoe_shape == 'sphere':
-                        if distance_to_target <= (ability.radius // 5):
+                        distance_to_center = self.calculate_distance(center_x, center_y, ally.xloc, ally.yloc)
+                        if distance_to_center <= (ability.radius // 5):
                             in_aoe = True
                             
                     elif aoe_shape == 'cone':
@@ -1001,6 +1054,12 @@ class CombatSimulation:
         else:
             print(f"Unknown attack type: {attack_type}")
 
+
+    # ===== DISTANCE AND RANGE FUNCTIONS =====
+    def calculate_distance(self, x1, y1, x2, y2):
+        # Manhattan distance for grid-based movement
+        return abs(x2 - x1) + abs(y2 - y1)
+    
     def calculate_angle(self, origin_x, origin_y, target_x, target_y, point_x, point_y):
         vec1_x = target_x - origin_x
         vec1_y = target_y - origin_y
@@ -1045,10 +1104,6 @@ class CombatSimulation:
         distance = self.calculate_distance(point_x, point_y, closest_x, closest_y)
         
         return distance <= line_width
-
-    def calculate_distance(self, x1, y1, x2, y2):
-        # Manhattan distance for grid-based movement
-        return abs(x2 - x1) + abs(y2 - y1)
     
     def find_closest_enemy(self, player, enemy_team):
         alive_enemies = [enemy for enemy in enemy_team if enemy.hp > 0]
@@ -1068,19 +1123,11 @@ class CombatSimulation:
         if attack_type == 'melee':
             return self.melee_range(player, target)
 
-        range_one = ability.rangeOne if ability.rangeOne is not None else 0
-        range_two = ability.rangeTwo if ability.rangeTwo is not None else 0
+        range_one = ability.rangeOne // 5 if ability.rangeOne else 0
+        range_two = ability.rangeTwo // 5 if ability.rangeTwo else 0
         
-        if attack_type == 'ranged':
-            normal_range = range_one // 5 if range_one > 0 else 0
-            long_range = range_two // 5 if range_two > 0 else 0
-            
-            if distance <= normal_range:
-                return True
-            elif long_range > 0 and distance <= long_range:
-                player.hasDisadvantage = True  # Attacks at long range have disadvantage
-                return True
-            return False
+        if ability.meleeRangedAOE.lower() == 'ranged':
+            return distance <= range_one or (range_two and distance <= range_two)
         
         if attack_type == 'aoe':
             range_one = ability.rangeOne // 5 if ability.rangeOne is not None else 0
@@ -1111,137 +1158,162 @@ class CombatSimulation:
                     player.yloc + (target.yloc - player.yloc) * 2,
                     target.xloc, target.yloc
                 )
-    
-    def heuristic(self, a, b):
-        """Manhattan distance heuristic for A* pathfinding"""
-        return abs(a[0] - b[0]) + abs(a[1] - b[1])
-
-    def get_neighbors(self, pos, occupied_positions, grid_xdim, grid_ydim):
-        """Get valid neighboring positions"""
-        x, y = pos
-        neighbors = []
-        # Check all 8 possible directions (4 orthogonal + 4 diagonal)
-        for dx, dy in [(1,0), (-1,0), (0,1), (0,-1), (1,1), (1,-1), (-1,1), (-1,-1)]:
-            nx, ny = x + dx, y + dy
-            if 1 <= nx <= grid_xdim and 1 <= ny <= grid_ydim and (nx, ny) not in occupied_positions:
-                neighbors.append((nx, ny))
-        return neighbors
-
-    def find_path(self, start, goal, occupied_positions, grid_xdim, grid_ydim, max_steps):
-        """A* pathfinding implementation with step limit"""
-        frontier = []
-        heapq.heappush(frontier, (0, start))
-        came_from = {}
-        cost_so_far = {}
-        came_from[start] = None
-        cost_so_far[start] = 0
-        
-        while frontier:
-            current = heapq.heappop(frontier)[1]
             
-            # Stop if we reach the goal or exceed max steps
-            if current == goal or cost_so_far[current] >= max_steps:
-                break
-                
-            for next_pos in self.get_neighbors(current, occupied_positions, grid_xdim, grid_ydim):
-                new_cost = cost_so_far[current] + 1
-                if next_pos not in cost_so_far or new_cost < cost_so_far[next_pos]:
-                    cost_so_far[next_pos] = new_cost
-                    priority = new_cost + self.heuristic(goal, next_pos)
-                    heapq.heappush(frontier, (priority, next_pos))
-                    came_from[next_pos] = current
-        
-        # Reconstruct path
-        path = []
-        current_pos = goal if goal in came_from else min(
-            cost_so_far.keys(), 
-            key=lambda pos: self.heuristic(pos, goal) + cost_so_far[pos]
-        )
-        
-        while current_pos != start:
-            path.append(current_pos)
-            current_pos = came_from.get(current_pos)
-            if current_pos is None:  # No path found
-                return []
-        path.reverse()
-        return path[:max_steps]  # Return only the first max_steps steps
+    def melee_range(self, attacker, enemy):
+        # Checks if attacker is in melee range
+        dx = abs(attacker.xloc - enemy.xloc)
+        dy = abs(attacker.yloc - enemy.yloc)
+        return dx <= 1 and dy <= 1 
 
-    def move_towards(self, player, target, max_movement):
-        """Improved movement using pathfinding"""
-        occupied_positions = {(p.xloc, p.yloc) for p in self.friends + self.foes 
-                            if p != player and p.hp > 0 and p.xloc is not None and p.yloc is not None}
-        
-        # If already adjacent, don't move
-        if self.melee_range(player, target):
+    def is_ally_adjacent_to_enemy(self, player, opponent):
+        ally_team = self.friends if player in self.friends else self.foes
+        for ally in ally_team:
+            if ally != player and ally.hp > 0:  # Don't count yourself and only alive allies
+                if self.melee_range(ally, opponent):
+                    return True
+        return False
+
+    def check_flanking(self, player, opponent):
+        if player.hasDisadvantage:
             return False
         
-        start_pos = (player.xloc, player.yloc)
-        goal_pos = self.find_optimal_approach_position(player, target, occupied_positions)
+        # Verify melee range
+        if not self.melee_range(player, opponent):
+            return False
         
-        path = self.find_path(start_pos, goal_pos, occupied_positions, self.grid_xdim, self.grid_ydim, max_movement)
+        ally_team = self.friends if player in self.friends else self.foes
         
-        if path and len(path) > 0:
-            # Move along the path as much as movement allows
-            steps_taken = min(max_movement, len(path))
-            new_x, new_y = path[steps_taken - 1]
+        # Find all living allies in melee range of opponent
+        potential_flankers = [
+            ally for ally in ally_team 
+            if ally != player and ally.hp > 0 and self.melee_range(ally, opponent)
+        ]
+
+        if not potential_flankers:
+            return False
+        
+        # Check for strict opposite positioning
+        for ally in potential_flankers:
+            # Get grid deltas (relative positions to enemy)
+            player_dx = player.xloc - opponent.xloc
+            player_dy = player.yloc - opponent.yloc
+            ally_dx = ally.xloc - opponent.xloc
+            ally_dy = ally.yloc - opponent.yloc
             
-            # Verify the move is valid
-            if (new_x, new_y) not in occupied_positions:
-                player.xloc, player.yloc = new_x, new_y
-                print(f"{player.characterName} moves to ({new_x}, {new_y}) toward {target.characterName}")
+            # Check if positions are directly opposite
+            if (player_dx == -ally_dx and player_dy == -ally_dy):
                 return True
-        
-        # Fallback to simple movement if pathfinding fails
-        print(f"{player.characterName} can't find clear path to {target.characterName}, using simple movement")
-        return self.simple_move_towards(player, target, max_movement, occupied_positions)
-
-    def find_optimal_approach_position(self, player, target, occupied_positions):
-        """Find the best adjacent position to approach target"""
-        target_pos = (target.xloc, target.yloc)
-        best_pos = None
-        min_distance = float('inf')
-        
-        # Check all adjacent positions to target
-        for dx, dy in [(1,0), (-1,0), (0,1), (0,-1), (1,1), (1,-1), (-1,1), (-1,-1)]:
-            nx, ny = target.xloc + dx, target.yloc + dy
-            if (1 <= nx <= self.grid_xdim and 1 <= ny <= self.grid_ydim and 
-                (nx, ny) not in occupied_positions):
-                dist = self.heuristic((player.xloc, player.yloc), (nx, ny))
-                if dist < min_distance:
-                    min_distance = dist
-                    best_pos = (nx, ny)
-        
-        return best_pos if best_pos else target_pos  # Fallback to target pos if no adjacent spots
-
-    def simple_move_towards(self, player, target, max_movement, occupied_positions):
-        """Fallback movement when pathfinding fails"""
-        moved = False
-        for _ in range(max_movement):
-            if self.melee_range(player, target):
-                break
-                
-            # Get all possible moves
-            possible_moves = self.get_neighbors(
-                (player.xloc, player.yloc), 
-                occupied_positions, 
-                self.grid_xdim, 
-                self.grid_ydim
-            )
             
-            if not possible_moves:
-                break
-                
-            # Choose move that minimizes distance to target
-            best_move = min(
-                possible_moves, 
-                key=lambda pos: self.heuristic(pos, (target.xloc, target.yloc))
-            )
-            
-            player.xloc, player.yloc = best_move
-            moved = True
-            print(f"{player.characterName} moves to ({best_move[0]}, {best_move[1]})")
+            # For diagonal positions, check if they form a line through the enemy
+            if (abs(player_dx) == 1 and abs(player_dy) == 1 and 
+                abs(ally_dx) == 1 and abs(ally_dy) == 1):
+                # Check if the vectors point in opposite directions
+                if (player_dx == -ally_dx and player_dy == -ally_dy):
+                    return True
         
-        return moved
+        return False
+
+
+    # ===== MOVEMENT FUNCTIONS =====
+    def move_character(self, player, target_enemy):
+        ally_team = self.friends if player in self.friends else self.foes
+        
+        # Check if player is the last conscious member of their team
+        conscious_allies = [ally for ally in ally_team if ally != player and ally.hp > 0]
+        
+        # If no target enemy (shouldn't happen but defensive programming)
+        if not target_enemy:
+            return None
+        
+        old_x, old_y = player.xloc, player.yloc
+        distance = self.calculate_distance(player.xloc, player.yloc, target_enemy.xloc, target_enemy.yloc)
+        max_movement = player.movementSpeed // 5  # Speed in feet, grid is 5 ft per square
+        
+        # Determine movement strategy
+        if not conscious_allies and player in self.friends and player.hp <= player.hpMax / 3:
+            # Last conscious friend - 50/50 chance to flee or fight
+            if random.random() < 0.5:  # Flee
+                print(f"{player.characterName} chooses to flee from combat!")
+                player.hp = 0  # Mark as dead/fled
+                return "Foes Win" if player in self.friends else "Friends Win"
+            else:  # Fight to the end
+                self.move_towards(player, target_enemy, max_movement)
+        elif player.hp > 0 and player.hp < player.hpMax / 4 and player in self.friends and distance <= 5:  # Very low health and close up
+            self.move_away(player, target_enemy, max_movement)
+        else:  # Normal behavior
+            self.move_towards(player, target_enemy, max_movement)
+        
+        return None
+
+    def move_towards(self, mover, target, max_movement):
+        """Moves the unit as close to the target as possible using greedy distance minimization."""
+        if self.melee_range(mover, target):
+            return False
+
+        occupied = self.get_occupied_positions()
+        move_pos = self.find_best_step_towards(mover, target, max_movement, occupied)
+
+        if move_pos and self.validate_movement(mover, move_pos[0], move_pos[1]):
+            old_pos = (mover.xloc, mover.yloc)
+            mover.xloc, mover.yloc = move_pos
+            if (mover.xloc, mover.yloc) != old_pos:
+                print(f"{mover.characterName} moves to {move_pos}")
+                return True
+
+        return False
+
+    def find_best_step_towards(self, mover, target, max_movement, occupied):
+        """Greedy search: chooses the best tile within range (including diagonals) to move closer to the target."""
+        best_tile = None
+        best_distance = float('inf')
+
+        for dx in range(-max_movement, max_movement + 1):
+            for dy in range(-max_movement, max_movement + 1):
+                # Use Chebyshev distance for diagonals
+                steps = max(abs(dx), abs(dy))
+                if steps == 0 or steps > max_movement:
+                    continue
+
+                new_x, new_y = mover.xloc + dx, mover.yloc + dy
+
+                if not (1 <= new_x <= self.grid_xdim and 1 <= new_y <= self.grid_ydim):
+                    continue
+                if (new_x, new_y) in occupied:
+                    continue
+                if not self.validate_movement(mover, new_x, new_y):
+                    continue
+
+                # Use Euclidean or Manhattan distance as heuristic — your call
+                distance = abs(new_x - target.xloc) + abs(new_y - target.yloc)
+                if distance < best_distance:
+                    best_distance = distance
+                    best_tile = (new_x, new_y)
+
+        return best_tile
+
+    def validate_movement(self, player, new_x, new_y):
+        """Validates if a movement is safe and doesn't trap the character."""
+        if not (1 <= new_x <= self.grid_xdim and 1 <= new_y <= self.grid_ydim):
+            return False
+
+        if (new_x, new_y) in self.get_occupied_positions():
+            return False
+
+        # Check for at least 2 possible exits (including diagonals now)
+        exits = 0
+        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1),
+                    (-1, -1), (-1, 1), (1, -1), (1, 1)]:
+            nx, ny = new_x + dx, new_y + dy
+            if (1 <= nx <= self.grid_xdim and
+                1 <= ny <= self.grid_ydim and
+                (nx, ny) not in self.get_occupied_positions()):
+                exits += 1
+
+        return exits >= 2
+
+    def get_occupied_positions(self):
+        """Returns  set  of  all  occupied  positions  on  the  grid"""
+        return  {(p.xloc,  p.yloc)  for  p  in  self.friends  +  self.foes  if  p.hp  >  0  and  (p.xloc,  p.yloc)  !=  (None,  None)}
 
     def move_away(self, player, target, max_movement):
         occupied_positions = {(p.xloc, p.yloc) for p in self.friends + self.foes if p != player}
@@ -1314,60 +1386,8 @@ class CombatSimulation:
 
         return moved
 
-    def melee_range(self, attacker, enemy):
-        # Checks if attacker is in melee range
-        dx = abs(attacker.xloc - enemy.xloc)
-        dy = abs(attacker.yloc - enemy.yloc)
-        return dx <= 1 and dy <= 1 
 
-    def is_ally_adjacent_to_enemy(self, player, opponent):
-        ally_team = self.friends if player in self.friends else self.foes
-        for ally in ally_team:
-            if ally != player and ally.hp > 0:  # Don't count yourself and only alive allies
-                if self.melee_range(ally, opponent):
-                    return True
-        return False
-
-    def check_flanking(self, player, opponent):
-        if player.hasDisadvantage:
-            return False
-        
-        # Verify melee range
-        if not self.melee_range(player, opponent):
-            return False
-        
-        ally_team = self.friends if player in self.friends else self.foes
-        
-        # Find all living allies in melee range of opponent
-        potential_flankers = [
-            ally for ally in ally_team 
-            if ally != player and ally.hp > 0 and self.melee_range(ally, opponent)
-        ]
-
-        if not potential_flankers:
-            return False
-        
-        # Check for strict opposite positioning
-        for ally in potential_flankers:
-            # Get grid deltas (relative positions to enemy)
-            player_dx = player.xloc - opponent.xloc
-            player_dy = player.yloc - opponent.yloc
-            ally_dx = ally.xloc - opponent.xloc
-            ally_dy = ally.yloc - opponent.yloc
-            
-            # Check if positions are directly opposite
-            if (player_dx == -ally_dx and player_dy == -ally_dy):
-                return True
-            
-            # For diagonal positions, check if they form a line through the enemy
-            if (abs(player_dx) == 1 and abs(player_dy) == 1 and 
-                abs(ally_dx) == 1 and abs(ally_dy) == 1):
-                # Check if the vectors point in opposite directions
-                if (player_dx == -ally_dx and player_dy == -ally_dy):
-                    return True
-        
-        return False
-
+    # ===== DAMAGE CALCULATION AND DICE ROLLING FUNCTIONS =====
     def calculate_damage(self, ability, player):
         # Calculate damage for an ability
         damage = sum(self.roll_dice(ability.firstNumDice, ability.firstDiceSize) for _ in range(1))  # Roll dice
@@ -1386,20 +1406,35 @@ class CombatSimulation:
     def get_save_modifier(self, enemy, save_type):
         # Get the appropriate saving throw modifier based on save_type
         save_type = save_type.lower()
+        modifier = 0
+        
+        # Calculate base ability modifier and add proficiency if applicable
         if save_type == 'strength':
-            return (enemy.strScore - 10) // 2
+            modifier = (enemy.strScore - 10) // 2
+            if hasattr(enemy, 'strSaveProf') and enemy.strSaveProf:
+                modifier += enemy.proficiencyBonus
         elif save_type == 'dexterity':
-            return (enemy.dexScore - 10) // 2
+            modifier = (enemy.dexScore - 10) // 2
+            if hasattr(enemy, 'dexSaveProf') and enemy.dexSaveProf:
+                modifier += enemy.proficiencyBonus
         elif save_type == 'constitution':
-            return (enemy.conScore - 10) // 2
+            modifier = (enemy.conScore - 10) // 2
+            if hasattr(enemy, 'conSaveProf') and enemy.conSaveProf:
+                modifier += enemy.proficiencyBonus
         elif save_type == 'intelligence':
-            return (enemy.intScore - 10) // 2
+            modifier = (enemy.intScore - 10) // 2
+            if hasattr(enemy, 'intSaveProf') and enemy.intSaveProf:
+                modifier += enemy.proficiencyBonus
         elif save_type == 'wisdom':
-            return (enemy.wisScore- 10) // 2
+            modifier = (enemy.wisScore - 10) // 2
+            if hasattr(enemy, 'wisSaveProf') and enemy.wisSaveProf:
+                modifier += enemy.proficiencyBonus
         elif save_type == 'charisma':
-            return (enemy.chaScore - 10) // 2
-        else:
-            return 0  # Default to no modifier if save_type is invalid
+            modifier = (enemy.chaScore - 10) // 2
+            if hasattr(enemy, 'chaSaveProf') and enemy.chaSaveProf:
+                modifier += enemy.proficiencyBonus
+        
+        return modifier
 
     def roll_dice(self, numDice, diceSize):
         return sum(random.randint(1, diceSize) for _ in range(numDice))

@@ -106,9 +106,9 @@ def initialize_templates() -> List[Template]:
 # Player class definition
 class Player:
     def __init__(self, characterID, uniqueCharacterID, accountID, characterName, characterClass, ancestry, hp, hpMax, ac, movementSpeed, charLevel, mainScore,
-                 strScore, dexScore, conScore, intScore, wisScore, chaScore, attackCount, canHeal, numHeals,
+                 strScore, dexScore, conScore, intScore, wisScore, chaScore,
                  proficiencyBonus, strSaveProf, dexSaveProf, conSaveProf, intSaveProf, wisSaveProf, chaSaveProf,
-                 spellLevel1, spellLevel2, spellLevel3, spellLevel4, spellLevel5, friendFoe, numDice, diceSize, xloc, yloc, 
+                 spellLevel1, spellLevel2, spellLevel3, spellLevel4, spellLevel5, friendFoe, xloc, yloc, 
                  bloodied, deathSaves, hasAdvantage, hasDisadvantage):
         self.characterID = characterID
         self.uniqueCharacterID = uniqueCharacterID
@@ -128,9 +128,6 @@ class Player:
         self.intScore = intScore
         self.wisScore = wisScore
         self.chaScore = chaScore
-        self.attackCount = attackCount
-        self.canHeal = canHeal
-        self.numHeals = numHeals
         self.proficiencyBonus = proficiencyBonus
         self.strSaveProf = strSaveProf
         self.dexSaveProf = dexSaveProf
@@ -144,8 +141,6 @@ class Player:
         self.spellLevel4 = spellLevel4
         self.spellLevel5 = spellLevel5
         self.friendFoe = friendFoe
-        self.numDice = numDice
-        self.diceSize = diceSize
         self.xloc = xloc  # X-coordinate from encounterPosition
         self.yloc = yloc  # Y-coordinate from encounterPosition
         self.bloodied = bloodied
@@ -179,9 +174,9 @@ def fetch_characters(encounter_id, encounter_version):
 
         query = """
             SELECT c.characterID, ep.uniqueCharacterID, c.accountID, c.characterName, c.characterClass, c.ancestry, c.hp, c.hpMax, c.ac, c.movementSpeed, c.charLevel, c.mainScore,
-                   c.strScore, c.dexScore, c.conScore, c.intScore, c.wisScore, c.chaScore, c.attackCount, c.canHeal, c.numHeals,
+                   c.strScore, c.dexScore, c.conScore, c.intScore, c.wisScore, c.chaScore, 
                    c.proficiencyBonus, c.strSaveProf, c.dexSaveProf, c.conSaveProf, c.intSaveProf, c.wisSaveProf, c.chaSaveProf,
-                   c.spellLevel1, c.spellLevel2, c.spellLevel3, c.spellLevel4, c.spellLevel5, c.friendFoe, c.numDice, c.diceSize,
+                   c.spellLevel1, c.spellLevel2, c.spellLevel3, c.spellLevel4, c.spellLevel5, c.friendFoe,
                    ep.xloc, ep.yloc
             FROM character.character c
             INNER JOIN encounter.encounterPosition ep ON c.characterID = ep.characterID
@@ -213,9 +208,6 @@ def fetch_characters(encounter_id, encounter_version):
                 intScore=row.intScore,
                 wisScore=row.wisScore,
                 chaScore=row.chaScore,
-                attackCount=row.attackCount,
-                canHeal=row.canHeal,
-                numHeals=row.numHeals,
                 proficiencyBonus=row.proficiencyBonus,
                 strSaveProf=row.strSaveProf,
                 dexSaveProf=row.dexSaveProf,
@@ -229,8 +221,6 @@ def fetch_characters(encounter_id, encounter_version):
                 spellLevel4=row.spellLevel4,
                 spellLevel5=row.spellLevel5,
                 friendFoe=row.friendFoe,
-                numDice=row.numDice,
-                diceSize=row.diceSize,
                 xloc=row.xloc,  # X-coordinate from encounterPosition
                 yloc=row.yloc,   # Y-coordinate from encounterPosition
                 bloodied=0,

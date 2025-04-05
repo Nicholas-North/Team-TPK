@@ -31,7 +31,7 @@ def run_simulator(batch_id, encounter_id, players):
         print("\nFinal Results:")
         print(f"Friends: {team1_wins} wins")
         print(f"Foes: {team2_wins} wins")
-        print(f"Stalemates: {10000 - team1_wins + team2_wins}")
+        print(f"Stalemates: {10000 - (team1_wins + team2_wins)}")
         print(f"Average number of rounds: {round_counts}")
         print(f"Overall Team MVP: {overall_mvp}")
 
@@ -127,7 +127,7 @@ def process_batch(batch):
             update_batch_status(connection, batch_id, 'failed')
             return
         
-        stalemates = 100 - team1_wins + team2_wins
+        stalemates = round(100 - (team1_wins + team2_wins), 2)
 
         # Update encounterHistory with simulation results
         update_encounter_history(connection, batch_id, encounter_id, encounter_version, account_id, team1_wins, team2_wins, stalemates, round_counts, overall_mvp)
