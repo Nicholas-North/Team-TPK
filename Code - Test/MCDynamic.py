@@ -124,6 +124,9 @@ class MonteCarloSimulation:
             "randomPosition": self.randomPosition 
         }
 
+        if (len(self.friends) + len(self.foes)) > (self.grid_xdim * self.grid_ydim):
+            return 0, 0, 0, "Error: Not Enough Space!"
+
         with Pool() as pool:
             pool.starmap(run_single_simulation, 
                         [(simulation_data, results, round_counts, mvp_points_list) 
@@ -150,7 +153,6 @@ class MonteCarloSimulation:
 
         print(f"Random Position value: {self.randomPosition}")        
         self.display_results()
-
 
     def display_results(self):
         # Retrieve wins from the results dictionary (defaulting to 0 if not present)
@@ -202,7 +204,7 @@ class CombatSimulation:
         self.grid_ydim = grid_ydim
         self.mvp_points = defaultdict(int) 
         
-        if randomPosition == True:
+        if randomPosition == True: 
             self.initialize_positions()
         self.turn_order, self.initiative_rolls = self.roll_initiative(friends + foes)
         self.print_initiative_order()
@@ -272,7 +274,7 @@ class CombatSimulation:
         print("\n")
     
     def run_round(self):
-        max_iterations = 20  # Prevent infinite loops
+        max_iterations = 25  # Prevent infinite loops
         iteration = 0
 
         while any(p.hp > 0 for p in self.friends) and any(p.hp > 0 for p in self.foes):
@@ -391,6 +393,7 @@ class CombatSimulation:
         return False  # Indicate that the player cannot take their turn
 
     def perform_actions(self, player, opponent):
+        
         target_enemy = opponent
         ally_team = self.friends if player in self.friends else self.foes
         enemy_team = self.foes if player in self.friends else self.friends
@@ -468,7 +471,7 @@ class CombatSimulation:
             current_dist = self.calculate_distance(player.xloc, player.yloc, closest_injured.xloc, closest_injured.yloc)
             
             # Only move if not already adjacent and would get us closer
-            if self.melee_range(player, ally):
+            if self.melee_range(player, ally, ability):
                 old_pos = (player.xloc, player.yloc)
                 self.move_towards(player, closest_injured, player.movementSpeed//5)
                 if (player.xloc, player.yloc) != old_pos:
@@ -522,7 +525,7 @@ class CombatSimulation:
                     print(f"{player.characterName} moves into optimal attack range")
 
         # Default movement if no range conditions apply or we're out of range
-        elif not has_offensive_in_range or (has_mostly_melee and not self.melee_range(player, target_enemy)):
+        elif not has_offensive_in_range or (has_mostly_melee and not self.melee_range(player, target_enemy, ability)):
             old_pos = (player.xloc, player.yloc)
             move_result = self.move_character(player, target_enemy)
             if move_result in ["Friends Win", "Foes Win"]:
@@ -610,7 +613,7 @@ class CombatSimulation:
             
             # Find all valid attack actions
             for ability in offensive_abilities:
-                if (ability.actionType.lower() == "action" and (self.is_ability_in_range(player, target_enemy, ability) or self.melee_range(player, target_enemy)) and not ability.abilityName.lower().startswith('multiattack')):
+                if (ability.actionType.lower() == "action" and (self.is_ability_in_range(player, target_enemy, ability) or self.melee_range(player, target_enemy, ability)) and not ability.abilityName.lower().startswith('multiattack')):
                     
                     # Skip spell attacks if using Multiattack
                     if multiattack_count > 1 and (ability.spellLevel is not None):
@@ -676,7 +679,7 @@ class CombatSimulation:
                 
                 action_used = True
             elif not action_used:
-                if self.melee_range(player, target_enemy):
+                if self.melee_range(player, target_enemy, ability):
                     print(f"{player.characterName} has no valid actions against {target_enemy.characterName} (in melee range)")
                 else:
                     print(f"{player.characterName} has no valid actions against {target_enemy.characterName} (out of range)")
@@ -734,6 +737,9 @@ class CombatSimulation:
 
     # ===== PLAYER HEALING LOGIC =====
     def perform_heal(self, player, ally, ability):
+
+        modifier = self.get_ability_modifier(player)
+
         # Perform a heal based on the chosen ability
         if ability.meleeRangedAOE.lower() is not None:
             heal_type = ability.meleeRangedAOE.lower()
@@ -741,11 +747,11 @@ class CombatSimulation:
         if heal_type == 'melee':
             # Melee heal: single target, must be in melee range
             distance = self.calculate_distance(player.xloc, player.yloc, ally.xloc, ally.yloc)
-            if self.melee_range(player, ally):
+            if self.melee_range(player, ally, ability):
                 heal_amount = sum(self.roll_dice(ability.firstNumDice, ability.firstDiceSize) for _ in range(1))
                 if ability.secondNumDice is not None:
                     heal_amount += sum(self.roll_dice(ability.secondNumDice, ability.secondDiceSize) for _ in range(1))  # Roll additional dice
-                heal_amount += ((player.mainScore - 10) // 2)
+                heal_amount += modifier
                 oldHp = ally.hp
                 ally.hp = min(ally.hpMax, ally.hp + heal_amount)
                 if ally.hp > 0 and ally.deathSaves:  # Reset death saves if healed
@@ -762,7 +768,7 @@ class CombatSimulation:
                 heal_amount = sum(self.roll_dice(ability.firstNumDice, ability.firstDiceSize) for _ in range(1))
                 if ability.secondNumDice is not None:
                     heal_amount += sum(self.roll_dice(ability.secondNumDice, ability.secondDiceSize) for _ in range(1))  # Roll additional dice
-                heal_amount += ((player.mainScore - 10) // 2)
+                heal_amount += modifier
                 oldHp = ally.hp
                 ally.hp = min(ally.hpMax, ally.hp + heal_amount)
                 if ally.hp > 0 and ally.deathSaves:  # Reset death saves if healed
@@ -811,7 +817,7 @@ class CombatSimulation:
                     heal_amount = sum(self.roll_dice(ability.firstNumDice, ability.firstDiceSize) for _ in range(1)) 
                     if ability.secondNumDice is not None:
                         heal_amount += sum(self.roll_dice(ability.secondNumDice, ability.secondDiceSize) for _ in range(1))  # Roll additional dice
-                    heal_amount += ((player.mainScore - 10) // 2)
+                    heal_amount += modifier
                     oldHp = friend.hp
                     friend.hp = min(friend.hpMax, friend.hp + heal_amount)
                     if friend.hp > 0 and friend.deathSaves:  # Reset death saves if healed
@@ -826,6 +832,9 @@ class CombatSimulation:
 
     # ===== ATTACK LOGIC =====
     def perform_attack(self, player, opponent, ability):
+
+        modifier = self.get_ability_modifier(player)
+
         # Perform an attack based on the chosen ability
         if ability.meleeRangedAOE.lower() is not None:
             attack_type = ability.meleeRangedAOE.lower() 
@@ -834,7 +843,7 @@ class CombatSimulation:
         if attack_type == 'melee':
             # Melee attack: single target, must be in melee range
             distance = self.calculate_distance(player.xloc, player.yloc, opponent.xloc, opponent.yloc)
-            if self.melee_range(player, opponent):
+            if self.melee_range(player, opponent, ability):
                 if player.hasAdvantage and not player.hasDisadvantage:
                     attack_roll = self.roll_with_advantage()
                 elif player.hasDisadvantage and not player.hasAdvantage:
@@ -845,7 +854,7 @@ class CombatSimulation:
                 if attack_roll == 20:
                     is_critical = True
                 
-                attack_roll += ((player.mainScore - 10) // 2) + player.proficiencyBonus + ability.itemToHitBonus
+                attack_roll += modifier + player.proficiencyBonus + ability.itemToHitBonus
 
                 if attack_roll >= opponent.ac:
                     if is_critical == True:
@@ -875,7 +884,7 @@ class CombatSimulation:
             # Ranged attack: single target, must be within range
             distance = self.calculate_distance(player.xloc, player.yloc, opponent.xloc, opponent.yloc)
             if distance <= (ability.rangeOne // 5):
-                if self.melee_range(player, opponent): # If target is in melee range, ranged attacks are at disadvantage 
+                if abs(player.xloc - opponent.xloc) <= 1 and abs(player.yloc - opponent.yloc) <= 1: # If target is in direct melee range, ranged attacks are at disadvantage 
                     player.hasDisadvantage = True # Attacks at long range with disadvantage
                     print(f"Too close! {player.characterName} is attacking at disadvantage!")
 
@@ -889,7 +898,7 @@ class CombatSimulation:
                 if attack_roll == 20:
                     is_critical = True
 
-                attack_roll += ((player.mainScore - 10) // 2) + player.proficiencyBonus + ability.itemToHitBonus
+                attack_roll += modifier + player.proficiencyBonus + ability.itemToHitBonus
 
                 if attack_roll >= opponent.ac:
                     if is_critical == True:
@@ -924,7 +933,7 @@ class CombatSimulation:
                 if attack_roll == 20:
                     is_critical = True
 
-                attack_roll += ((player.mainScore - 10) // 2) + player.proficiencyBonus + ability.itemToHitBonus
+                attack_roll += modifier + player.proficiencyBonus + ability.itemToHitBonus
 
                 if attack_roll >= opponent.ac:
                     if is_critical == True:
@@ -999,7 +1008,7 @@ class CombatSimulation:
                         if ability.saveType: 
                             save_modifier = self.get_save_modifier(enemy, ability.saveType)
                             save_roll = self.roll_dice(1, 20) + save_modifier
-                            if save_roll >= ((player.mainScore - 10) // 2) + 10:
+                            if save_roll >= modifier + 10:
                                 damage = base_damage // 2
                             else:
                                 damage = base_damage
@@ -1038,7 +1047,7 @@ class CombatSimulation:
                         if ability.saveType:
                             save_modifier = self.get_save_modifier(ally, ability.saveType)
                             save_roll = self.roll_dice(1, 20) + save_modifier
-                            if save_roll >= ((player.mainScore - 10) // 2) + 10:
+                            if save_roll >= modifier + 10:
                                 damage = base_damage // 2
                             else:
                                 damage = base_damage
@@ -1121,7 +1130,7 @@ class CombatSimulation:
             aoe_shape = getattr(ability, 'coneLineSphere', 'sphere').lower()
 
         if attack_type == 'melee':
-            return self.melee_range(player, target)
+            return self.melee_range(player, target, ability)
 
         range_one = ability.rangeOne // 5 if ability.rangeOne else 0
         range_two = ability.rangeTwo // 5 if ability.rangeTwo else 0
@@ -1159,17 +1168,20 @@ class CombatSimulation:
                     target.xloc, target.yloc
                 )
             
-    def melee_range(self, attacker, enemy):
+    def melee_range(self, attacker, enemy, ability):
+        if ability.rangeOne is None or ability.rangeOne == 0:
+            ability.rangeOne = 5
+
         # Checks if attacker is in melee range
         dx = abs(attacker.xloc - enemy.xloc)
         dy = abs(attacker.yloc - enemy.yloc)
-        return dx <= 1 and dy <= 1 
+        return dx <= ability.rangeOne // 5 and dy <= ability.rangeOne // 5
 
     def is_ally_adjacent_to_enemy(self, player, opponent):
         ally_team = self.friends if player in self.friends else self.foes
         for ally in ally_team:
             if ally != player and ally.hp > 0:  # Don't count yourself and only alive allies
-                if self.melee_range(ally, opponent):
+                if abs(ally.xloc - opponent.xloc) <= 1 and abs(ally.yloc - opponent.yloc) <= 1:
                     return True
         return False
 
@@ -1178,7 +1190,7 @@ class CombatSimulation:
             return False
         
         # Verify melee range
-        if not self.melee_range(player, opponent):
+        if abs(player.xloc - opponent.xloc) > 1 or abs(player.yloc - opponent.yloc) > 1:
             return False
         
         ally_team = self.friends if player in self.friends else self.foes
@@ -1186,7 +1198,7 @@ class CombatSimulation:
         # Find all living allies in melee range of opponent
         potential_flankers = [
             ally for ally in ally_team 
-            if ally != player and ally.hp > 0 and self.melee_range(ally, opponent)
+            if ally != player and ally.hp > 0 and abs(ally.xloc - opponent.xloc) <= 1 and abs(ally.yloc - opponent.yloc) <= 1
         ]
 
         if not potential_flankers:
@@ -1247,7 +1259,10 @@ class CombatSimulation:
 
     def move_towards(self, mover, target, max_movement):
         """Moves the unit as close to the target as possible using greedy distance minimization."""
-        if self.melee_range(mover, target):
+        # If Target is within melee range
+        dx = abs(mover.xloc - target.xloc)
+        dy = abs(mover.yloc - target.yloc)
+        if dx <= 1 and dy <= 1:
             return False
 
         occupied = self.get_occupied_positions()
@@ -1391,17 +1406,44 @@ class CombatSimulation:
     def calculate_damage(self, ability, player):
         # Calculate damage for an ability
         damage = sum(self.roll_dice(ability.firstNumDice, ability.firstDiceSize) for _ in range(1))  # Roll dice
+        max_possible = ability.firstNumDice * ability.firstDiceSize
+        total_num_dice = ability.firstNumDice
+
         if ability.secondNumDice is not None:
             damage += sum(self.roll_dice(ability.secondNumDice, ability.secondDiceSize) for _ in range(1))  # Roll additional dice
-        damage += ((player.mainScore - 10) // 2)  # Add main modifier to damage
+            max_possible += ability.secondNumDice * ability.secondDiceSize
+            total_num_dice += ability.secondNumDice
+
+        modifier = self.get_ability_modifier(player)
+        damage += modifier # Add main modifier to damage
+
+        # Award MVP Point for a high damage roll
+        if total_num_dice >= 2 and max_possible > 0:
+            threshold = int(max_possible * 0.75)
+            if (damage - modifier) >= threshold:
+                self.award_mvp_point(player)
+
         return damage
     
     def calculate_crit(self, ability, player):
         damage = sum(self.roll_dice(ability.firstNumDice * 2, ability.firstDiceSize) for _ in range(1))  # Roll dice
         if ability.secondNumDice is not None:
             damage += sum(self.roll_dice(ability.secondNumDice * 2, ability.secondDiceSize) for _ in range(1))  # Roll additional dice
-        damage += ((player.mainScore - 10) // 2)  # Add main modifier to damage
+        modifier = self.get_ability_modifier(player)
+        damage += modifier  # Add main modifier to damage
         return damage
+
+    def get_ability_modifier(self, player):
+        ability_scores = {
+            'STR': player.strScore,
+            'DEX': player.dexScore,
+            'CON': player.conScore,
+            'INT': player.intScore,
+            'WIS': player.wisScore,
+            'CHA': player.chaScore
+        }
+        score = ability_scores.get(player.mainScore, 10)  # Default to 10 if mainScore is invalid
+        return (score - 10) // 2
 
     def get_save_modifier(self, enemy, save_type):
         # Get the appropriate saving throw modifier based on save_type
