@@ -1,1 +1,154 @@
-[]
+[
+  {
+    "ContainingType": "TPK_Web_Application.Pages.CharacterEditor.CharacterAPIController",
+    "Method": "GetAbilities",
+    "RelativePath": "api/CharacterAPI/GetAbilities",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TPK_Web_Application.Pages.CharacterEditor.CharacterAPIController",
+    "Method": "GetCharacters",
+    "RelativePath": "api/CharacterAPI/GetCharacters",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TPK_Web_Application.Pages.CharacterEditor.CharacterAPIController",
+    "Method": "GetSelectedCharacterAbilities",
+    "RelativePath": "api/CharacterAPI/GetSelectedCharacterAbilities/{characterId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "characterId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TPK_Web_Application.Pages.CharacterEditor.CharacterAPIController",
+    "Method": "GetSelectedCharacters",
+    "RelativePath": "api/CharacterAPI/GetSelectedCharacters/{characterId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "characterId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TPK_Web_Application.Pages.EncounterEditor.EncounterAPIController",
+    "Method": "CreateEncounter",
+    "RelativePath": "api/EncounterAPI/CreateEncounter",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "newEncounter",
+        "Type": "TPK_Web_Application.Model.Encounter_Model",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TPK_Web_Application.Pages.EncounterEditor.EncounterAPIController",
+    "Method": "GetCharacters",
+    "RelativePath": "api/EncounterAPI/GetCharacters",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TPK_Web_Application.Pages.EncounterEditor.EncounterAPIController",
+    "Method": "GetEncounters",
+    "RelativePath": "api/EncounterAPI/GetEncounters",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TPK_Web_Application.Pages.EncounterEditor.EncounterAPIController",
+    "Method": "GetPositions",
+    "RelativePath": "api/EncounterAPI/GetPositions/{encounterId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "encounterId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TPK_Web_Application.Pages.EncounterEditor.EncounterAPIController",
+    "Method": "GetSelectedCharacters",
+    "RelativePath": "api/EncounterAPI/GetSelectedCharacters/{characterId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "characterId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TPK_Web_Application.Pages.EncounterEditor.EncounterAPIController",
+    "Method": "GetSelectedEncounter",
+    "RelativePath": "api/EncounterAPI/GetSelectedEncounter/{encounterId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "encounterId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TPK_Web_Application.Pages.EncounterEditor.EncounterAPIController",
+    "Method": "RunEncounter",
+    "RelativePath": "api/EncounterAPI/RunEncounter",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "selectedEncounterId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

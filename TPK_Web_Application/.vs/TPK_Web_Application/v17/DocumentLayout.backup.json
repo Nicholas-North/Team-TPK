@@ -1,42 +1,30 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\",
+  "WorkspaceRootPath": "C:\\College\\Alternate Project\\Team-TPK\\TPK_Web_Application\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\pages\\account\\account.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\account\\account.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\alternate project\\team-tpk\\tpk_web_application\\pages\\charactereditor\\charactereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\charactereditor\\charactereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\pages\\account\\account.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\account\\account.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\alternate project\\team-tpk\\tpk_web_application\\pages\\charactereditor\\charactereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\charactereditor\\charactereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\pages\\account\\login.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\account\\login.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\alternate project\\team-tpk\\tpk_web_application\\model\\character_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:model\\character_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\pages\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\alternate project\\team-tpk\\tpk_web_application\\pages\\charactereditor\\characterapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\charactereditor\\characterapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\alternate project\\team-tpk\\tpk_web_application\\pages\\encountereditor\\encountereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encountereditor\\encountereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\model\\account_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:model\\account_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\service\\sessioncontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:service\\sessioncontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\service\\datacontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:service\\datacontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\alternate project\\team-tpk\\tpk_web_application\\pages\\encountereditor\\encountereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encountereditor\\encountereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -46,123 +34,84 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Character_Model.cs",
+              "DocumentMoniker": "C:\\College\\Alternate Project\\Team-TPK\\TPK_Web_Application\\Model\\Character_Model.cs",
+              "RelativeDocumentMoniker": "Model\\Character_Model.cs",
+              "ToolTip": "C:\\College\\Alternate Project\\Team-TPK\\TPK_Web_Application\\Model\\Character_Model.cs",
+              "RelativeToolTip": "Model\\Character_Model.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADsAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-06T00:24:16.059Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "Login.cshtml",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\Account\\Login.cshtml",
-              "RelativeDocumentMoniker": "Pages\\Account\\Login.cshtml",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\Account\\Login.cshtml",
-              "RelativeToolTip": "Pages\\Account\\Login.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAkAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-02-16T18:18:33.26Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAmAAAAAAAAAA==",
+              "Title": "CharacterAPI.cs",
+              "DocumentMoniker": "C:\\College\\Alternate Project\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterAPI.cs",
+              "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterAPI.cs",
+              "ToolTip": "C:\\College\\Alternate Project\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterAPI.cs",
+              "RelativeToolTip": "Pages\\CharacterEditor\\CharacterAPI.cs",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAAwGoAAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-16T18:39:11.126Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Account_Model.cs",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Model\\Account_Model.cs",
-              "RelativeDocumentMoniker": "Model\\Account_Model.cs",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Model\\Account_Model.cs",
-              "RelativeToolTip": "Model\\Account_Model.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-16T18:39:00.495Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "DataContext.cs",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Service\\DataContext.cs",
-              "RelativeDocumentMoniker": "Service\\DataContext.cs",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Service\\DataContext.cs",
-              "RelativeToolTip": "Service\\DataContext.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-16T18:36:35.255Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "SessionContext.cs",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Service\\SessionContext.cs",
-              "RelativeDocumentMoniker": "Service\\SessionContext.cs",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Service\\SessionContext.cs",
-              "RelativeToolTip": "Service\\SessionContext.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-16T18:36:32.452Z",
+              "WhenOpened": "2025-04-04T21:59:20.729Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "Account.cshtml",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\Account\\Account.cshtml",
-              "RelativeDocumentMoniker": "Pages\\Account\\Account.cshtml",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\Account\\Account.cshtml",
-              "RelativeToolTip": "Pages\\Account\\Account.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAABIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-02-16T18:19:47.71Z",
+              "Title": "CharacterEditor.cshtml.cs",
+              "DocumentMoniker": "C:\\College\\Alternate Project\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
+              "ToolTip": "C:\\College\\Alternate Project\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
+              "RelativeToolTip": "Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
+              "ViewState": "AgIAABcAAAAAAAAAAAAwwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-06T00:40:01.363Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Account.cshtml.cs",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\Account\\Account.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\Account\\Account.cshtml.cs",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\Account\\Account.cshtml.cs",
-              "RelativeToolTip": "Pages\\Account\\Account.cshtml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAAyAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-16T18:19:35.717Z",
+              "Title": "CharacterEditor.cshtml",
+              "DocumentMoniker": "C:\\College\\Alternate Project\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
+              "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
+              "ToolTip": "C:\\College\\Alternate Project\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
+              "RelativeToolTip": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
+              "ViewState": "AgIAAMEBAAAAAAAAAAArwOsBAABIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-04T21:57:15.819Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\appsettings.json",
-              "RelativeDocumentMoniker": "appsettings.json",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\appsettings.json",
-              "RelativeToolTip": "appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-02-16T18:04:54.149Z",
+              "DocumentIndex": 4,
+              "Title": "EncounterEditor.cshtml.cs",
+              "DocumentMoniker": "C:\\College\\Alternate Project\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
+              "ToolTip": "C:\\College\\Alternate Project\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
+              "RelativeToolTip": "Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-04T21:57:23.578Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Login.cshtml.cs",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\Account\\Login.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\Account\\Login.cshtml.cs",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\Account\\Login.cshtml.cs",
-              "RelativeToolTip": "Pages\\Account\\Login.cshtml.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAAQwCgAAABBAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-16T16:20:29.994Z",
+              "DocumentIndex": 5,
+              "Title": "EncounterEditor.cshtml",
+              "DocumentMoniker": "C:\\College\\Alternate Project\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
+              "RelativeDocumentMoniker": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
+              "ToolTip": "C:\\College\\Alternate Project\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
+              "RelativeToolTip": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABQAAACMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-04T21:57:20.842Z",
               "EditorCaption": ""
             }
           ]

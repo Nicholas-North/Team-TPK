@@ -1,75 +1,625 @@
 ﻿@page
-@model PrivacyModel
+@model CharacterEditorModel
 @{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Character Editor";
 }
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-8">
-                <h1>@ViewData["Title"]</h1>
-                <ul class="nav nav-tabs" id="myTab" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="form1-tab" data-toggle="tab" href="#form1" role="tab" aria-controls="form1" aria-selected="true">Form1</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="form2-tab" data-toggle="tab" href="#form2" role="tab" aria-controls="form2" aria-selected="false">Form2</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="form3-tab" data-toggle="tab" href="#form3" role="tab" aria-controls="form3" aria-selected="false">Form3</a>
-                    </li>
-                </ul>
-                <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="form1" role="tabpanel" aria-labelledby="form1-tab">
-                        <form>
-                            <div class="form-group">
-                                <label for="input1">Label 1</label>
-                                <input type="text" class="form-control" id="input1" placeholder="Enter value">
-                            </div>
-                            <div class="form-group">
-                                <label for="input2">Label 2</label>
-                                <input type="text" class="form-control" id="input2" placeholder="Enter value">
-                            </div>
-                        </form>
-                    </div>
-                    <div class="tab-pane fade" id="form2" role="tabpanel" aria-labelledby="form2-tab">
-                        <form>
-                            <div class="form-group">
-                                <label for="input3">Label 3</label>
-                                <input type="text" class="form-control" id="input3" placeholder="Enter value">
-                            </div>
-                            <div class="form-group">
-                                <label for="input4">Label 4</label>
-                                <input type="text" class="form-control" id="input4" placeholder="Enter value">
-                            </div>
-                        </form>
-                    </div>
-                    <div class="tab-pane fade" id="form3" role="tabpanel" aria-labelledby="form3-tab">
-                        <form>
-                            <div class="form-group">
-                                <label for="input5">Label 5</label>
-                                <input type="text" class="form-control" id="input5" placeholder="Enter value">
-                            </div>
-                            <div class="form-group">
-                                <label for="input6">Label 6</label>
-                                <input type="text" class="form-control" id="input6" placeholder="Enter value">
-                            </div>
-                        </form>
-                    </div>
+    <div class="mainframe container-fluid d-flex">
+        <div class="DisplayCharacter col-md-8">
+            <div class="CharacterInfo">
+                <div class="Tabs">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="form1-tab" data-toggle="tab" onclick="togglePane(0)" href="#form1" role="tab" aria-controls="form1" aria-selected="true">Character Stats</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="form2-tab" data-toggle="tab" onclick="togglePane(1)" href="#form2" role="tab" aria-controls="form2" aria-selected="false">Character Behavior</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="TabInfo" id="TabInfoPane">
                 </div>
             </div>
-            <div class="col-md-4">
-                <h2>List</h2>
-                <ul class="list-group">
-                    <li class="list-group-item">Item 1</li>
-                    <li class="list-group-item">Item 2</li>
-                    <li class="list-group-item">Item 3</li>
-                    <li class="list-group-item">Item 4</li>
-                    <li class="list-group-item">Item 5</li>
-                </ul>
+            <div class="Manip-Buttons">
+                <form method="post" asp-page-handler="SaveCharacter" id="SaveCharacterForm" class="requires-character d-none">
+                    <input type="hidden" asp-for="SelectedCharacter.characterID" />
+                    <button type="button" class="btn btn-secondary btn-sm edit-button" onclick="toggleEdit(this)" id="EditButton">Edit</button>
+                    <button type="button" class="btn btn-secondary btn-sm close-button d-none" onclick="toggleEdit(this)" id="CloseButton">Close</button>
+                    <button type="submit" class="btn btn-primary btn-sm save-button d-none" id="SaveButton">Save</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-4" id="CharacterVault">
+            <h2>Character Vault</h2>
+            <ul class="list-group" id="character-list">
+                <!-- Characters will be dynamically loaded here -->
+            </ul>
+        </div>
+    </div>
+
+
+    @* Character Modal *@
+    <div class="modal fade" id="CharacterEditorModal" tabindex="-1" role="dialog" aria-labelledby="Character Editor" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Character Editor</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" asp-page-handler="CreateCharacter">
+                        <input type="hidden" id="selectedCharacterId" name="selectedCharacterId" value="@Model.SelectedCharacter.characterID" />
+                        <label for="NameInput">Name: </label>
+                        <input type="text" asp-for="NameInput" class="form-control" id="NameInput" name="NameInput" />
+                        <label for="AncestryInput">Ancestry: </label>
+                        <input type="text" asp-for="AncestryInput" class ="form-control" id="AncestryInput" name="AncestryInput" />
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+
+    @* Ability Modal *@
+    <div class="modal fade" id="AbilityEditorModal" tabindex="-1" role="dialog" aria-labelledby="Ability Editor" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ability Editor</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" asp-page-handler="CreateAbility" id="createAbilityForm">
+                        <input type="hidden" id="selectedCharacterId" name="selectedCharacterId" value="@Model.SelectedCharacter.characterID" />
+
+                        <!-- Hidden input to store JSON -->
+                        <input type="hidden" id="AbilityJson" name="AbilityJson" />
+
+                        <!-- Ability Name -->
+                        <label for="NameInput">Ability Name:</label>
+                        <input type="text" class="form-control" id="AbilityNameInput" name="NameInput" required />
+
+                        <!-- Target Type -->
+                        <label for="TargetInput" class="mt-3">Target:</label>
+                        <select class="form-control" id="TargetInput" name="TargetInput" required>
+                            <option value="Melee">Melee</option>
+                            <option value="Ranged">Ranged</option>
+                            <option value="AOE">AOE</option>
+                        </select>
+
+                        <!-- Healing Flag -->
+                        <div class="form-check mt-3">
+                            <input type="checkbox" class="form-check-input" id="HealingFlag" name="HealingFlag" />
+                            <label class="form-check-label" for="HealingFlag">Healing Ability</label>
+                        </div>
+
+                        <!-- Additional To-Hit Bonus -->
+                        <label for="ToHitBonusInput" class="mt-3">Additional To-Hit Bonus:</label>
+                        <input type="number" class="form-control" id="ToHitBonusInput" name="ToHitBonusInput" min="0" />
+
+                        <!-- First Number of Dice -->
+                        <label for="FirstNumDiceInput" class="mt-3">Number of Dice:</label>
+                        <input type="number" class="form-control" id="FirstNumDiceInput" name="FirstNumDiceInput" min="1" required />
+
+                        <!-- First Dice Size -->
+                        <label for="FirstDiceSizeInput" class="mt-3">Dice Size:</label>
+                        <select class="form-control" id="FirstDiceSizeInput" name="FirstDiceSizeInput" required>
+                            <option value="2">2</option>
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8">8</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                            <option value="20">20</option>
+                        </select>
+
+                        <div class="modal-footer mt-4">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="submitAbilityForm()">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
+<script>
+    let currentlyHighightedElement = null;
+    let selectedCharacter = null;
+    let currentTab = 0;
+
+    function loadCharacters() 
+    {
+        fetch('/api/CharacterAPI/GetCharacters')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Characters:', data); // Log the data for debugging
+                const characterList = document.getElementById('character-list');
+                characterList.innerHTML = ''; // Clear existing characters
+                data.forEach(character => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item';
+                    listItem.textContent = `Character: ${character.characterName} (ID: ${character.characterID})`;
+
+                    // Set data attributes for drag-and-drop functionality
+                    listItem.setAttribute('data-character-id', character.characterID);
+                    listItem.setAttribute('data-character-name', character.characterName);
+
+                    listItem.onclick = () =>{
+                        selectCharacter(character.characterID);
+                        highlightSelected(listItem);
+                    }
+                    characterList.appendChild(listItem);
+                });
+                displayAttributes([]);
+                displayAbilities([]);
+            })
+            .catch(error => console.error('Error fetching characters:', error));
+    }
+
+    function selectCharacter(characterId) {
+        toggleElementsVisibility();
+        fetch('/api/CharacterAPI/GetSelectedCharacters/' + characterId)
+            .then(response => response.json())
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    const character = data[0]; // Grab the first character from the array
+                    selectedCharacter = character; // Update the global selectedCharacter variable
+                    displayAttributes(character); // Pass the character to displayAttributes
+                    displayAbilities(character.characterID)
+                } else {
+                    console.warn('No character data found.');
+                }
+            })
+            .catch(error => {
+                console.error('Error: ', error)
+            });
+    }
+
+    function toggleElementsVisibility() {
+        const elementsToToggle = document.querySelectorAll('.requires-character'); // Elements that depend on a selected character
+
+        elementsToToggle.forEach(element => {
+            if (selectedCharacter == null) {
+                element.classList.remove('d-none'); // Show the element
+            }
+        });
+    }
+
+    function toggleEdit(button) {
+        const parentTab = document.getElementById('TabInfoPane');
+        const viewModeElements = parentTab.querySelectorAll('.view-mode');
+        const editModeElements = parentTab.querySelectorAll('.edit-mode');
+
+        const editButton = document.getElementById('EditButton');
+        const closeButton = document.getElementById('CloseButton');
+        const saveButton = document.getElementById('SaveButton');
+
+        viewModeElements.forEach(element => element.classList.toggle('d-none'));
+        editModeElements.forEach(element => element.classList.toggle('d-none'));
+
+        editButton.classList.toggle('d-none');
+        closeButton.classList.toggle('d-none');
+        saveButton.classList.toggle('d-none');
+    }
+
+    function togglePane(paneValue){
+        console.log(paneValue);
+        const attributePane = document.querySelectorAll('.attributePane');
+        const abilityPane = document.querySelectorAll('.abilityPane');
+        if (currentTab === paneValue){  // Attribute Pane
+            return;
+        }
+        currentTab = paneValue;
+        attributePane.forEach(element => element.classList.toggle('d-none'));
+        abilityPane.forEach(element => element.classList.toggle('d-none'));
+    }
+
+    function highlightSelected(currentElement){
+        const element = currentElement;
+
+        if (currentlyHighightedElement) {
+            currentlyHighightedElement.classList.remove('highlight-selected');
+        }
+        element.classList.add('highlight-selected');
+        currentlyHighightedElement = element;
+    }
+
+    function submitAbilityForm(){
+        const ability = {
+            abilityName: document.getElementById('AbilityNameInput').value,
+            meleeRangedAOE: document.getElementById('TargetInput').value,
+            healingTag: document.getElementById('HealingFlag').checked,
+            itemToHitBonus: parseInt(document.getElementById('ToHitBonusInput').value || 0),
+            firstNumDice: parseInt(document.getElementById('FirstNumDiceInput').value || 1),
+            firstDiceSize: parseInt(document.getElementById('FirstDiceSizeInput').value || 2)
+        };
+
+        document.getElementById('AbilityJson').value = JSON.stringify(ability);
+        console.log('Ability Json:', ability); // Debugging log
+    }
+
+    function displayAttributes(character){
+        const container = document.getElementById('TabInfoPane');
+        container.innerHTML = `
+        <div class="attributePane">
+            <div class="form-group d-flex">
+                <div class="mr-3">
+                    <h2>Name: <span class="view-mode">${character.characterName}</span></h2>
+                    <input type="text" name="characterName" class="form-control edit-mode d-none" value="${character.characterName}" />
+                    <h4>Ancestry: <span class="view-mode">${character.ancestry}</span></h4>
+                    <input type="text" name="ancestry" class="form-control edit-mode d-none" value="${character.ancestry}" />
+                </div>
+                <div>
+                    <h2>Level: <span class="view-mode">${character.charLevel}</span></h2>
+                    <input type="number" name="charLevel" class="form-control edit-mode d-none" value="${character.charLevel}" />
+                </div>
+            </div>
+            <div class="form-group">
+                <h4>Class: <span class="view-mode">${character.characterClass || "None"}</span></h4>
+                <select name="class" class="form-control edit-mode d-none">
+                    <option value="" ${!character.class ? 'selected' : ''}>Blank</option>
+                    <option value="Fighter" ${character.characterClass === 'Fighter' ? 'selected' : ''}>Fighter</option>
+                    <option value="Cleric" ${character.characterClass === 'Cleric' ? 'selected' : ''}>Cleric</option>
+                    <option value="Rogue" ${character.characterClass === 'Rogue' ? 'selected' : ''}>Rogue</option>
+                    <option value="Wizard" ${character.characterClass === 'Wizard' ? 'selected' : ''}>Wizard</option>
+                    <option value="Monster" ${character.characterClass === 'Monster' ? 'selected' : ''}>Monster</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Friend or Foe: <span class="view-mode">${character.isAlly === 1 ? "Friend" : "Foe"}</span></label>
+                <input type="checkbox" name="isAlly" class="edit-mode d-none" ${character.isAlly === 1 ? "checked" : ""} />
+            </div>
+            <div class="form-group d-flex align-items-center">
+                <div class="mr-3">
+                    <label>Current Health: ${character.hp}</label>
+                    <input type="number" name="hp" class="form-control edit-mode d-none" value="${character.hp}" />
+                    <br />
+                    <label>Maximum Health: ${character.hpMax}</label>
+                    <input type="number" name="hpMax" class="form-control edit-mode d-none" value="${character.hpMax}" />
+                </div>
+                <div class="mr-3">
+                    <label>AC: ${character.ac}</label>
+                    <input type="number" name="ac" class="form-control edit-mode d-none" value="${character.ac}" />
+                </div>
+                <div>
+                    <label>Movement: ${character.movementSpeed}</label>
+                    <input type="number" name="movementSpeed" class="form-control edit-mode d-none" value="${character.movementSpeed}" />
+                </div>
+            </div>
+            <div class="form-group">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>STR</th>
+                            <th>DEX</th>
+                            <th>CON</th>
+                            <th>INT</th>
+                            <th>WIS</th>
+                            <th>CHA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Score</td>
+                            <td><span class="view-mode">${character.strScore}</span><input type="number" name="strScore" class="form-control edit-mode d-none" value="${character.strScore}" /></td>
+                            <td><span class="view-mode">${character.dexScore}</span><input type="number" name="dexScore" class="form-control edit-mode d-none" value="${character.dexScore}" /></td>
+                            <td><span class="view-mode">${character.conScore}</span><input type="number" name="conScore" class="form-control edit-mode d-none" value="${character.conScore}" /></td>
+                            <td><span class="view-mode">${character.intScore}</span><input type="number" name="intScore" class="form-control edit-mode d-none" value="${character.intScore}" /></td>
+                            <td><span class="view-mode">${character.wisScore}</span><input type="number" name="wisScore" class="form-control edit-mode d-none" value="${character.wisScore}" /></td>
+                            <td><span class="view-mode">${character.chaScore}</span><input type="number" name="chaScore" class="form-control edit-mode d-none" value="${character.chaScore}" /></td>
+                        </tr>
+                        <tr>
+                            <td>Ability Bonus</td>
+                            <td>${Math.floor((character.strScore - 10) / 2)}</td>
+                            <td>${Math.floor((character.dexScore - 10) / 2)}</td>
+                            <td>${Math.floor((character.conScore - 10) / 2)}</td>
+                            <td>${Math.floor((character.intScore - 10) / 2)}</td>
+                            <td>${Math.floor((character.wisScore - 10) / 2)}</td>
+                            <td>${Math.floor((character.chaScore - 10) / 2)}</td>
+                        </tr>
+                        <tr>
+                            <td>Saving Throw Proficiency</td>
+                            <td>
+                                <input type="checkbox" class="view-mode" ${character.strSaveProf ? "checked" : ""} disabled />
+                                <input type="checkbox" class="edit-mode d-none" name="strSaveProf" ${character.strSaveProf ? "checked" : ""} />
+                            </td>
+                            <td>
+                                <input type="checkbox" class="view-mode" ${character.dexSaveProf ? "checked" : ""} disabled />
+                                <input type="checkbox" class="edit-mode d-none" name="dexSaveProf" ${character.dexSaveProf ? "checked" : ""} />
+                            </td>
+                            <td>
+                                <input type="checkbox" class="view-mode" ${character.conSaveProf ? "checked" : ""} disabled />
+                                <input type="checkbox" class="edit-mode d-none" name="conSaveProf" ${character.conSaveProf ? "checked" : ""} />
+                            </td>
+                            <td>
+                                <input type="checkbox" class="view-mode" ${character.intSaveProf ? "checked" : ""} disabled />
+                                <input type="checkbox" class="edit-mode d-none" name="intSaveProf" ${character.intSaveProf ? "checked" : ""} />
+                            </td>
+                            <td>
+                                <input type="checkbox" class="view-mode" ${character.wisSaveProf ? "checked" : ""} disabled />
+                                <input type="checkbox" class="edit-mode d-none" name="wisSaveProf" ${character.wisSaveProf ? "checked" : ""} />
+                            </td>
+                            <td>
+                                <input type="checkbox" class="view-mode" ${character.chaSaveProf ? "checked" : ""} disabled />
+                                <input type="checkbox" class="edit-mode d-none" name="chaSaveProf" ${character.chaSaveProf ? "checked" : ""} />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="form-group">
+                <h4>Main Ability Score: <span class="view-mode">${character.mainScore || "None"}</span></h4>
+                    <select name="class" class="form-control edit-mode d-none">
+                        <option value="" ${!character.class ? 'selected' : ''}>Blank</option>
+                        <option value="STR" ${character.mainScore === 'STR' ? 'selected' : ''}>STR</option>
+                        <option value="DEX" ${character.mainScore === 'DEX' ? 'selected' : ''}>DEX</option>
+                        <option value="CON" ${character.mainScore === 'CON' ? 'selected' : ''}>CON</option>
+                        <option value="INT" ${character.mainScore === 'INT' ? 'selected' : ''}>INT</option>
+                        <option value="WIS" ${character.characterClass === 'WIS' ? 'selected' : ''}>WIS</option>
+                        <option value="CHA" ${character.mainScore === 'CHA' ? 'selected' : ''}>CHA</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Spell Count</th>
+                                <th>Level 1</th>
+                                <th>Level 2</th>
+                                <th>Level 3</th>
+                                <th>Level 4</th>
+                                <th>Level 5</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Spell Count</td>
+                                <td>
+                                    <span class="view-mode">${character.spellLevel1 || 0}</span>
+                                    <input type="number" name="spellCountLevel1" class="form-control edit-mode d-none" value="${character.spellLevel1 || 0}" min="0" max="4" />
+                                </td>
+                                <td>
+                                    <span class="view-mode">${character.spellLevel2 || 0}</span>
+                                    <input type="number" name="spellCountLevel2" class="form-control edit-mode d-none" value="${character.spellLevel2 || 0}" min="0" max="4" />
+                                </td>
+                                <td>
+                                    <span class="view-mode">${character.spellLevel3 || 0}</span>
+                                    <input type="number" name="spellCountLevel3" class="form-control edit-mode d-none" value="${character.spellLevel3 || 0}" min="0" max="4" />
+                                </td>
+                                <td>
+                                    <span class="view-mode">${character.spellLevel4 || 0}</span>
+                                    <input type="number" name="spellCountLevel4" class="form-control edit-mode d-none" value="${character.spellLevel4 || 0}" min="0" max="4" />
+                                </td>
+                                <td>
+                                    <span class="view-mode">${character.spellLevel5 || 0}</span>
+                                    <input type="number" name="spellCountLevel5" class="form-control edit-mode d-none" value="${character.spellLevel5 || 0}" min="0" max="4" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="abilityPane d-none">
+        </div
+    `;
+
+    }
+
+    function displayAbilities(characterId) {
+        fetch(`/api/CharacterAPI/GetSelectedCharacterAbilities/${characterId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! ssstatus: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(abilities => {
+                const container = document.querySelector('.abilityPane');
+                container.innerHTML = ''; // Clear existing abilities
+
+                // Add the "Create New Ability" button
+                const createButton = document.createElement('div');
+                createButton.className = 'sticky-top bg-white p-3 mb-3';
+                createButton.innerHTML = `
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#AbilityEditorModal">
+                        Create New Ability
+                    </button>
+                `;
+                container.appendChild(createButton);
+
+                if (abilities.length === 0) {
+                    const noAbilitiesMessage = document.createElement('p');
+                    noAbilitiesMessage.textContent = 'No abilities found for this characacter.';
+                    container.appendChild(noAbilitiesMessage);
+                    return;
+                }
+
+                abilities.forEach(ability => {
+                    const abilityElement = document.createElement('div');
+                    abilityElement.className = 'form-group';
+
+                    abilityElement.innerHTML = `
+                            <div class="d-flex justify-content-between">
+                                <h4>Ability Name: <span class="view-mode">${ability.abilityName}</span></h4>
+                                <input type="text" name="abilityName" class="form-control edit-mode d-none" value="${ability.abilityName}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Target Type: <span class="view-mode">${ability.meleeRangedAOE}</span></label>
+                                <select name="meleeRangedAOE" class="form-control edit-mode d-none">
+                                    <option value="Melee" ${ability.meleeRangedAOE === 'Melee' ? 'selected' : ''}>Melee</option>
+                                    <option value="Ranged" ${ability.meleeRangedAOE === 'Ranged' ? 'selected' : ''}>Ranged</option>
+                                    <option value="AOE" ${ability.meleeRangedAOE === 'AOE' ? 'selected' : ''}>AOE</option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Range One: <span class="view-mode">${ability.rangeOne}</span></label>
+                                <input type="number" name="rangeOne" class="form-control edit-mode d-none" value="${ability.rangeOne}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Range Two: <span class="view-mode">${ability.rangeTwo}</span></label>
+                                <input type="number" name="rangeTwo" class="form-control edit-mode d-none" value="${ability.rangeTwo}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Radius: <span class="view-mode">${ability.radius}</span></label>
+                                <input type="number" name="radius" class="form-control edit-mode d-none" value="${ability.radius}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>AoE Type: <span class="view-mode">${ability.coneLineSphere}</span></label>
+                                <select name="coneLineSphere" class="form-control edit-mode d-none">
+                                    <option value="Cone" ${ability.coneLineSphere === 'Cone' ? 'selected' : ''}>Cone</option>
+                                    <option value="Line" ${ability.coneLineSphere === 'Line' ? 'selected' : ''}>Line</option>
+                                    <option value="Sphere" ${ability.coneLineSphere === 'Sphere' ? 'selected' : ''}>Sphere</option>
+                                    <option value="AOE" ${ability.coneLineSphere === '' ? 'selected' : ''}></option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Action Cost: <span class="view-mode">${ability.actionType}</span></label>
+                                <select name="actionType" class="form-control edit-mode d-none">
+                                    <option value="Action" ${ability.actionType === 'Action' ? 'selected' : ''}>Action</option>
+                                    <option value="Bonus" ${ability.actionType === 'Bonus' ? 'selected' : ''}>Bonus</option>
+                                    <option value="Free" ${ability.actionType === 'Free' ? 'selected' : ''}>Free</option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <input type="checkbox" class="view-mode" ${ability.healTag ? "checked" : ""} disabled />
+                                <input type="checkbox" class="edit-mode d-none" name="healTag" ${ability.healTag ? "checked" : ""} />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>To hit bonus: <span class="view-mode">${ability.itemToHitBonus}</span></label>
+                                <input type="number" name="toHit" class="form-control edit-mode d-none" value="${ability.itemToHitBonus}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label># Dice: <span class="view-mode">${ability.firstNumDice}</span></label>
+                                <input type="number" name="numDice1" class="form-control edit-mode d-none" value="${ability.firstNumDice}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Dice Type: <span class="view-mode">${ability.firstDiceSize}</span></label>
+                                <input type="number" name="numDiceSize1" class="form-control edit-mode d-none" value="${ability.firstDiceSize}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Action Cost: <span class="view-mode">${ability.firstDamageType}</span></label>
+                                <select name="firstDamageType" class="form-control edit-mode d-none">
+                                    <option value="Bludgeoning" ${ability.firstDamageType === 'Bludgeoning' ? 'selected' : ''}>Bludgeoning</option>
+                                    <option value="Slashing" ${ability.firstDamageType === 'Slashing' ? 'selected' : ''}>Slashing</option>
+                                    <option value="Piercing" ${ability.firstDamageType === 'Piercing' ? 'selected' : ''}>Piercing</option>
+                                    <option value="Force" ${ability.firstDamageType === 'Force' ? 'selected' : ''}>Force</option>
+                                    <option value="Psychic" ${ability.firstDamageType === 'Psychic' ? 'selected' : ''}>Psychic</option>
+                                    <option value="Fire" ${ability.firstDamageType === 'Fire' ? 'selected' : ''}>Fire</option>
+                                    <option value="Cold" ${ability.firstDamageType === 'Cold' ? 'selected' : ''}>Cold</option>
+                                    <option value="Lightning" ${ability.firstDamageType === 'Lightning' ? 'selected' : ''}>Lightning</option>
+                                    <option value="Thunder" ${ability.firstDamageType === 'Thunder' ? 'selected' : ''}>Thunder</option>
+                                    <option value="Acid" ${ability.firstDamageType === 'Acid' ? 'selected' : ''}>Acid</option>
+                                    <option value="Poison" ${ability.firstDamageType === 'Poison' ? 'selected' : ''}>Poison</option>
+                                    <option value="Radiant" ${ability.firstDamageType === 'Radiant' ? 'selected' : ''}>Radiant</option>
+                                    <option value="Necrotic" ${ability.firstDamageType === 'Necrotic' ? 'selected' : ''}>Necrotic</option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label># Dice: <span class="view-mode">${ability.secondNumDice}</span></label>
+                                <input type="number" name="numDice1" class="form-control edit-mode d-none" value="${ability.secondNumDice}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Dice Type: <span class="view-mode">${ability.secondDiceSize}</span></label>
+                                <input type="number" name="numDiceSize1" class="form-control edit-mode d-none" value="${ability.secondDiceSize}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Action Cost: <span class="view-mode">${ability.secondDamageType}</span></label>
+                                <select name="secondDamageType" class="form-control edit-mode d-none">
+                                    <option value="Bludgeoning" ${ability.secondDamageType === 'Bludgeoning' ? 'selected' : ''}>Bludgeoning</option>
+                                    <option value="Slashing" ${ability.secondDamageType === 'Slashing' ? 'selected' : ''}>Slashing</option>
+                                    <option value="Piercing" ${ability.secondDamageType === 'Piercing' ? 'selected' : ''}>Piercing</option>
+                                    <option value="Force" ${ability.secondDamageType === 'Force' ? 'selected' : ''}>Force</option>
+                                    <option value="Psychic" ${ability.secondDamageType === 'Psychic' ? 'selected' : ''}>Psychic</option>
+                                    <option value="Fire" ${ability.secondDamageType === 'Fire' ? 'selected' : ''}>Fire</option>
+                                    <option value="Cold" ${ability.secondDamageType === 'Cold' ? 'selected' : ''}>Cold</option>
+                                    <option value="Lightning" ${ability.secondDamageType === 'Lightning' ? 'selected' : ''}>Lightning</option>
+                                    <option value="Thunder" ${ability.secondDamageType === 'Thunder' ? 'selected' : ''}>Thunder</option>
+                                    <option value="Acid" ${ability.secondDamageType === 'Acid' ? 'selected' : ''}>Acid</option>
+                                    <option value="Poison" ${ability.secondDamageType === 'Poison' ? 'selected' : ''}>Poison</option>
+                                    <option value="Radiant" ${ability.secondDamageType === 'Radiant' ? 'selected' : ''}>Radiant</option>
+                                    <option value="Necrotic" ${ability.secondDamageType === 'Necrotic' ? 'selected' : ''}>Necrotic</option>
+                                </select>
+                            </div>
+                    `;
+
+                    container.appendChild(abilityElement);
+                });
+            })
+            .catch(error => console.error('Error fetching abilities:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadCharacters();
+
+            const createAbilityForm = document.querySelector('#createAbilityForm'); // Use the form's ID
+            if (createAbilityForm) {
+                createAbilityForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    submitAbilityForm();
+                    createAbilityForm.submit()
+                });
+            } else {
+                console.error('createAbilityForm form not found in the DOM.');
+            }
+    });
+</script>
+
+<style>
+    .sticky-top {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .highlight-selected {
+        outline: 2px solid black;
+        background-color: lightgray;
+    }
+
+    .rounded-circle {
+        border-radius: 50%;
+    }
+
+    .bg-secondary {
+        background-color: #6c757d;
+    }
+
+    .text-white {
+        color: #fff;
+    }
+
+    .mr-3 {
+        margin-right: 1rem;
+    }
+
+    .edit-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
+    }
+
+    .list-group-item:hover .edit-icon {
+        display: inline;
+    }
+</style>

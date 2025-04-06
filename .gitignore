@@ -1,0 +1,15 @@
+# Ignore Visual Studio files
+.vs/
+*.user
+*.suo
+
+# Ignore build outputs
+bin/
+obj/
+
+# Ignore temporary files
+*.log
+*.tmp
+
+# Ignore other specific files or folders
+node_modules/

@@ -36,8 +36,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hhcmFjdGVyRWRpdG9yXENoYXJhY3RlckVkaXRvci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/College/Y5S3/Team-TPK/TPK_Web_Application/Pages/CharacterEditor/OldCharacter.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hhcmFjdGVyRWRpdG9yXE9sZENoYXJhY3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/College/Y5S3/Team-TPK/TPK_Web_Application/Pages/EncounterEditor/EncounterEditor.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRW5jb3VudGVyRWRpdG9yXEVuY291bnRlckVkaXRvci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/College/Y5S3/Team-TPK/TPK_Web_Application/Pages/EncounterEditor/Testing.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRW5jb3VudGVyRWRpdG9yXFRlc3RpbmcuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/College/Y5S3/Team-TPK/TPK_Web_Application/Pages/EncounterHistory/EncounterHistory.cshtml]

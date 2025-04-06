@@ -1,4 +1,55 @@
 ﻿@page
-@model TPK_Web_Application.Pages.EncounterResults.EncounterResultsModel
+@model TPK_Web_Application.Pages.EncounterHistory.EncounterHistoryPageModel
 @{
+    ViewData["Title"] = "Encounter History";
 }
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Encounter History</h2>
+            <div style="position: sticky; top: 0; background-color: white; z-index: 1000;">
+                <label class="list-group-item list-group-item-action mb-3" >View the results of your Encounter here! </label>
+            </div>
+            <form method="post">
+                <input type="hidden" id="selectedBatchId" name="selectedBatchId" value="@Model.selectedEncounter.batchID" />
+                <ul class="list-group" style="max-height: 600px; overflow-y: auto;">
+                    @if (Model.History.Count != null)
+                    {
+                        @foreach (var encounter in Model.History)
+                        {
+                            <li class="list-group-item @(encounter.encounterID == Model.selectedEncounter.encounterID ? "active" : "")" onclick="document.getElementById('selectedBatchId').value = '@encounter.batchID'; this.closest('form').submit();">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mr-3" style="width: 30px; height: 30px;">
+                                        @encounter.encounterID
+                                    </div>
+                                    <span>Batch Number: @encounter.batchID</span>
+                                </div>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="list-group-item">This is where your Encounter History will show after a run!</li>
+                    }
+                </ul>
+            </form>
+        </div>
+        <div class="col-md-8">
+            <h2>Encounter Details</h2>
+            <div id="encounterDetails">
+                @if (Model.selectedEncounter != null && Model.selectedEncounter.encounterID != 0)
+                {
+                    <p>Team 1 Win Percentage: @Model.selectedEncounter.team1Wins%</p>
+                    <p>Team 2 Win Percentage: @Model.selectedEncounter.team2Wins%</p>
+                    @* <p>Encounter Run Time: @Model.selectedEncounter.RunTime</p> *@
+                }
+                else
+                {
+                    <p>Select an encounter to see details.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

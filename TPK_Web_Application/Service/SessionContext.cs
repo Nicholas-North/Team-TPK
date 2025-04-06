@@ -1,4 +1,4 @@
-﻿using TPK_Web_Application.Model
+﻿using TPK_Web_Application.Model;
 
 namespace TPK_Web_Application.Service
 {
@@ -7,6 +7,7 @@ namespace TPK_Web_Application.Service
         public SessionContext() 
         {
             IsAuthenticated = false;
+            Account = new Account_Model();
         }
 
         public bool IsAuthenticated { get; set; }

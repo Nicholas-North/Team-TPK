@@ -1,24 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
+using TPK_Web_Application.Service;
+using TPK_Web_Application.Model;
 
 namespace TPK_Web_Application.Pages.Account
 {
     public class AccountCreationModel : PageModel
     {
-        [BindProperty]
-        [Required]
-        public string Username { get; set; }
+        private readonly DataContext _dataContext;
+        private readonly SessionContext _sessionContext;
 
         [BindProperty]
-        [Required]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public Credential Credential { get; set; }
 
-        [BindProperty]
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        public AccountCreationModel(DataContext data_context, SessionContext session_context)
+        {
+            _dataContext = data_context;
+            _sessionContext = session_context;
+        }
 
         public IActionResult OnPost()
         {
@@ -27,9 +27,35 @@ namespace TPK_Web_Application.Pages.Account
                 return Page();
             }
 
-            // Add your account creation logic here
+            var user = _dataContext.Accounts.SingleOrDefault(u => u.username == Credential.UserName);
 
-            return RedirectToPage("/Index");
+            if (user == null)
+            {
+                var maxAccountId = _dataContext.Accounts.Max(u => (int?)u.accountID) ?? 0;
+                var newAccountId = maxAccountId + 1;
+
+                var newUser = new Account_Model
+                {
+                    username = Credential.UserName,
+                    password = Credential.Password,
+                    email = Credential.Email,
+                    accountID = newAccountId
+                };
+
+                _dataContext.Accounts.Add(newUser);
+                _dataContext.SaveChanges();
+
+                _sessionContext.Account.username = newUser.username;
+                _sessionContext.Account.password = newUser.password;
+                _sessionContext.Account.email = newUser.email;
+                _sessionContext.Account.accountID = newUser.accountID;
+                _sessionContext.Account.deleted = newUser.deleted;
+                return RedirectToPage("/Account/Account");
+            }
+
+            // Add your account creation logic here
+            ModelState.AddModelError(string.Empty, "User already exists. Please try a different user name");
+            return Page();
         }
     }
 }
