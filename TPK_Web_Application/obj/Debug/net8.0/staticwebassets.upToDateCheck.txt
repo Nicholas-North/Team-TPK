@@ -61,4 +61,5 @@ wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt
 wwwroot\Resources\Account_Icon.png
 wwwroot\Resources\Character_Creation_Icon.jpg
 wwwroot\Resources\Encounter_Creation_Icon.jpg
+wwwroot\Resources\logo.png
 wwwroot\Resources\Visualization_Icon.png
