@@ -17,7 +17,7 @@ def run_simulator(batch_id, encounter_id, players):
     try:
         if not players:
             print(f"ERROR: No players found for EncounterID: {encounter_id}")
-            return False, None, None
+            return True, 0, 0, 0, "None"
         
         for char in players:
             print(f"Character: {char.characterName}, Class: {char.characterClass}, FriendFoe: {char.friendFoe}")
@@ -148,8 +148,8 @@ def batch_processor():
             # Fetch enqueued batches
             enqueued_batches = fetch_enqueued_batches(connection)
             if not enqueued_batches:
-                print("No enqueued batches found. Sleeping for 5 seconds...")
-                time.sleep(5)
+                print("No enqueued batches found. Sleeping for 2.5 seconds...")
+                time.sleep(2.5)
                 continue
 
             # Use ProcessPoolExecutor to process batches in parallel
