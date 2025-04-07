@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.IdentityModel.Tokens;
+using System.Text.Json;
 using TPK_Web_Application.Model;
 using TPK_Web_Application.Service;
 
@@ -135,7 +136,42 @@ namespace TPK_Web_Application.Pages.CharacterEditor
 
         public IActionResult OnPostCreateAbility()
         {
-            return RedirectToPage();
+            try
+            {
+                Console.WriteLine(SelectedCharacter.characterID);
+                // Deserialize the JSON string from the AbilityJson property
+                var newAbility = JsonSerializer.Deserialize<Ability_Model>(AbilityJson);
+
+                if (newAbility == null)
+                {
+                    _logger.LogWarning("Failed to deserialize AbilityJson. Ensure the JSON structure matches the Ability_Model.");
+                    return BadRequest("Invalid ability data.");
+                }
+
+                // Assign a new ability ID (if needed)
+                var highestAbilityID = _dataContext.Abilities
+                    .OrderByDescending(a => a.abilityID)
+                    .Select(a => a.abilityID)
+                    .FirstOrDefault();
+
+                newAbility.abilityID = highestAbilityID + 1;
+
+
+                // Add the new ability to the database
+                _dataContext.Abilities.Add(newAbility);
+
+                // Save changes to the database
+                _dataContext.SaveChanges();
+
+                _logger.LogInformation("New ability created successfully: {AbilityName}", newAbility.abilityName);
+
+                return RedirectToPage();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating a new ability.");
+                return StatusCode(500, "An error occurred while creating the ability.");
+            }
         }
 
         private List<Character_Model> GetCharacters(long account_id)

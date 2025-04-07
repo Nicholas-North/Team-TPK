@@ -88,21 +88,40 @@ namespace TPK_Web_Application.Pages.EncounterEditor
                     .Select(b => b.batchID)
                     .FirstOrDefault();
 
-                var batch = new Batch_Model
+                long highestEncounterVersion = 0;
+                try
                 {
-                    batchID = highestBatchID + 1,
-                    encounterID = selectedEncounterId,
-                    startTime = DateTime.Now
-                };
+                    highestEncounterVersion = _dataContext.encounterPosition
+                        .Where(filter => filter.encounterID == selectedEncounterId)
+                        .Max(filter => filter.encounterVersion);
+                }
+                catch (InvalidOperationException)
+                {
+                    highestEncounterVersion = 0;
+                }
 
-                _dataContext.Batch.Add(batch);
-                _dataContext.SaveChanges();
+                if (selectedEncounterId != 0)
+                {
+                    var batch = new Batch_Model
+                    {
+                        batchID = highestBatchID + 1,
+                        encounterID = selectedEncounterId,
+                        encounterVersion = highestEncounterVersion,
+                        startTime = DateTime.Now,
+                    };
 
-                return Ok(batch);
+                    _dataContext.Batch.Add(batch);
+                    _dataContext.SaveChanges();
+
+                    _logger.LogInformation($"Encounter {selectedEncounterId} successfully started with Batch ID {batch.batchID}.");
+                    return Ok(new { message = "Encounter started successfully.", batchId = batch.batchID });
+                }
+
+                return BadRequest("Invalid encounter ID.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e.Message);
+                _logger.LogError(e, "An error occurred while running the encounter.");
                 return StatusCode(500, "An error occurred while running the encounter.");
             }
         }
