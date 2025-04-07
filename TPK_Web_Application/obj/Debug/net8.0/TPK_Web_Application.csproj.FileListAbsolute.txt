@@ -14,7 +14,6 @@ C:\College\Y5S3\Team-TPK\TPK_Web_Application\obj\Debug\net8.0\TPK_Web_Applicatio
 C:\College\Y5S3\Team-TPK\TPK_Web_Application\obj\Debug\net8.0\TPK_Web_Application.MvcApplicationPartsAssemblyInfo.cache
 C:\College\Y5S3\Team-TPK\TPK_Web_Application\obj\Debug\net8.0\TPK_Web_Application.RazorAssemblyInfo.cache
 C:\College\Y5S3\Team-TPK\TPK_Web_Application\obj\Debug\net8.0\TPK_Web_Application.RazorAssemblyInfo.cs
-C:\College\Y5S3\Team-TPK\TPK_Web_Application\obj\Debug\net8.0\TPK_Web_Application.sourcelink.json
 C:\College\Y5S3\Team-TPK\TPK_Web_Application\obj\Debug\net8.0\scopedcss\Pages\Shared\_Layout.cshtml.rz.scp.css
 C:\College\Y5S3\Team-TPK\TPK_Web_Application\obj\Debug\net8.0\scopedcss\bundle\TPK_Web_Application.styles.css
 C:\College\Y5S3\Team-TPK\TPK_Web_Application\obj\Debug\net8.0\scopedcss\projectbundle\TPK_Web_Application.bundle.scp.css
