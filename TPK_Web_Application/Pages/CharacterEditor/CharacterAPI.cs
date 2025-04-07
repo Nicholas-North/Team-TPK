@@ -240,8 +240,9 @@ namespace TPK_Web_Application.Pages.CharacterEditor
                         // Save changes to the database
                         _dataContext.SaveChanges();
 
+                        Console.WriteLine("I got here and am fine");
                         // Return success response
-                        return Ok("Character and abilities updated successfully.");
+                        return Ok(new { message = "Character and abilities updated successfully" });
                     }
                     catch (JsonException jsonEx)
                     {

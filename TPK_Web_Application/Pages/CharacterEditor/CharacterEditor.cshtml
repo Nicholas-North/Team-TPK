@@ -282,6 +282,7 @@
         const hiddenCharacterIdInput = document.getElementById('selectedCharacterId');
         if (hiddenCharacterIdInput) {
             hiddenCharacterIdInput.value = characterId;
+            console.log(hiddenCharacterIdInput.value)
         }
 
         fetch('/api/CharacterAPI/GetSelectedCharacters/' + characterId)
@@ -432,7 +433,7 @@
     function collectCharacterData() {
         // Collect character attributes
         const character = {
-            characterID: parseInt(document.querySelector('input[name="characterID"]').value || 0), // Add characterID
+            characterID: parseInt(document.getElementById('selectedCharacterId').value), // Add characterID
             accountID: parseInt(document.querySelector('input[name="accountID"]').value || 0), // Add accountID
             characterName: document.querySelector('input[name="characterName"]').value,
             ancestry: document.querySelector('input[name="ancestry"]').value,
@@ -455,7 +456,7 @@
             intSaveProf: document.querySelector('input[name="intSaveProf"]').checked,
             wisSaveProf: document.querySelector('input[name="wisSaveProf"]').checked,
             chaSaveProf: document.querySelector('input[name="chaSaveProf"]').checked,
-            mainScore: document.querySelector('select[name="class"]').value,
+            mainScore: document.querySelector('select[name="mainScore"]').value,
             spellLevel1: parseInt(document.querySelector('input[name="spellCountLevel1"]').value || 0),
             spellLevel2: parseInt(document.querySelector('input[name="spellCountLevel2"]').value || 0),
             spellLevel3: parseInt(document.querySelector('input[name="spellCountLevel3"]').value || 0),
@@ -546,7 +547,7 @@
             <div class="form-group">
                 <h4>Class: <span class="view-mode">${character.characterClass || "None"}</span></h4>
                 <select name="class" class="form-control edit-mode d-none">
-                    <option value="" ${!character.class ? 'selected' : ''}>Blank</option>
+                    <option value="" ${!character.characterClass ? 'selected' : ''}>Blank</option>
                     <option value="Fighter" ${character.characterClass === 'Fighter' ? 'selected' : ''}>Fighter</option>
                     <option value="Cleric" ${character.characterClass === 'Cleric' ? 'selected' : ''}>Cleric</option>
                     <option value="Rogue" ${character.characterClass === 'Rogue' ? 'selected' : ''}>Rogue</option>
@@ -890,6 +891,7 @@
                     collectCharacterData();
                     submitCharacterData();
                     toggleEdit();
+                    loadCharacters();
                     //saveButton.submit()
                 });
             } else {

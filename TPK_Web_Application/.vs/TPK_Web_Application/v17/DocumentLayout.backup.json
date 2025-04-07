@@ -13,10 +13,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\pages\\charactereditor\\charactereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\charactereditor\\charactereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\pages\\encountereditor\\encountereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encountereditor\\encountereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,21 +22,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "EncounterEditor.cshtml",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
-              "RelativeDocumentMoniker": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
-              "RelativeToolTip": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
-              "ViewState": "AgIAABIAAAAAAAAAAAAAADMAAAB+AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-06T21:36:38.065Z",
-              "EditorCaption": ""
-            },
             {
               "$type": "Document",
               "DocumentIndex": 2,
@@ -49,7 +32,7 @@
               "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
               "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
               "RelativeToolTip": "Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
-              "ViewState": "AgIAALkAAAAAAAAAAAAqwJIAAABDAAAAAAAAAA==",
+              "ViewState": "AgIAAHEAAAAAAAAAAADwv5IAAABDAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-06T21:35:07.681Z",
               "EditorCaption": ""
@@ -62,7 +45,7 @@
               "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
               "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
               "RelativeToolTip": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
-              "ViewState": "AgIAAEoDAAAAAAAAAAAUwGoDAAAmAAAAAAAAAA==",
+              "ViewState": "AgIAAGEDAAAAAAAAAAAiwHwDAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-04-06T21:35:05.115Z",
               "EditorCaption": ""
@@ -75,7 +58,7 @@
               "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterAPI.cs",
               "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterAPI.cs",
               "RelativeToolTip": "Pages\\CharacterEditor\\CharacterAPI.cs",
-              "ViewState": "AgIAAB0BAAAAAAAAAAAIwEQBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAANcAAAAAAAAAAADwv+sAAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-06T21:35:03.7Z",
               "EditorCaption": ""
