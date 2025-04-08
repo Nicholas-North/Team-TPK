@@ -1,7 +1,7 @@
 # Ignore Visual Studio files
-.TPK_Web_Application/.vs/
-.TPK_Web_Application/obj/
-.TPK_Web_Application/bin/
+TPK_Web_Application/.vs/
+TPK_Web_Application/obj/
+TPK_Web_Application/bin/
 *.user
 *.suo
 
