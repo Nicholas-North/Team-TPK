@@ -6,6 +6,23 @@ import math
 import pyodbc
 import copy
 import random
+from tqdm import tqdm
+
+
+class ConnectionPool:
+    _pool = []
+    
+    @classmethod
+    def get_connection(cls):
+        if not cls._pool:
+            cls._pool.append(create_db_connection())
+        return cls._pool[-1]
+    
+    @classmethod
+    def close_all(cls):
+        for conn in cls._pool:
+            conn.close()
+        cls._pool = []
 
 def create_db_connection():
     DB_SERVER = 'database-1.c16m0yos4c9g.us-east-2.rds.amazonaws.com,1433'
@@ -14,6 +31,9 @@ def create_db_connection():
     DB_PASSWORD = 'teamtpk4vr!'
     connection_string = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={DB_SERVER};DATABASE={DB_NAME};UID={DB_USER};PWD={DB_PASSWORD}'
     return pyodbc.connect(connection_string)
+
+def run_simulation_wrapper(args):
+    return run_single_simulation(*args)
 
 class ActionType(Enum):
     Movement = 1
@@ -90,7 +110,7 @@ class MonteCarloSimulation:
     def fetch_encounter_dimensions(self, encounter_id):
         db_connection = None
         try:
-            db_connection = create_db_connection()
+            db_connection = ConnectionPool.get_connection()
             cursor = db_connection.cursor()
             
             query = "SELECT xdim, ydim, randomPosition FROM encounter.encounter WHERE encounterID = ?"
@@ -104,12 +124,9 @@ class MonteCarloSimulation:
         except Exception as e:
             print(f"Error fetching encounter dimensions: {str(e)}")
             return 15, 15, False  # Return defaults on error
-        finally:
-            if db_connection:
-                db_connection.close()
 
     def fetch_all_player_abilities(self):
-        db_connection = create_db_connection()  # Create a temporary connection
+        db_connection = ConnectionPool.get_connection()
         cursor = db_connection.cursor()
         abilities = {}
         cursor.execute("""
@@ -159,9 +176,15 @@ class MonteCarloSimulation:
             return 0, 0, 0, "Error: Not Enough Space!"
 
         with Pool() as pool:
-            pool.starmap(run_single_simulation, 
-                        [(simulation_data, results, round_counts, mvp_points_list) 
-                         for _ in range(self.num_simulations)])
+            args_iterable = [
+                (simulation_data, results, round_counts, mvp_points_list)
+                for _ in range(self.num_simulations)
+            ]
+            
+            for _ in tqdm(pool.imap_unordered(run_simulation_wrapper, args_iterable),
+                        total=self.num_simulations,
+                        desc="Running Simulations"):
+                pass
 
         # Aggregate results
         for winner in results:
@@ -304,7 +327,7 @@ class CombatSimulation:
     #     print("\n")
     
     def run_round(self):
-        max_iterations = 25  # Prevent infinite loops
+        max_iterations = 50  # Prevent infinite loops
         iteration = 0
 
         while any(p.hp > 0 for p in self.friends) and any(p.hp > 0 for p in self.foes):
