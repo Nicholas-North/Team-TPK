@@ -50,8 +50,12 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 7,
@@ -72,7 +76,7 @@
               "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
               "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
               "RelativeToolTip": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
-              "ViewState": "AgIAAJ8DAAAAAAAAAAAAAKgDAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAMgCAAAAAAAAAAAAAM8CAAA8AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-04-04T21:57:15.819Z",
               "EditorCaption": ""
@@ -85,10 +89,9 @@
               "RelativeDocumentMoniker": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
               "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
               "RelativeToolTip": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
-              "ViewState": "AgIAALwAAAAAAAAAAAAhwDEBAABZAAAAAAAAAA==",
+              "ViewState": "AgIAAGoAAAAAAAAAAAAhwO4AAABAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-04T21:57:20.842Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-04T21:57:20.842Z"
             },
             {
               "$type": "Document",
@@ -136,8 +139,7 @@
               "RelativeToolTip": "Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-06T00:40:01.363Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-06T00:40:01.363Z"
             },
             {
               "$type": "Document",
