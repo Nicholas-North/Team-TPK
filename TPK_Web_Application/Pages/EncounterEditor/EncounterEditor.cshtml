@@ -241,18 +241,20 @@
             console.log(`Selected Character ID: ${characterId}`);
         }
 
-        function toggleEdit(button) {
+                function toggleEdit(button) {
             const encounterVault = document.getElementById('EncounterVault');
             const characterVault = document.getElementById('CharacterVault');
             const editButton = document.getElementById('EditButton');
             const closeButton = document.getElementById('CloseButton');
             const saveButton = document.getElementById('SaveButton');
+            const runEncounterButton = document.getElementById('RunEncounterForm');
 
             encounterVault.classList.toggle('d-none');
             characterVault.classList.toggle('d-none');
             editButton.classList.toggle('d-none');
             closeButton.classList.toggle('d-none');
             saveButton.classList.toggle('d-none');
+            runEncounterButton.classList.toggle('d-none');
         }
 
         function toggleElementsVisibility() {
