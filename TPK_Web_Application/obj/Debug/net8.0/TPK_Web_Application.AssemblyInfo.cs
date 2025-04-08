@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TPK_Web_Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ed1e5a572e74039eb7aa84c6763d3266ae5d4696")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+57cc67635541ed72b9e184e006b6abccab779fcd")]
 [assembly: System.Reflection.AssemblyProductAttribute("TPK_Web_Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TPK_Web_Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

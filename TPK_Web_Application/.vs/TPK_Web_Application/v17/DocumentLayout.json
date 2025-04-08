@@ -3,10 +3,6 @@
   "WorkspaceRootPath": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\pages\\encounterhistory\\encounterhistory.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encounterhistory\\encounterhistory.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\pages\\charactereditor\\charactereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\charactereditor\\charactereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
@@ -17,6 +13,10 @@
     {
       "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\pages\\encountereditor\\encountereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encountereditor\\encountereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\pages\\encounterhistory\\encounterhistory.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encounterhistory\\encounterhistory.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\pages\\encountereditor\\encountereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -50,7 +50,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
@@ -66,27 +66,29 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "CharacterEditor.cshtml",
               "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
               "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
               "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
               "RelativeToolTip": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
-              "ViewState": "AgIAAGsDAAAAAAAAAAAhwH0DAAATAAAAAAAAAA==",
+              "ViewState": "AgIAAJ8DAAAAAAAAAAAAAKgDAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-04T21:57:15.819Z"
+              "WhenOpened": "2025-04-04T21:57:15.819Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "EncounterEditor.cshtml",
               "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
               "RelativeDocumentMoniker": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
               "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
               "RelativeToolTip": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
-              "ViewState": "AgIAACUBAAAAAAAAAAAhwKMBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAALwAAAAAAAAAAAAhwDEBAABZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-04T21:57:20.842Z"
+              "WhenOpened": "2025-04-04T21:57:20.842Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -126,7 +128,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "CharacterEditor.cshtml.cs",
               "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
               "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
@@ -134,11 +136,12 @@
               "RelativeToolTip": "Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-06T00:40:01.363Z"
+              "WhenOpened": "2025-04-06T00:40:01.363Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "EncounterHistory.cshtml",
               "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistory.cshtml",
               "RelativeDocumentMoniker": "Pages\\EncounterHistory\\EncounterHistory.cshtml",
@@ -146,8 +149,7 @@
               "RelativeToolTip": "Pages\\EncounterHistory\\EncounterHistory.cshtml",
               "ViewState": "AgIAAEAAAAAAAAAAAADwv3UAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-06T07:26:53.244Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-06T07:26:53.244Z"
             },
             {
               "$type": "Document",
