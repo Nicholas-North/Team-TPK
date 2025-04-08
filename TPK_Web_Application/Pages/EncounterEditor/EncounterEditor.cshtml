@@ -63,10 +63,14 @@
                 <div class="modal-body">
                     <form method="post" asp-page-handler="CreateEncounter">
                         <input type="hidden" id="selectedEncounterId" name="selectedEncounterId" value="@Model.SelectedEncounter.encounterID" />
-                        <label for="NameInput">Map X dimensions: </label>
-                        <input type="number" asp-for="XInput" class="form-control" id="XInput" name="XInput" min="5" max="100" />
-                        <label for="AncestryInput">Map Y dimensions: </label>
-                        <input type="number" asp-for="YInput" class="form-control" id="YInput" name="YInput" min="5" max="100" />
+                        <div class="form-group">
+                            <label for="XInput">Map X dimensions:</label>
+                            <input type="number" asp-for="XInput" class="form-control" id="XInput" name="XInput" min="5" max="100" value="50" />
+                        </div>
+                        <div class="form-group">
+                            <label for="YInput">Map Y dimensions:</label>
+                            <input type="number" asp-for="YInput" class="form-control" id="YInput" name="YInput" min="5" max="100" value="50" />
+                        </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Save changes</button>
@@ -89,26 +93,24 @@
         const characterMap = new Map();
 
         function initializeGrid() {
-            createGrid(gridSizeX, gridSizeY);
+            createGrid();
             setupGridControls();
         }
 
-        function createGrid(xSize, ySize) {
+        function createGrid() {
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
-            gridSizeX = xSize;
-            gridSizeY = ySize;
-            document.getElementById('grid-size-display').textContent = `${xSize}x${ySize}`;
-            grid.style.gridTemplateColumns = `repeat(${xSize}, 50px)`;
-            grid.style.gridTemplateRows = `repeat(${ySize}, 50px)`;
+            document.getElementById('grid-size-display').textContent = `${gridSizeX}x${gridSizeY}`;
+            grid.style.gridTemplateColumns = `repeat(${gridSizeX}, 50px)`;
+            grid.style.gridTemplateRows = `repeat(${gridSizeY}, 50px)`;
 
-            for (let i = 0; i < xSize * ySize; i++) {
+            for (let i = 0; i < gridSizeX * gridSizeY; i++) {
                 const gridItem = document.createElement('div');
                 gridItem.className = 'grid-item';
                 gridItem.id = `grid-item-${i}`;
                 if (showCoordinates) {
-                    const x = i % xSize;
-                    const y = Math.floor(i / xSize);
+                    const x = i % gridSizeX;
+                    const y = Math.floor(i / gridSizeX);
                     gridItem.setAttribute('title', `(${x}, ${y})`);
                 }
                 grid.appendChild(gridItem);
@@ -119,10 +121,18 @@
 
         function setupGridControls() {
             document.getElementById('increase-grid').addEventListener('click', () => {
-                if (gridSizeX < 100) createGrid(gridSizeX + 5, gridSizeY + 5);
+                if (gridSizeX < 100) {
+                    gridSizeX += 5;
+                    gridSizeY += 5;
+                    createGrid();
+                }
             });
             document.getElementById('decrease-grid').addEventListener('click', () => {
-                if (gridSizeX > 5) createGrid(gridSizeX - 5, gridSizeY - 5);
+                if (gridSizeX > 5) {
+                    gridSizeX -= 5;
+                    gridSizeY -= 5;
+                    createGrid();
+                }
             });
             document.getElementById('toggle-coords').addEventListener('click', () => {
                 showCoordinates = !showCoordinates;
@@ -207,7 +217,15 @@
             document.getElementById('SelectedEncounterId').value = encounterId;
             selectedEncounter = encounterId;
 
-            fetch(`/api/EncounterAPI/GetPositions/${encounterId}`)
+            fetch(`/api/EncounterAPI/GetSelectedEncounter/${encounterId}`)
+                .then(response => response.json())
+                .then(encounter => {
+                    gridSizeX = encounter.xdim;
+                    gridSizeY = encounter.ydim;
+                    createGrid();
+
+                    return fetch(`/api/EncounterAPI/GetPositions/${encounterId}`);
+                })
                 .then(response => response.json())
                 .then(data => {
                     const gridItems = document.querySelectorAll('.grid-item');
@@ -234,14 +252,14 @@
                         }
                     });
                 })
-                .catch(error => console.error('Error fetching characters:', error));
+                .catch(error => console.error('Error fetching encounter data:', error));
         }
 
         function selectCharacter(characterId) {
             console.log(`Selected Character ID: ${characterId}`);
         }
 
-                function toggleEdit(button) {
+        function toggleEdit(button) {
             const encounterVault = document.getElementById('EncounterVault');
             const characterVault = document.getElementById('CharacterVault');
             const editButton = document.getElementById('EditButton');
@@ -375,7 +393,7 @@
                 if (token) {
                     const x = index % gridSizeX;
                     const y = Math.floor(index / gridSizeX);
-                    const characterId = parseInt(token.dataset.characterId); // Convert to integer
+                    const characterId = parseInt(token.dataset.characterId);
                     gridData.push({ x, y, characterID: characterId });
                 }
             });
@@ -516,18 +534,19 @@
         .grid {
             display: grid;
             gap: 0;
-            background-color: #f0f0f0;
+            background-color: transparent; /* Remove grey background */
         }
 
         .grid-item {
-            border: 1px solid #ddd;
+            border: 1px solid #ddd; /* Keep border for visibility */
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: white;
+            background-color: white; /* Remove white background */
             transition: background-color 0.2s;
         }
 
+            /* Remove alternating grey color */
             .grid-item:nth-child(odd) {
                 background-color: #f8f9fa;
             }
@@ -537,7 +556,7 @@
             }
 
             .grid-item.drop-target {
-                background-color: #e2f0fd !important;
+                background-color: #e2f0fd !important; /* Keep drop target highlight */
             }
 
         .character-token {
@@ -551,6 +570,7 @@
             font-weight: bold;
             cursor: move;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1;
         }
 
             .character-token.invisible {
@@ -560,7 +580,7 @@
 
             .character-token.dragging {
                 transform: scale(1.1);
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 0 10px rgba(0,0,0,0.3);
                 z-index: 100;
             }
 
@@ -621,28 +641,31 @@
         }
 
         @@media (max-width: 768px) {
-            .Formatting {
-                flex-direction: column;
-            }
+            .Formatting
 
-            .frame {
-                height: 60vh;
-            }
+        {
+            flex-direction: column;
+        }
 
-            .col-md-4 {
-                width: 100%;
-            }
+        .frame {
+            height: 60vh;
+        }
 
-            .grid-item {
-                width: 30px;
-                height: 30px;
-            }
+        .col-md-4 {
+            width: 100%;
+        }
 
-            .character-token {
-                width: 25px;
-                height: 25px;
-                font-size: 10px;
-            }
+        .grid-item {
+            width: 30px;
+            height: 30px;
+        }
+
+        .character-token {
+            width: 25px;
+            height: 25px;
+            font-size: 10px;
+        }
+
         }
     </style>
 </body>
