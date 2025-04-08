@@ -37,6 +37,7 @@ namespace TPK_Web_Application.Pages.Account
             _sessionContext.Account.email = "";
             _sessionContext.Account.accountID = 0;
             _sessionContext.Account.deleted = false;
+            _sessionContext.IsAuthenticated = false;
             return RedirectToPage("/Index");
         }
 

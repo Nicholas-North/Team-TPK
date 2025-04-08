@@ -59,7 +59,7 @@
                     <form method="post" class="d-inline">
                         <button type="submit" asp-page-handler="SignOut" class="btn btn-primary">Sign Out</button>
                     </form>
-                    <form method="post" class="d-inline">
+                    <form method="post" class="d-inline" onsubmit="return confirmDeleteAccount();">
                         <button type="submit" asp-page-handler="DeleteAccount" class="btn btn-danger">Delete Account</button>
                     </form>
                 </div>
@@ -67,3 +67,9 @@
         </div>
     </div>
 </div>
+
+<script>
+    function confirmDeleteAccount() {
+        return confirm("Are you sure you want to delete your account? This action cannot be undone.");
+    }
+</script>

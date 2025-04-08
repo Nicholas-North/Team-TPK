@@ -37,7 +37,6 @@
         </div>
     </div>
 
-
     @* Character Modal *@
     <div class="modal fade" id="CharacterEditorModal" tabindex="-1" role="dialog" aria-labelledby="Character Editor" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -45,7 +44,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Character Editor</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -72,7 +71,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Ability Editor</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -241,9 +240,6 @@
         </div>
     </div>
 
-
-
-
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
@@ -253,7 +249,7 @@
     let selectedCharacter = null;
     let currentTab = 0;
 
-        function loadCharacters() {
+    function loadCharacters() {
         const characterList = document.getElementById('character-list');
         characterList.innerHTML = '<li class="list-group-item text-center py-4">Loading characters...</li>';
 
@@ -300,7 +296,7 @@
             });
     }
 
-            function selectCharacter(characterId, clickedElement) {
+    function selectCharacter(characterId, clickedElement) {
         // Store the current character ID and element before any changes
         const currentCharacterId = selectedCharacter ? selectedCharacter.characterID : null;
         const currentCharacterElement = currentlyHighightedElement;
@@ -319,10 +315,6 @@
                 return;
             }
         }
-
-        // Only proceed with highlighting if we either:
-        // 1. Aren't in edit mode, or
-        // 2. Are in edit mode and confirmed the switch
 
         // Remove highlight from current element
         if (currentlyHighightedElement) {
@@ -343,13 +335,18 @@
                 if (Array.isArray(data) && data.length > 0) {
                     const character = data[0];
                     selectedCharacter = character;
-                    displayAttributes(character);
-                    displayAbilities(character.characterID);
+
+                    // Display the correct pane based on the current tab
+                    if (currentTab === 0) {
+                        displayAttributes(character);
+                    } else if (currentTab === 1) {
+                        displayAttributes(character); // Still need to set up the panes
+                        displayAbilities(character.characterID);
+                    }
 
                     // Update button states based on edit mode
                     const isEditMode = editModeElements.length > 0;
                     if (isEditMode) {
-                        // Keep the edit mode UI
                         document.getElementById('EditButton').classList.add('d-none');
                         document.getElementById('CloseButton').classList.remove('d-none');
                         document.getElementById('SaveButton').classList.remove('d-none');
@@ -370,11 +367,10 @@
     }
 
     function toggleElementsVisibility() {
-        const elementsToToggle = document.querySelectorAll('.requires-character'); // Elements that depend on a selected character
-
+        const elementsToToggle = document.querySelectorAll('.requires-character');
         elementsToToggle.forEach(element => {
             if (selectedCharacter == null) {
-                element.classList.remove('d-none'); // Show the element
+                element.classList.remove('d-none');
             }
         });
     }
@@ -405,19 +401,24 @@
         });
     }
 
-    function togglePane(paneValue){
+    function togglePane(paneValue) {
         console.log(paneValue);
         const attributePane = document.querySelectorAll('.attributePane');
         const abilityPane = document.querySelectorAll('.abilityPane');
-        if (currentTab === paneValue){  // Attribute Pane
+        if (currentTab === paneValue) {
             return;
         }
         currentTab = paneValue;
         attributePane.forEach(element => element.classList.toggle('d-none'));
         abilityPane.forEach(element => element.classList.toggle('d-none'));
+
+        // Load abilities if switching to the behavior tab and a character is selected
+        if (paneValue === 1 && selectedCharacter) {
+            displayAbilities(selectedCharacter.characterID);
+        }
     }
 
-        function highlightSelected(currentElement) {
+    function highlightSelected(currentElement) {
         const element = currentElement;
 
         // Remove highlight from all elements first
@@ -445,7 +446,6 @@
             coneLineSphere: $('#AoeTypeInput').val() || null
         };
 
-        // Add secondary damage if enabled
         if ($('#HasSecondaryDamage').is(':checked')) {
             ability.secondNumDice = parseInt($('#SecondNumDiceInput').val() || 1);
             ability.secondDiceSize = parseInt($('#SecondDiceSizeInput').val() || 6);
@@ -456,11 +456,11 @@
         $('#createAbilityForm').submit();
     }
 
-    function displayAttributes(character){
+    function displayAttributes(character) {
         const container = document.getElementById('TabInfoPane');
         const isEditMode = document.querySelectorAll('.edit-mode:not(.d-none)').length > 0;
         container.innerHTML = `
-        <div class="attributePane">
+        <div class="attributePane ${currentTab === 0 ? '' : 'd-none'}">
             <div class="form-group d-flex">
                 <div class="mr-3">
                     <h2>Name: <span class="view-mode">${character.characterName}</span></h2>
@@ -567,14 +567,14 @@
                     </tbody>
                 </table>
                 <div class="form-group">
-                <h4>Main Ability Score: <span class="view-mode">${character.mainScore || "None"}</span></h4>
-                    <select name="class" class="form-control edit-mode d-none">
-                        <option value="" ${!character.class ? 'selected' : ''}>Blank</option>
+                    <h4>Main Ability Score: <span class="view-mode">${character.mainScore || "None"}</span></h4>
+                    <select name="mainScore" class="form-control edit-mode d-none">
+                        <option value="" ${!character.mainScore ? 'selected' : ''}>Blank</option>
                         <option value="STR" ${character.mainScore === 'STR' ? 'selected' : ''}>STR</option>
                         <option value="DEX" ${character.mainScore === 'DEX' ? 'selected' : ''}>DEX</option>
                         <option value="CON" ${character.mainScore === 'CON' ? 'selected' : ''}>CON</option>
                         <option value="INT" ${character.mainScore === 'INT' ? 'selected' : ''}>INT</option>
-                        <option value="WIS" ${character.characterClass === 'WIS' ? 'selected' : ''}>WIS</option>
+                        <option value="WIS" ${character.mainScore === 'WIS' ? 'selected' : ''}>WIS</option>
                         <option value="CHA" ${character.mainScore === 'CHA' ? 'selected' : ''}>CHA</option>
                     </select>
                 </div>
@@ -619,18 +619,18 @@
                 </div>
             </div>
         </div>
-        <div class="abilityPane d-none">
-        </div
-    `;
-    const viewModeElements = container.querySelectorAll('.view-mode');
-    const editModeElements = container.querySelectorAll('.edit-mode');
+        <div class="abilityPane ${currentTab === 1 ? '' : 'd-none'}">
+        </div>
+        `;
 
-    viewModeElements.forEach(el => el.classList.toggle('d-none', isEditMode));
-    editModeElements.forEach(el => el.classList.toggle('d-none', !isEditMode));
+        const viewModeElements = container.querySelectorAll('.view-mode');
+        const editModeElements = container.querySelectorAll('.edit-mode');
+
+        viewModeElements.forEach(el => el.classList.toggle('d-none', isEditMode));
+        editModeElements.forEach(el => el.classList.toggle('d-none', !isEditMode));
     }
 
-        function displayAbilities(characterId) {
-        // Show loading state
+    function displayAbilities(characterId) {
         const container = document.querySelector('.abilityPane');
         container.innerHTML = '<div class="text-center py-4">Loading abilities...</div>';
 
@@ -642,9 +642,8 @@
                 return response.json();
             })
             .then(abilities => {
-                container.innerHTML = ''; // Clear loading state
+                container.innerHTML = '';
 
-                // Add the "Create New Ability" button
                 const createButton = document.createElement('div');
                 createButton.className = 'sticky-top bg-white p-3 mb-3 border-bottom';
                 createButton.innerHTML = `
@@ -662,7 +661,6 @@
                     return;
                 }
 
-                // Group abilities by action type
                 const groupedAbilities = {
                     Action: [],
                     Bonus: [],
@@ -670,15 +668,14 @@
                 };
 
                 abilities.forEach(ability => {
-                    const actionType = ability.actionType || 'Action'; // Default to Action if not specified
+                    const actionType = ability.actionType || 'Action';
                     if (groupedAbilities[actionType]) {
                         groupedAbilities[actionType].push(ability);
                     } else {
-                        groupedAbilities.Action.push(ability); // Fallback to Action
+                        groupedAbilities.Action.push(ability);
                     }
                 });
 
-                // Create sections for each action type
                 const createSection = (title, abilitiesList) => {
                     if (abilitiesList.length === 0) return null;
 
@@ -694,7 +691,6 @@
                         const abilityElement = document.createElement('div');
                         abilityElement.className = 'compact-ability mb-3 p-3 border rounded';
 
-                        // Determine styling based on action type and healing
                         const actionTypeClass = ability.actionType ? ability.actionType.toLowerCase().replace(' ', '-') : 'action';
                         const isHealing = ability.healTag || false;
 
@@ -723,7 +719,6 @@
                     return section;
                 };
 
-                // Append sections in order: Action, Bonus Action, Free Action
                 const actionSection = createSection('Actions', groupedAbilities.Action);
                 const bonusSection = createSection('Bonus Actions', groupedAbilities.Bonus);
                 const freeSection = createSection('Free Actions', groupedAbilities.Free);
@@ -747,10 +742,8 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize the page
         loadCharacters();
 
-        // Set up ability form submission
         const createAbilityForm = document.querySelector('#createAbilityForm');
         if (createAbilityForm) {
             createAbilityForm.addEventListener('submit', async (event) => {
@@ -767,7 +760,6 @@
             console.error('createAbilityForm form not found in the DOM.');
         }
 
-        // Conditional field display logic
         $('#TargetInput').change(function() {
             const targetType = $(this).val();
             $('#rangeFields').addClass('d-none');
@@ -780,22 +772,18 @@
             }
         });
 
-        // Secondary damage toggle
         $('#HasSecondaryDamage').change(function() {
             if ($(this).is(':checked')) {
                 $('#secondaryDamageFields').removeClass('d-none');
-                // Set required fields if needed
                 $('#SecondNumDiceInput').prop('required', true);
             } else {
                 $('#secondaryDamageFields').addClass('d-none');
-                // Clear values when hidden
                 $('#SecondNumDiceInput').val('').prop('required', false);
                 $('#SecondDiceSizeInput').val('2');
                 $('#SecondDamageTypeInput').val('');
             }
         });
 
-        // Initialize the form state
         $('#TargetInput').trigger('change');
     });
 </script>
@@ -912,7 +900,7 @@
 
     #character-list {
         overflow-y: auto;
-        max-height: calc(100vh - 150px); /* Adjust based on your header height */
+        max-height: calc(100vh - 150px);
         flex-grow: 1;
         margin-bottom: 0;
         border: 1px solid #dee2e6;
@@ -939,7 +927,6 @@
                 background-color: #f1f1f1;
             }
 
-        /* Custom scrollbar */
         #character-list::-webkit-scrollbar {
             width: 8px;
         }
@@ -957,5 +944,4 @@
             #character-list::-webkit-scrollbar-thumb:hover {
                 background: #555;
             }
-
 </style>
