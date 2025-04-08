@@ -1,10 +1,17 @@
 # Ignore Visual Studio files
 .vs/
+<<<<<<< HEAD
+.TPK_Web_Application/.vs/
 .TPK_Web_Application/obj/
+.TPK_Web_Application/bin/
+=======
+.TPK_Web_Application/obj/
+>>>>>>> origin/main
 *.user
 *.suo
 
 # Ignore build outputs
+.vs/
 bin/
 obj/
 

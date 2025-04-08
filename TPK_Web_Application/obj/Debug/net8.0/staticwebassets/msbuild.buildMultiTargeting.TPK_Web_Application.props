@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\TPK_Web_Application.props" />
-</Project>
