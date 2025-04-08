@@ -11,6 +11,9 @@ namespace TPK_Web_Application.Model
             accountID = -1;
             team1Wins = 0;
             team2Wins = 0;
+            stalemates = 0;
+            roundCounts = 0;
+            overallMVP = "";
         }
         [Key]
         public long batchID { get; set; }
@@ -19,5 +22,8 @@ namespace TPK_Web_Application.Model
         public long accountID { get; set; }
         public double team1Wins { get; set; }
         public double team2Wins { get; set; }
+        public double? stalemates { get; set; }
+        public double? roundCounts { get; set; }
+        public string? overallMVP {  get; set; }
     }
 }

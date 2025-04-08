@@ -494,26 +494,40 @@
 
         // Collect abilities
         const abilities = [];
-        const abilityElements = document.querySelectorAll('.abilityPane .form-group'); // Select all ability divs
+        const abilityElements = document.querySelectorAll('.ability-section .compact-ability');
+        abilityElements.forEach(abilityElement => {
+            console.log('Processing ability element:', abilityElement);
+
+            const abilityID = abilityElement.getAttribute('data-ability-id');
+            console.log('Ability ID:', abilityID);
+
+            const meleeRangedAOE = abilityElement.querySelector('select[name="meleeRangedAOE"]');
+            console.log('Melee/Ranged/AOE:', meleeRangedAOE);
+
+            const rangeOne = abilityElement.querySelector('input[name="rangeOne"]');
+            console.log('Range One:', rangeOne);
+
+            // Repeat for other fields...
+        });
 
         abilityElements.forEach(abilityElement => {
             const ability = {
-                abilityID: parseInt(abilityElement.getAttribute('data-ability-id')), // Add abilityID
-                abilityName: abilityElement.querySelector('input[name="abilityName"]').value,
-                meleeRangedAOE: abilityElement.querySelector('select[name="meleeRangedAOE"]').value,
-                rangeOne: parseInt(abilityElement.querySelector('input[name="rangeOne"]').value || 0),
-                rangeTwo: parseInt(abilityElement.querySelector('input[name="rangeTwo"]').value || 0),
-                radius: parseInt(abilityElement.querySelector('input[name="radius"]').value || 0),
-                coneLineSphere: abilityElement.querySelector('select[name="coneLineSphere"]').value,
-                actionType: abilityElement.querySelector('select[name="actionType"]').value,
-                healTag: abilityElement.querySelector('input[name="healTag"]').checked,
-                itemToHitBonus: parseInt(abilityElement.querySelector('input[name="toHit"]').value || 0),
-                firstNumDice: parseInt(abilityElement.querySelector('input[name="numDice1"]').value || 0),
-                firstDiceSize: parseInt(abilityElement.querySelector('input[name="numDiceSize1"]').value || 0),
-                firstDamageType: abilityElement.querySelector('select[name="firstDamageType"]').value,
-                secondNumDice: parseInt(abilityElement.querySelector('input[name="numDice1"]').value || 0),
-                secondDiceSize: parseInt(abilityElement.querySelector('input[name="numDiceSize1"]').value || 0),
-                secondDamageType: abilityElement.querySelector('select[name="secondDamageType"]').value
+                abilityID: parseInt(abilityElement.getAttribute('data-ability-id')),
+                abilityName: abilityElement.querySelector('input[name="abilityName"]')?.value || '',
+                meleeRangedAOE: abilityElement.querySelector('select[name="meleeRangedAOE"]')?.value || '',
+                rangeOne: parseInt(abilityElement.querySelector('input[name="rangeOne"]')?.value || 0),
+                rangeTwo: parseInt(abilityElement.querySelector('input[name="rangeTwo"]')?.value || 0),
+                radius: parseInt(abilityElement.querySelector('input[name="radius"]')?.value || 0),
+                coneLineSphere: abilityElement.querySelector('select[name="coneLineSphere"]')?.value || '',
+                actionType: abilityElement.querySelector('select[name="actionType"]')?.value || '',
+                healTag: abilityElement.querySelector('input[name="healTag"]')?.checked || false,
+                itemToHitBonus: parseInt(abilityElement.querySelector('input[name="toHit"]')?.value || 0),
+                firstNumDice: parseInt(abilityElement.querySelector('input[name="numDice1"]')?.value || 0),
+                firstDiceSize: parseInt(abilityElement.querySelector('select[name="numDiceSize1"]')?.value || 0),
+                firstDamageType: abilityElement.querySelector('select[name="firstDamageType"]')?.value || '',
+                secondNumDice: parseInt(abilityElement.querySelector('input[name="numDice2"]')?.value || 0),
+                secondDiceSize: parseInt(abilityElement.querySelector('select[name="numDiceSize2"]')?.value || 0),
+                secondDamageType: abilityElement.querySelector('select[name="secondDamageType"]')?.value || ''
             };
             abilities.push(ability);
         });
@@ -790,24 +804,22 @@
                     abilityElement.innerHTML = `
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h4 class="mb-0 view-mode">${ability.abilityName || 'Unnamed Ability'}</h4>
-                            <input type="text" class="form-control edit-mode d-none" value="${ability.abilityName || ''}" />
-                            <button type="button" class="btn btn-sm btn-secondary edit-button" onclick="toggleAbilityEdit(this)">Edit</button>
-                            <button type="button" class="btn btn-sm btn-primary save-button d-none" onclick="saveAbilityEdit(this)">Save</button>
+                            <input type="text" name="abilityName" class="form-control edit-mode d-none" value="${ability.abilityName || ''}" />
                         </div>
                         <div class="ability-details">
                             <div><strong>Target:</strong> <span class="view-mode">${ability.meleeRangedAOE || 'Melee'}</span></div>
-                            <select class="form-control edit-mode d-none">
+                            <select name="meleeRangedAOE" class="form-control edit-mode d-none">
                                 <option value="Melee" ${ability.meleeRangedAOE === 'Melee' ? 'selected' : ''}>Melee</option>
                                 <option value="Ranged" ${ability.meleeRangedAOE === 'Ranged' ? 'selected' : ''}>Ranged</option>
                                 <option value="AOE" ${ability.meleeRangedAOE === 'AOE' ? 'selected' : ''}>AOE</option>
                             </select>
                             <div><strong>To Hit Bonus:</strong> <span class="view-mode">${ability.itemToHitBonus >= 0 ? '+' : ''}${ability.itemToHitBonus || 0}</span></div>
-                            <input type="number" class="form-control edit-mode d-none" value="${ability.itemToHitBonus || 0}" />
+                            <input type="number" name="toHit" class="form-control edit-mode d-none" value="${ability.itemToHitBonus || 0}" />
                             <div class="${isHealing ? 'text-success' : 'text-danger'}">
                                 <strong>${isHealing ? 'Healing' : 'Damage'}:</strong>
                                 <span class="view-mode">${ability.firstNumDice || 1}d${ability.firstDiceSize || 6} ${ability.firstDamageType || ''}</span>
-                                <input type="number" class="form-control edit-mode d-none" value="${ability.firstNumDice || 1}" />
-                                <select class="form-control edit-mode d-none">
+                                <input type="number" name="numDice1" class="form-control edit-mode d-none" value="${ability.firstNumDice || 1}" />
+                                <select name="numDiceSize1" class="form-control edit-mode d-none">
                                     <option value="2" ${ability.firstDiceSize === 2 ? 'selected' : ''}>2</option>
                                     <option value="4" ${ability.firstDiceSize === 4 ? 'selected' : ''}>4</option>
                                     <option value="6" ${ability.firstDiceSize === 6 ? 'selected' : ''}>6</option>
@@ -816,7 +828,7 @@
                                     <option value="12" ${ability.firstDiceSize === 12 ? 'selected' : ''}>12</option>
                                     <option value="20" ${ability.firstDiceSize === 20 ? 'selected' : ''}>20</option>
                                 </select>
-                                <select class="form-control edit-mode d-none">
+                                <select name="firstDamageType" class="form-control edit-mode d-none">
                                     <option value="Bludgeoning" ${ability.firstDamageType === 'Bludgeoning' ? 'selected' : ''}>Bludgeoning</option>
                                     <option value="Slashing" ${ability.firstDamageType === 'Slashing' ? 'selected' : ''}>Slashing</option>
                                     <option value="Piercing" ${ability.firstDamageType === 'Piercing' ? 'selected' : ''}>Piercing</option>

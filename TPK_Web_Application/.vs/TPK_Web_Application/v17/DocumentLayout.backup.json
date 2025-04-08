@@ -7,16 +7,32 @@
       "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\charactereditor\\charactereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\worried\\salvation\\team-tpk\\tpk_web_application\\pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\worried\\salvation\\team-tpk\\tpk_web_application\\model\\encounterhistory_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:model\\encounterhistory_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\worried\\salvation\\team-tpk\\tpk_web_application\\pages\\encounterhistory\\encounterhistory.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encounterhistory\\encounterhistory.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\worried\\salvation\\team-tpk\\tpk_web_application\\pages\\encounterhistory\\encounterhistory.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encounterhistory\\encounterhistory.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\worried\\salvation\\team-tpk\\tpk_web_application\\model\\batch_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:model\\batch_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\worried\\salvation\\team-tpk\\tpk_web_application\\pages\\encountereditor\\encountereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encountereditor\\encountereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\worried\\salvation\\team-tpk\\tpk_web_application\\pages\\encounterhistory\\encounterhistoryapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encounterhistory\\encounterhistoryapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\worried\\salvation\\team-tpk\\tpk_web_application\\pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,11 +42,63 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Batch_Model.cs",
+              "DocumentMoniker": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Model\\Batch_Model.cs",
+              "RelativeDocumentMoniker": "Model\\Batch_Model.cs",
+              "ToolTip": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Model\\Batch_Model.cs",
+              "RelativeToolTip": "Model\\Batch_Model.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-08T13:44:13.983Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "EncounterHistory_Model.cs",
+              "DocumentMoniker": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Model\\EncounterHistory_Model.cs",
+              "RelativeDocumentMoniker": "Model\\EncounterHistory_Model.cs",
+              "ToolTip": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Model\\EncounterHistory_Model.cs",
+              "RelativeToolTip": "Model\\EncounterHistory_Model.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-08T13:22:32.717Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "EncounterHistory.cshtml.cs",
+              "DocumentMoniker": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistory.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\EncounterHistory\\EncounterHistory.cshtml.cs",
+              "ToolTip": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistory.cshtml.cs",
+              "RelativeToolTip": "Pages\\EncounterHistory\\EncounterHistory.cshtml.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAQwCEAAABZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-08T13:16:18.878Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "EncounterEditor.cshtml",
+              "DocumentMoniker": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
+              "RelativeDocumentMoniker": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
+              "ToolTip": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
+              "RelativeToolTip": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
+              "ViewState": "AgIAAC0AAAAAAAAAAAAvwDcAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-08T13:06:39.636Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\Index.cshtml",
               "RelativeDocumentMoniker": "Pages\\Index.cshtml",
@@ -49,35 +117,36 @@
               "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
               "ToolTip": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
               "RelativeToolTip": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
-              "ViewState": "AgIAAJQDAAAAAAAAAAAowKIDAAA2AAAAAAAAAA==",
+              "ViewState": "AgIAAB0DAAAAAAAAAAAAADMDAAByAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-04-08T05:48:18.005Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "EncounterHistory.cshtml",
               "DocumentMoniker": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistory.cshtml",
               "RelativeDocumentMoniker": "Pages\\EncounterHistory\\EncounterHistory.cshtml",
               "ToolTip": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistory.cshtml",
               "RelativeToolTip": "Pages\\EncounterHistory\\EncounterHistory.cshtml",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAkwB4AAABNAAAAAAAAAA==",
+              "ViewState": "AgIAAEUAAAAAAAAAAAAAAM8AAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-04-08T05:44:57.479Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
               "Title": "EncounterHistoryAPI.cs",
               "DocumentMoniker": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistoryAPI.cs",
               "RelativeDocumentMoniker": "Pages\\EncounterHistory\\EncounterHistoryAPI.cs",
               "ToolTip": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistoryAPI.cs",
               "RelativeToolTip": "Pages\\EncounterHistory\\EncounterHistoryAPI.cs",
-              "ViewState": "AgIAAB4AAAAAAAAAAAAowBYAAAAsAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-08T05:44:13.888Z"
+              "WhenOpened": "2025-04-08T05:44:13.888Z",
+              "EditorCaption": ""
             }
           ]
         }

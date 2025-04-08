@@ -217,6 +217,13 @@
             document.getElementById('SelectedEncounterId').value = encounterId;
             selectedEncounter = encounterId;
 
+            const runEncounterButton = document.getElementById('RunEncounterForm');
+
+            // Show the Run Encounter button if not in edit mode
+            if (!document.getElementById('EditButton').classList.contains('d-none')) {
+                runEncounterButton.classList.remove('d-none');
+            }
+
             fetch(`/api/EncounterAPI/GetSelectedEncounter/${encounterId}`)
                 .then(response => response.json())
                 .then(encounter => {
@@ -267,12 +274,20 @@
             const saveButton = document.getElementById('SaveButton');
             const runEncounterButton = document.getElementById('RunEncounterForm');
 
+            const isEditing = !editButton.classList.contains('d-none');
+
             encounterVault.classList.toggle('d-none');
             characterVault.classList.toggle('d-none');
             editButton.classList.toggle('d-none');
             closeButton.classList.toggle('d-none');
             saveButton.classList.toggle('d-none');
-            runEncounterButton.classList.toggle('d-none');
+            // runEncounterButton.classList.toggle('d-none');
+
+            if (isEditing) {
+                runEncounterButton.classList.add('d-none');
+            } else if (selectedEncounter) {
+                runEncounterButton.classList.remove('d-none');
+            }
         }
 
         function toggleElementsVisibility() {

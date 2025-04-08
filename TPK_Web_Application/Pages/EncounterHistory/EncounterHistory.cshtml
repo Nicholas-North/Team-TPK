@@ -44,7 +44,8 @@
                                 <div class="accordion-body">
 
                                     <!-- Sub-accordion: group by encounterVersion -->
-                                    <div class="accordion" id="versionAccordion@encounterId">
+                                    @* <div class="accordion" id="versionAccordion@encounterId"> *@
+                                    <div class="accordion" id="versionAccordion-@encounterId">
                                         @foreach (var versionGroup in encounterGroup.GroupBy(e => e.encounterVersion))
                                         {
                                             var versionKey = $"{encounterId}-v{versionGroup.Key}";
@@ -65,7 +66,8 @@
                                                 <div id="@versionCollapseId"
                                                      class="accordion-collapse collapse"
                                                      aria-labelledby="@versionHeadingId"
-                                                     data-bs-parent="#versionAccordion@encounterId">
+                                                     @* data-bs-parent="#versionAccordion@encounterId"> *@
+                                                     data-bs-parent="#versionAccordion-@encounterId">
                                                     <div class="accordion-body">
                                                         @foreach (var encounter in versionGroup)
                                                         {
@@ -109,13 +111,34 @@
             <h2>Encounter Details</h2>
             <div id="encounterDetails">
                 <p id="detailsPlaceholder">Select an encounter to see details.</p>
-                <div id="detailsContent" class="d-none">
+                <div id="detailsContent" class="d-none card shadow-sm p-3 mb-4">
+                    <h4 class="card-title text-center mb-3">Encounter Details</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Encounter ID:</strong> <span id="detailEncounterId"></span></p>
+                            <p><strong>Version:</strong> <span id="detailVersion"></span></p>
+                            <p><strong>Batch ID:</strong> <span id="detailBatchId"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Team 1 Win Percentage:</strong> <span id="detailTeam1Wins"></span>%</p>
+                            <p><strong>Team 2 Win Percentage:</strong> <span id="detailTeam2Wins"></span>%</p>
+                            <p><strong>Stalemates:</strong> <span id="detailStalemates"></span></p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <p><strong>Round Counts:</strong> <span id="detailRoundCounts"></span></p>
+                            <p><strong>Overall MVP:</strong> <span id="detailOverallMVP"></span></p>
+                        </div>
+                    </div>
+                </div>
+@*                 <div id="detailsContent" class="d-none">
                     <p><strong>Encounter ID:</strong> <span id="detailEncounterId"></span></p>
                     <p><strong>Version:</strong> <span id="detailVersion"></span></p>
                     <p><strong>Batch ID:</strong> <span id="detailBatchId"></span></p>
                     <p><strong>Team 1 Win Percentage:</strong> <span id="detailTeam1Wins"></span>%</p>
                     <p><strong>Team 2 Win Percentage:</strong> <span id="detailTeam2Wins"></span>%</p>
-                </div>
+                </div> *@
             </div>
         </div>
     </div>
@@ -133,8 +156,8 @@
         const detailTeam1Wins = document.getElementById('detailTeam1Wins');
         const detailTeam2Wins = document.getElementById('detailTeam2Wins');
         const detailStalemates = document.getElementById('detailStalemates');
-        const detailRoundCounts = document.getElementById('roundCounts');
-        const detail overallMVP = document..getElementById('overallMVP');
+        const detailRoundCounts = document.getElementById('detailRoundCounts');
+        const detailOverallMVP = document.getElementById('detailOverallMVP');
 
 
         encounterItems.forEach(item => {
@@ -145,9 +168,9 @@
                 const batchId = item.dataset.batchId;
                 const team1Wins = item.dataset.team1Wins;
                 const team2Wins = item.dataset.team2Wins;
-                const staleMates = item.dataset.staleMates;
+                const stalemates = item.dataset.stalemates;
                 const roundCounts = item.dataset.roundCounts;
-                const overallMVP = item.dataset.overallMVP;
+                const overallMvp = item.dataset.overallMvp;
 
                 // Update the details section
                 detailEncounterId.textContent = encounterId;
@@ -181,4 +204,19 @@
         .encounter-item:hover {
             background-color: #f8f9fa;
         }
+
+    .card-title {
+        font-weight: bold;
+        color: #343a40;
+    }
+
+    .card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        background-color: #ffffff;
+    }
+
+    p {
+        margin-bottom: 0.5rem;
+    }
 </style>
