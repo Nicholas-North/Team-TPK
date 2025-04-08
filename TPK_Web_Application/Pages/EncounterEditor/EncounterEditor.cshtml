@@ -6,12 +6,15 @@
 <body>
     <div class="Formatting">
         <div class="frame">
+            <div class="grid-controls">
+                <button id="increase-grid" class="btn btn-sm btn-secondary">+</button>
+                <button id="decrease-grid" class="btn btn-sm btn-secondary">-</button>
+                <span id="grid-size-display" class="ml-2">50x50</span>
+                <button id="toggle-coords" class="btn btn-sm btn-secondary ml-2">Toggle Coordinates</button>
+            </div>
             <div class="grid-container" id="grid-container">
                 <div class="grid" id="grid">
-                    @for (int i = 0; i < 50 * 50; i++)
-                    {
-                        <div class="grid-item" id="grid-item-@i"></div>
-                    }
+                    <!-- Grid items will be dynamically created -->
                 </div>
             </div>
         </div>
@@ -36,7 +39,6 @@
         <form method="post" asp-page-handler="SaveEncounter" id="SaveEncounterForm" class="requires-encounter d-none">
             <input type="hidden" asp-for="SelectedEncounter.encounterID" id="SelectedEncounterId" />
             <input type="hidden" asp-for="SelectedCharacter.characterID" />
-
             <input type="hidden" id="gridData" name="gridData" />
             <button type="button" class="btn btn-secondary btn-sm edit-button" onclick="toggleEdit(this)" id="EditButton">Edit</button>
             <button type="button" class="btn btn-secondary btn-sm close-button d-none" onclick="toggleEdit(this)" id="CloseButton">Close</button>
@@ -55,16 +57,20 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Encounter Editor</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <form method="post" asp-page-handler="CreateEncounter">
                         <input type="hidden" id="selectedEncounterId" name="selectedEncounterId" value="@Model.SelectedEncounter.encounterID" />
-                        <label for="NameInput">Map X dimensions: </label>
-                        <input type="number" asp-for="XInput" class="form-control" id="XInput" name="XInput" />
-                        <label for="AncestryInput">Map Y dimensions: </label>
-                        <input type="number" asp-for="YInput" class="form-control" id="YInput" name="YInput" />
+                        <div class="form-group">
+                            <label for="XInput">Map X dimensions:</label>
+                            <input type="number" asp-for="XInput" class="form-control" id="XInput" name="XInput" min="5" max="100" value="50" />
+                        </div>
+                        <div class="form-group">
+                            <label for="YInput">Map Y dimensions:</label>
+                            <input type="number" asp-for="YInput" class="form-control" id="YInput" name="YInput" min="5" max="100" value="50" />
+                        </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Save changes</button>
@@ -74,30 +80,85 @@
             </div>
         </div>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
         let currentlyHighightedElement = null;
         let selectedEncounter = null;
-        // Fetch and display encounters
+        let gridSizeX = 50;
+        let gridSizeY = 50;
+        let showCoordinates = false;
+        const characterMap = new Map();
+
+        function initializeGrid() {
+            createGrid();
+            setupGridControls();
+        }
+
+        function createGrid() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            document.getElementById('grid-size-display').textContent = `${gridSizeX}x${gridSizeY}`;
+            grid.style.gridTemplateColumns = `repeat(${gridSizeX}, 50px)`;
+            grid.style.gridTemplateRows = `repeat(${gridSizeY}, 50px)`;
+
+            for (let i = 0; i < gridSizeX * gridSizeY; i++) {
+                const gridItem = document.createElement('div');
+                gridItem.className = 'grid-item';
+                gridItem.id = `grid-item-${i}`;
+                if (showCoordinates) {
+                    const x = i % gridSizeX;
+                    const y = Math.floor(i / gridSizeX);
+                    gridItem.setAttribute('title', `(${x}, ${y})`);
+                }
+                grid.appendChild(gridItem);
+            }
+            enableGridDropping();
+            enableGridItemDeletion();
+        }
+
+        function setupGridControls() {
+            document.getElementById('increase-grid').addEventListener('click', () => {
+                if (gridSizeX < 100) {
+                    gridSizeX += 5;
+                    gridSizeY += 5;
+                    createGrid();
+                }
+            });
+            document.getElementById('decrease-grid').addEventListener('click', () => {
+                if (gridSizeX > 5) {
+                    gridSizeX -= 5;
+                    gridSizeY -= 5;
+                    createGrid();
+                }
+            });
+            document.getElementById('toggle-coords').addEventListener('click', () => {
+                showCoordinates = !showCoordinates;
+                const gridItems = document.querySelectorAll('.grid-item');
+                gridItems.forEach((item, index) => {
+                    if (showCoordinates) {
+                        const x = index % gridSizeX;
+                        const y = Math.floor(index / gridSizeX);
+                        item.setAttribute('title', `(${x}, ${y})`);
+                    } else {
+                        item.removeAttribute('title');
+                    }
+                });
+            });
+        }
+
         function loadEncounters() {
             fetch('/api/EncounterAPI/GetEncounters')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    console.log('Encounters:', data); // Log the data for debugging
                     const encounterList = document.getElementById('encounter-list');
-                    encounterList.innerHTML = ''; // Clear existing encounters
+                    encounterList.innerHTML = '';
                     data.forEach(encounter => {
                         const listItem = document.createElement('li');
                         listItem.className = 'list-group-item';
                         listItem.textContent = `Encounter ID: ${encounter.encounterID}`;
-
                         listItem.onclick = () => {
                             selectEncounter(encounter.encounterID);
                             highlightSelected(listItem);
@@ -110,199 +171,194 @@
 
         function loadCharacters() {
             fetch('/api/EncounterAPI/GetCharacters')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    console.log('Characters:', data); // Log the data for debugging
                     const characterList = document.getElementById('character-list');
-                    characterList.innerHTML = ''; // Clear existing characters
-                    data.forEach(character => {
-                        const listItem = document.createElement('li');
-                        listItem.className = 'list-group-item';
-                        listItem.textContent = `Character: ${character.characterName} (ID: ${character.characterID})`;
+                    characterList.innerHTML = '';
+                    characterMap.clear();
 
-                        // Set data attributes for drag-and-drop functionality
+                    data.forEach(character => {
+                        characterMap.set(character.characterID, character);
+
+                        const listItem = document.createElement('li');
+                        listItem.className = 'list-group-item character-item';
                         listItem.setAttribute('data-character-id', character.characterID);
                         listItem.setAttribute('data-character-name', character.characterName);
+                        listItem.textContent = character.characterName;
 
-                        listItem.onclick = () =>{
+                        const tokenPreview = document.createElement('span');
+                        tokenPreview.className = 'token-preview';
+                        tokenPreview.style.backgroundColor = getRandomColor();
+                        tokenPreview.textContent = getInitials(character.characterName);
+                        listItem.prepend(tokenPreview);
+
+                        listItem.onclick = () => {
                             selectCharacter(character.characterID);
                             highlightSelected(listItem);
                         }
                         characterList.appendChild(listItem);
                     });
-
                     makeCharactersDraggable();
                 })
                 .catch(error => console.error('Error fetching characters:', error));
         }
 
-        // Fetch and display characters for a selected encounter
+        function getInitials(name) {
+            return name.split(' ').map(word => word[0]).join('').toUpperCase().substring(0, 2);
+        }
+
+        function getRandomColor() {
+            const colors = ['#FFADAD', '#FFD6A5', '#FDFFB6', '#CAFFBF', '#9BF6FF', '#A0C4FF', '#BDB2FF', '#FFC6FF'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
         function selectEncounter(encounterId) {
             toggleElementsVisibility();
-            console.log(`Selected Encounter ID: ${encounterId}`);
-            const selectedEncounterInput = document.getElementById('SelectedEncounterId');
-            if (selectedEncounterInput) {
-                selectedEncounterInput.value = encounterId; // Set the value dynamically
-            } else {
-                console.error('Hidden input field for SelectedEncounterId not found.');
-            }
+            document.getElementById('SelectedEncounterId').value = encounterId;
+            selectedEncounter = encounterId;
 
-            fetch(`/api/EncounterAPI/GetPositions/${encounterId}`)
+            fetch(`/api/EncounterAPI/GetSelectedEncounter/${encounterId}`)
+                .then(response => response.json())
+                .then(encounter => {
+                    gridSizeX = encounter.xdim;
+                    gridSizeY = encounter.ydim;
+                    createGrid();
+
+                    return fetch(`/api/EncounterAPI/GetPositions/${encounterId}`);
+                })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Fetched character positions:', data); // Log the fetched data for debugging
-                    // const characterList = document.getElementById('character-list');
-                    // characterList.innerHTML = ''; // Clear existing characters in the vault
-
-                    // Clear the grid
                     const gridItems = document.querySelectorAll('.grid-item');
                     gridItems.forEach(item => {
-                        item.textContent = ''; // Clear any existing character data
-                        item.style.backgroundColor = ''; // Reset background color
+                        item.innerHTML = '';
+                        item.style.backgroundColor = '';
                     });
 
-                    // Populate the character vault and display characters on the grid
                     data.forEach(character => {
                         if (character.xloc !== undefined && character.yloc !== undefined) {
-                            // Calculate the grid item ID based on X and Y positions
-                            const gridIndex = character.yloc * 50 + character.xloc; // Assuming a 50x50 grid
+                            const gridIndex = character.yloc * gridSizeX + character.xloc;
                             const gridItem = document.getElementById(`grid-item-${gridIndex}`);
-                            console.log(gridItem);
-                            console.log(gridIndex);
-                            if (gridItem) {
-                                // Extract initials from the character's name
-                                // const initials = character.characterName.split(' ').map(word => word[0]).join('').toUpperCase();
-                                // gridItem.textContent = `${initials} (${character.characterID})`;
-                                gridItem.textContent = `(${character.characterID})`;
-                                gridItem.style.backgroundColor = '#d4edda'; // Optional: Change background to indicate placement
-                                console.log('Arrive');
+                            if (gridItem && characterMap.has(character.characterID)) {
+                                const charData = characterMap.get(character.characterID);
+                                const token = document.createElement('div');
+                                token.className = 'character-token';
+                                token.textContent = getInitials(charData.characterName);
+                                token.style.backgroundColor = getRandomColor();
+                                token.setAttribute('data-character-id', character.characterID);
+                                token.setAttribute('data-character-name', charData.characterName);
+                                token.setAttribute('draggable', true);
+                                gridItem.appendChild(token);
                             }
                         }
                     });
                 })
-                .catch(error => console.error('Error fetching characters:', error));
+                .catch(error => console.error('Error fetching encounter data:', error));
         }
 
-        // Handle character selection
         function selectCharacter(characterId) {
             console.log(`Selected Character ID: ${characterId}`);
-            // You can add additional logic here, such as updating the UI or sending data to the server
         }
 
         function toggleEdit(button) {
             const encounterVault = document.getElementById('EncounterVault');
             const characterVault = document.getElementById('CharacterVault');
-            //const editButton = button;
             const editButton = document.getElementById('EditButton');
             const closeButton = document.getElementById('CloseButton');
             const saveButton = document.getElementById('SaveButton');
+            const runEncounterButton = document.getElementById('RunEncounterForm');
 
-            // Toggle visibility of vaults
             encounterVault.classList.toggle('d-none');
             characterVault.classList.toggle('d-none');
-
-            // Toggle visibility of buttons
             editButton.classList.toggle('d-none');
             closeButton.classList.toggle('d-none');
             saveButton.classList.toggle('d-none');
+            runEncounterButton.classList.toggle('d-none');
         }
 
         function toggleElementsVisibility() {
-            const elementsToToggle = document.querySelectorAll('.requires-encounter'); // Elements that depend on a selected character
-
+            const elementsToToggle = document.querySelectorAll('.requires-encounter');
             elementsToToggle.forEach(element => {
-                if (selectedEncounter == null) {
-                    element.classList.remove('d-none'); // Show the element
-                }
+                element.classList.remove('d-none');
             });
         }
 
         function makeCharactersDraggable() {
-            const characterListItems = document.querySelectorAll('#character-list .list-group-item');
-            characterListItems.forEach(item => {
-                // Ensure the character ID and name are stored as data attributes
-                const characterId = item.getAttribute('data-character-id');
-                const characterName = item.getAttribute('data-character-name');
-
-                if (!characterId || !characterName) {
-                    console.warn('Missing character data attributes:', item);
-                    return;
-                }
-
+            const characterItems = document.querySelectorAll('.character-item');
+            characterItems.forEach(item => {
                 item.setAttribute('draggable', true);
-
-                item.addEventListener('dragstart', (event) => {
-                    // Store character data in the drag event
-                    const data = { characterId, characterName };
-                    event.dataTransfer.setData('text/plain', JSON.stringify(data));
-                    console.log(`Dragging Character: ${characterName} (ID: ${characterId})`);
+                item.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        characterId: item.dataset.characterId,
+                        characterName: item.dataset.characterName,
+                        color: item.querySelector('.token-preview').style.backgroundColor
+                    }));
+                    item.classList.add('dragging');
+                });
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
                 });
             });
         }
 
-        // Enable dropping on grid items
         function enableGridDropping() {
             const gridItems = document.querySelectorAll('.grid-item');
+            let draggedToken = null;
+            let draggedTokenOriginalCell = null;
 
             gridItems.forEach(item => {
-                // Allow dropping on grid items
-                item.addEventListener('dragover', (event) => {
-                    event.preventDefault(); // Allow dropping
-                });
-
-                // Handle dropping on grid items
-                item.addEventListener('drop', (event) => {
-                    event.preventDefault();
-
-                    try {
-                        // Parse the dropped data
-                        const data = JSON.parse(event.dataTransfer.getData('text/plain'));
-                        console.log('Dropped data:', data);
-
-                        const characterId = data.characterId;
-                        const characterName = data.characterName;
-
-                        if (!characterId || !characterName) {
-                            console.error('Invalid character data:', data);
-                            return;
-                        }
-
-                        // Extract initials from the character's name
-                        const initials = characterName.split(' ').map(word => word[0]).join('').toUpperCase();
-
-                        // Update the grid item with the character's initials and ID
-                        item.textContent = `${initials} (${characterId})`;
-                        item.style.backgroundColor = '#d4edda'; // Optional: Change background to indicate placement
-                        console.log(`Dropped Character: ${characterName} (ID: ${characterId}) on Grid Item ID: ${item.id}`);
-                    } catch (error) {
-                        console.error('Error processing dropped data:', error);
+                item.addEventListener('dragstart', (e) => {
+                    if (e.target.classList.contains('character-token')) {
+                        draggedToken = e.target;
+                        draggedTokenOriginalCell = item;
+                        const characterId = e.target.dataset.characterId;
+                        const characterName = e.target.dataset.characterName;
+                        e.dataTransfer.setData('text/plain', JSON.stringify({
+                            characterId: characterId,
+                            characterName: characterName,
+                            color: e.target.style.backgroundColor
+                        }));
+                        e.target.classList.add('dragging');
+                        setTimeout(() => e.target.classList.add('invisible'), 0);
                     }
                 });
 
-                // Make grid items draggable if they contain a character
-                item.addEventListener('dragstart', (event) => {
-                    if (item.textContent.trim() !== '') {
-                        const characterData = item.textContent.match(/\((\d+)\)$/); // Extract character ID from text
-                        if (characterData) {
-                            const characterId = characterData[1];
-                            const characterName = item.textContent.split(' ')[0]; // Extract character name initials
-                            const data = { characterId, characterName };
-                            event.dataTransfer.setData('text/plain', JSON.stringify(data));
-                            console.log(`Dragging Character: ${characterName} (ID: ${characterId})`);
-                            // Clear the grid item being dragged
-                            item.textContent = '';
-                            item.style.backgroundColor = '';
-                        }
+                item.addEventListener('dragend', (e) => {
+                    if (e.target.classList.contains('character-token')) {
+                        e.target.classList.remove('dragging', 'invisible');
+                        draggedToken = null;
+                        draggedTokenOriginalCell = null;
                     }
                 });
 
-                // Allow grid items to be draggable
-                item.setAttribute('draggable', true);
+                item.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if (!item.querySelector('.character-token')) {
+                        item.classList.add('drop-target');
+                    }
+                });
+
+                item.addEventListener('dragleave', () => {
+                    item.classList.remove('drop-target');
+                });
+
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    item.classList.remove('drop-target');
+                    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                    if (draggedTokenOriginalCell && draggedTokenOriginalCell !== item) {
+                        draggedTokenOriginalCell.innerHTML = '';
+                    }
+                    if (!item.querySelector('.character-token')) {
+                        const token = document.createElement('div');
+                        token.className = 'character-token';
+                        token.textContent = getInitials(data.characterName);
+                        token.style.backgroundColor = data.color || getRandomColor();
+                        token.setAttribute('data-character-id', data.characterId);
+                        token.setAttribute('data-character-name', data.characterName);
+                        token.setAttribute('draggable', true);
+                        item.appendChild(token);
+                    }
+                });
             });
         }
 
@@ -311,26 +367,20 @@
             let selectedGridItem = null;
 
             gridItems.forEach(item => {
-                // Add a click event listener to select the grid item
-                item.addEventListener('click', () => {
-                    // Highlight the selected grid item (optional)
-                    if (selectedGridItem) {
-                        selectedGridItem.style.outline = ''; // Remove outline from previously selected item
+                item.addEventListener('click', (e) => {
+                    if (e.target === item) {
+                        if (selectedGridItem) selectedGridItem.classList.remove('selected');
+                        selectedGridItem = item;
+                        item.classList.add('selected');
                     }
-                    selectedGridItem = item;
-                    selectedGridItem.style.outline = '2px solid red'; // Highlight the selected item
                 });
             });
 
-            // Add a keydown event listener to the document to handle deletion
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Delete' && selectedGridItem) {
-                    // Clear the content and reset the background color of the selected grid item
-                    selectedGridItem.textContent = '';
-                    selectedGridItem.style.backgroundColor = '';
-                    selectedGridItem.style.outline = ''; // Remove the highlight
-                    selectedGridItem = null; // Deselect the grid item
-                    console.log('Character removed from grid item.');
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Delete' && selectedGridItem) {
+                    selectedGridItem.innerHTML = '';
+                    selectedGridItem.classList.remove('selected');
+                    selectedGridItem = null;
                 }
             });
         }
@@ -338,28 +388,20 @@
         function collectGridData() {
             const gridItems = document.querySelectorAll('.grid-item');
             const gridData = [];
-
             gridItems.forEach((item, index) => {
-                // if (item.getAttribute('data-has-character') === 'true') {
-                if (item.textContent !== '') {
-                    const x = index % 50; // Calculate x position (column)
-                    const y = Math.floor(index / 50); // Calculate y position (row)
-                    const characterID = parseInt(item.textContent.match(/\((\d+)\)$/)?.[1]); // Extract character ID from text
-
-                    if (characterID) {
-                        gridData.push({ x, y, characterID });
-                    }
+                const token = item.querySelector('.character-token');
+                if (token) {
+                    const x = index % gridSizeX;
+                    const y = Math.floor(index / gridSizeX);
+                    const characterId = parseInt(token.dataset.characterId);
+                    gridData.push({ x, y, characterID: characterId });
                 }
             });
-
-            // Serialize the grid data as a JSON string and store it in the hidden input field
             document.getElementById('gridData').value = JSON.stringify(gridData);
-            console.log('Grid Data:', gridData); // Debugging log
+            console.log('Grid Data:', gridData);
         }
 
-        function highlightSelected(currentElement){
-            const element = currentElement;
-
+        function highlightSelected(element) {
             if (currentlyHighightedElement) {
                 currentlyHighightedElement.classList.remove('highlight-selected');
             }
@@ -370,17 +412,10 @@
         function runEncounter(encounterId) {
             fetch('/api/EncounterAPI/RunEncounter', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(encounterId)
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     console.log('Encounter started successfully:', data);
                     alert(`Encounter started successfully! Batch ID: ${data.batchId}`);
@@ -390,128 +425,244 @@
                     alert('An error occurred while starting the encounter.');
                 });
         }
-        // Load encounters on page load
+
         document.addEventListener('DOMContentLoaded', () => {
+            initializeGrid();
             loadEncounters();
             loadCharacters();
-            enableGridDropping();
-            enableGridItemDeletion();
 
-            const saveEncounterForm = document.querySelector('#SaveEncounterForm'); // Use the form's ID
-            if (saveEncounterForm) {
-                saveEncounterForm.addEventListener('submit', (event) => {
-                    event.preventDefault();
-                    collectGridData();
-                    saveEncounterForm.submit()
-                });
-            } else {
-                console.error('SaveEncounter form not found in the DOM.');
-            }
+            document.getElementById('SaveEncounterForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                collectGridData();
+                e.target.submit();
+            });
 
-            const selectedEncounterInput = document.getElementById('SelectedEncounterId');
-            const runEncounterForm = document.querySelector('#RunEncounterForm'); // Use the form's ID
+            const runEncounterForm = document.getElementById('RunEncounterForm');
             if (runEncounterForm) {
-                runEncounterForm.addEventListener('submit', (event) => {
-                    event.preventDefault();
-                    runEncounter(selectedEncounterInput.value);
+                runEncounterForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    runEncounter(document.getElementById('SelectedEncounterId').value);
                 });
-            } else {
-                console.error('SaveEncounter form not found in the DOM.');
             }
 
             const gridContainer = document.getElementById('grid-container');
-            let scale = 1; // Initial zoom level
+            let scale = 1;
             let isPanning = false;
-            let startX, startY; // Starting mouse position for panning
-            let translateX = 0, translateY = 0; // Current translation values
+            let startX, startY;
+            let translateX = 0, translateY = 0;
 
-            // Zoom functionality
-            gridContainer.addEventListener('wheel', (event) => {
-                event.preventDefault();
-                const zoomSpeed = 0.1; // Adjust zoom speed
-                if (event.deltaY < 0) {
-                    scale += zoomSpeed; // Zoom in
-                } else {
-                    scale = Math.max(0.1, scale - zoomSpeed); // Zoom out (minimum scale: 0.1)
+            gridContainer.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const zoomSpeed = 0.1;
+                const delta = e.deltaY < 0 ? zoomSpeed : -zoomSpeed;
+                const newScale = Math.max(0.1, Math.min(3, scale + delta));
+                const rect = gridContainer.getBoundingClientRect();
+                const offsetX = e.clientX - rect.left;
+                const offsetY = e.clientY - rect.top;
+                const gridX = (offsetX - translateX) / scale;
+                const gridY = (offsetY - translateY) / scale;
+                scale = newScale;
+                translateX = offsetX - gridX * scale;
+                translateY = offsetY - gridY * scale;
+                gridContainer.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+            });
+
+            gridContainer.addEventListener('mousedown', (e) => {
+                if (e.button === 0) {
+                    isPanning = true;
+                    startX = e.clientX - translateX;
+                    startY = e.clientY - translateY;
+                    gridContainer.style.cursor = 'grabbing';
                 }
-                gridContainer.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
             });
 
-            // Pan functionality
-            gridContainer.addEventListener('mousedown', (event) => {
-                isPanning = true;
-                startX = event.clientX - translateX;
-                startY = event.clientY - translateY;
+            document.addEventListener('mousemove', (e) => {
+                if (isPanning) {
+                    translateX = e.clientX - startX;
+                    translateY = e.clientY - startY;
+                    gridContainer.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isPanning = false;
                 gridContainer.style.cursor = 'grab';
-            });
-
-            gridContainer.addEventListener('mousemove', (event) => {
-                if (!isPanning) return;
-                translateX = event.clientX - startX;
-                translateY = event.clientY - startY;
-                gridContainer.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
-            });
-
-            gridContainer.addEventListener('mouseup', () => {
-                isPanning = false;
-                gridContainer.style.cursor = 'default';
-            });
-
-            gridContainer.addEventListener('mouseleave', () => {
-                isPanning = false;
-                gridContainer.style.cursor = 'default';
             });
         });
     </script>
 
     <style>
-        .frame {
-            width: 600px;
-            height: 600px;
-            overflow: hidden;
-            border: 2px solid #000;
-            position: relative;
-            flex: 1;
-        }
-
-        .col-md-4 {
-            flex: 0 0 300px;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
         }
 
         .Formatting {
             display: flex;
             gap: 20px;
+            margin-bottom: 20px;
         }
 
-        .highlight-selected{
-            outline: 2px solid black;
-            background-color: lightgray;
+        .frame {
+            width: 100%;
+            max-width: 800px;
+            height: 80vh;
+            overflow: hidden;
+            border: 2px solid #343a40;
+            border-radius: 5px;
+            position: relative;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .grid-controls {
+            padding: 10px;
+            background-color: #343a40;
+            color: white;
+            display: flex;
+            align-items: center;
         }
 
         .grid-container {
             position: absolute;
-            top: 0;
+            top: 50px;
             left: 0;
             transform-origin: 0 0;
+            will-change: transform;
         }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(50, 50px);
-            grid-template-rows: repeat(50, 50px);
             gap: 0;
-            border: 1px solid #000;
+            background-color: transparent; /* Remove grey background */
         }
 
         .grid-item {
-            width: 50px;
-            height: 50px;
-            border: 1px solid #ccc;
-            background-color: #f0f0f0;
+            border: 1px solid #ddd; /* Keep border for visibility */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white; /* Remove white background */
+            transition: background-color 0.2s;
+        }
+
+            /* Remove alternating grey color */
+            .grid-item:nth-child(odd) {
+                background-color: #f8f9fa;
+            }
+
+            .grid-item.selected {
+                outline: 2px solid #dc3545;
+            }
+
+            .grid-item.drop-target {
+                background-color: #e2f0fd !important; /* Keep drop target highlight */
+            }
+
+        .character-token {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            cursor: move;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+            .character-token.invisible {
+                opacity: 0.2;
+                background-color: #ccc !important;
+            }
+
+            .character-token.dragging {
+                transform: scale(1.1);
+                box-shadow: 0 0 10px rgba(0,0,0,0.3);
+                z-index: 100;
+            }
+
+        .token-preview {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+            color: white;
+            font-size: 10px;
+            text-align: center;
+            line-height: 20px;
+        }
+
+        .col-md-4 {
+            flex: 0 0 300px;
+            background-color: white;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .list-group {
+            max-height: 70vh;
+            overflow-y: auto;
         }
 
         .list-group-item {
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+            .list-group-item:hover {
+                background-color: #f8f9fa;
+            }
+
+        .highlight-selected {
+            background-color: #e2f0fd !important;
+            border-left: 3px solid #007bff;
+        }
+
+        .dragging {
+            opacity: 0.5;
+        }
+
+        .Manip-Buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            transition: all 0.2s;
+        }
+
+        @@media (max-width: 768px) {
+            .Formatting {
+                flex-direction: column;
+            }
+
+            .frame {
+                height: 60vh;
+            }
+
+            .col-md-4 {
+                width: 100%;
+            }
+
+            .grid-item {
+                width: 30px;
+                height: 30px;
+            }
+
+            .character-token {
+                width: 25px;
+                height: 25px;
+                font-size: 10px;
+            }
         }
     </style>
 </body>

@@ -1,34 +1,22 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\",
+  "WorkspaceRootPath": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\pages\\encounterhistory\\encounterhistory.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encounterhistory\\encounterhistory.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\pages\\charactereditor\\charactereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\worried\\salvation\\team-tpk\\tpk_web_application\\pages\\charactereditor\\charactereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\charactereditor\\charactereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\pages\\encounterhistory\\encounterhistoryapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\worried\\salvation\\team-tpk\\tpk_web_application\\pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\worried\\salvation\\team-tpk\\tpk_web_application\\pages\\encounterhistory\\encounterhistory.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encounterhistory\\encounterhistory.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\worried\\salvation\\team-tpk\\tpk_web_application\\pages\\encounterhistory\\encounterhistoryapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encounterhistory\\encounterhistoryapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\pages\\encountereditor\\encounterapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encountereditor\\encounterapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\pages\\encountereditor\\encountereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encountereditor\\encountereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\pages\\encountereditor\\encountereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encountereditor\\encountereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\college\\y5s3\\team-tpk\\tpk_web_application\\pages\\account\\accountapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\account\\accountapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -43,93 +31,53 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\Index.cshtml",
+              "RelativeDocumentMoniker": "Pages\\Index.cshtml",
+              "ToolTip": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\Index.cshtml",
+              "RelativeToolTip": "Pages\\Index.cshtml",
+              "ViewState": "AgIAAF8AAAAAAAAAAAAowHUAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-08T10:28:53.78Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
               "Title": "CharacterEditor.cshtml",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
+              "DocumentMoniker": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
               "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
+              "ToolTip": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
               "RelativeToolTip": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
-              "ViewState": "AgIAAP4AAAAAAAAAAAAtwB4BAABQAAAAAAAAAA==",
+              "ViewState": "AgIAAJQDAAAAAAAAAAAowKIDAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-04-08T05:48:18.005Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "EncounterHistory.cshtml",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistory.cshtml",
+              "DocumentMoniker": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistory.cshtml",
               "RelativeDocumentMoniker": "Pages\\EncounterHistory\\EncounterHistory.cshtml",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistory.cshtml",
+              "ToolTip": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistory.cshtml",
               "RelativeToolTip": "Pages\\EncounterHistory\\EncounterHistory.cshtml",
-              "ViewState": "AgIAAEAAAAAAAAAAAAAAAFUAAAAVAAAAAAAAAA==",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAkwB4AAABNAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-04-08T05:44:57.479Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "EncounterHistoryAPI.cs",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistoryAPI.cs",
+              "DocumentMoniker": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistoryAPI.cs",
               "RelativeDocumentMoniker": "Pages\\EncounterHistory\\EncounterHistoryAPI.cs",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistoryAPI.cs",
+              "ToolTip": "C:\\College\\Worried\\Salvation\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistoryAPI.cs",
               "RelativeToolTip": "Pages\\EncounterHistory\\EncounterHistoryAPI.cs",
               "ViewState": "AgIAAB4AAAAAAAAAAAAowBYAAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-08T05:44:13.888Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "EncounterEditor.cshtml",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
-              "RelativeDocumentMoniker": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
-              "RelativeToolTip": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
-              "ViewState": "AgIAANgBAAAAAAAAAAAAwPABAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-08T05:43:34.491Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "EncounterEditor.cshtml.cs",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
-              "RelativeToolTip": "Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-08T05:43:32.125Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "EncounterAPI.cs",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterAPI.cs",
-              "RelativeDocumentMoniker": "Pages\\EncounterEditor\\EncounterAPI.cs",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterAPI.cs",
-              "RelativeToolTip": "Pages\\EncounterEditor\\EncounterAPI.cs",
-              "ViewState": "AgIAAJYAAAAAAAAAAAAYwL8AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-08T05:41:22.796Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "AccountAPI.cs",
-              "DocumentMoniker": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\Account\\AccountAPI.cs",
-              "RelativeDocumentMoniker": "Pages\\Account\\AccountAPI.cs",
-              "ToolTip": "C:\\College\\Y5S3\\Team-TPK\\TPK_Web_Application\\Pages\\Account\\AccountAPI.cs",
-              "RelativeToolTip": "Pages\\Account\\AccountAPI.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-08T05:18:19.523Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-08T05:44:13.888Z"
             }
           ]
         }
