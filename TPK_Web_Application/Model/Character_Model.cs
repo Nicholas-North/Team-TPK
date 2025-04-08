@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text;
 
 namespace TPK_Web_Application.Model
 {
@@ -36,6 +37,7 @@ namespace TPK_Web_Application.Model
         public int? spellLevel5 { get; set; }
         public string mainScore { get; set; }
         public bool? friendFoe {  get; set; }
+        public byte[]? charToken { get; set; }
 
         public Character_Model(){
             characterID = 0;
@@ -68,6 +70,7 @@ namespace TPK_Web_Application.Model
             spellLevel5 = 0;
             mainScore = "";
             friendFoe = false;
+            charToken = Encoding.UTF8.GetBytes("");
         }
     }
 }

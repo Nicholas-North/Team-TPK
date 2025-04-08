@@ -23,6 +23,9 @@
             <div class="Manip-Buttons">
                 <form method="post" asp-page-handler="SaveCharacter" id="SaveCharacterForm" class="requires-character d-none">
                     <input type="hidden" asp-for="SelectedCharacter.characterID" />
+                    <input type="hidden" name="characterID" value="@Model.SelectedCharacter.characterID" />
+                    <input type="hidden" name="accountID" value="@Model.SelectedCharacter.accountID" />
+                    <input type="hidden" id="CharacterSheet" name="CharacterSheet" />
                     <button type="button" class="btn btn-secondary btn-sm edit-button" onclick="toggleEdit(this)" id="EditButton">Edit</button>
                     <button type="button" class="btn btn-secondary btn-sm close-button d-none" onclick="toggleEdit(this)" id="CloseButton">Close</button>
                     <button type="submit" class="btn btn-primary btn-sm save-button d-none" id="SaveButton">Save</button>
@@ -31,6 +34,9 @@
         </div>
         <div class="col-md-4" id="CharacterVault">
             <h2>Character Vault</h2>
+            <div class="sticky-top bg-white p-3 mb-3">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#CharacterEditorModal">Add Character</button>
+            </div>
             <ul class="list-group" id="character-list">
                 <!-- Characters will be dynamically loaded here -->
             </ul>
@@ -154,6 +160,7 @@
                             </select>
                         </div>
 
+<<<<<<< HEAD
                         <div class="form-group">
                             <label for="FirstDamageTypeInput">Damage Type:</label>
                             <select class="form-control" id="FirstDamageTypeInput" name="FirstDamageTypeInput">
@@ -230,10 +237,119 @@
                                 <option value="freeAction">Free Action</option>
                             </select>
                         </div>
+=======
+<<<<<<< HEAD
+                        <!-- First Damage Type -->
+                        <label for="FirstDamageTypeInput" class="mt-3">First Damage Type:</label>
+                        <select class="form-control" id="FirstDamageTypeInput" name="FirstDamageTypeInput" required>
+                            <option value="Bludgeoning">Bludgeoning</option>
+                            <option value="Slashing">Slashing</option>
+                            <option value="Piercing">Piercing</option>
+                            <option value="Force">Force</option>
+                            <option value="Psychic">Psychic</option>
+                            <option value="Fire">Fire</option>
+                            <option value="Cold">Cold</option>
+                            <option value="Lightning">Lightning</option>
+                            <option value="Thunder">Thunder</option>
+                            <option value="Acid">Acid</option>
+                            <option value="Poison">Poison</option>
+                            <option value="Radiant">Radiant</option>
+                            <option value="Necrotic">Necrotic</option>
+                        </select>
 
+                        <!-- Second Number of Dice -->
+                        <label for="SecondNumDiceInput" class="mt-3">Second Number of Dice:</label>
+                        <input type="number" class="form-control" id="SecondNumDiceInput" name="SecondNumDiceInput" min="0" />
+
+                        <!-- Second Dice Size -->
+                        <label for="SecondDiceSizeInput" class="mt-3">Second Dice Size:</label>
+                        <select class="form-control" id="SecondDiceSizeInput" name="SecondDiceSizeInput">
+                            <option value="2">2</option>
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8">8</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                            <option value="20">20</option>
+                        </select>
+
+                        <!-- Second Damage Type -->
+                        <label for="SecondDamageTypeInput" class="mt-3">Second Damage Type:</label>
+                        <select class="form-control" id="SecondDamageTypeInput" name="SecondDamageTypeInput">
+                            <option value="Bludgeoning">Bludgeoning</option>
+                            <option value="Slashing">Slashing</option>
+                            <option value="Piercing">Piercing</option>
+                            <option value="Force">Force</option>
+                            <option value="Psychic">Psychic</option>
+                            <option value="Fire">Fire</option>
+                            <option value="Cold">Cold</option>
+                            <option value="Lightning">Lightning</option>
+                            <option value="Thunder">Thunder</option>
+                            <option value="Acid">Acid</option>
+                            <option value="Poison">Poison</option>
+                            <option value="Radiant">Radiant</option>
+                            <option value="Necrotic">Necrotic</option>
+                        </select>
+
+                        <!-- Range One -->
+                        <label for="RangeOneInput" class="mt-3">Range One:</label>
+                        <input type="number" class="form-control" id="RangeOneInput" name="RangeOneInput" min="0" />
+
+                        <!-- Range Two -->
+                        <label for="RangeTwoInput" class="mt-3">Range Two:</label>
+                        <input type="number" class="form-control" id="RangeTwoInput" name="RangeTwoInput" min="0" />
+
+                        <!-- Radius -->
+                        <label for="RadiusInput" class="mt-3">Radius:</label>
+                        <input type="number" class="form-control" id="RadiusInput" name="RadiusInput" min="0" />
+
+                        <!-- AoE Type -->
+                        <label for="AoETypeInput" class="mt-3">AoE Type:</label>
+                        <select class="form-control" id="AoETypeInput" name="AoETypeInput">
+                            <option value="Cone">Cone</option>
+                            <option value="Line">Line</option>
+                            <option value="Sphere">Sphere</option>
+                        </select>
+
+                        <!-- Action Cost -->
+                        <label for="ActionTypeInput" class="mt-3">Action Cost:</label>
+                        <select class="form-control" id="ActionTypeInput" name="ActionTypeInput">
+                            <option value="Action">Action</option>
+                            <option value="Bonus">Bonus</option>
+                            <option value="Free">Free</option>
+                        </select>
+
+                        <!-- Save Type -->
+                        <label for="SaveTypeInput" class="mt-3">Save Type:</label>
+                        <select class="form-control" id="SaveTypeInput" name="SaveTypeInput">
+                            <option value="None">None</option>
+                            <option value="Strength">Strength</option>
+                            <option value="Dexterity">Dexterity</option>
+                            <option value="Constitution">Constitution</option>
+                            <option value="Intelligence">Intelligence</option>
+                            <option value="Wisdom">Wisdom</option>
+                            <option value="Charisma">Charisma</option>
+                        </select>
+
+                        <!-- Spell Level -->
+                        <label for="SpellLevelInput" class="mt-3">Spell Level:</label>
+                        <input type="number" class="form-control" id="SpellLevelInput" name="SpellLevelInput" min="0" max="5" />
+
+=======
+                        <!-- Action Type: Action or Bonus Action -->
+                        <label for="ActionTypeInput" class="mt-3">Action Type:</label>
+                        <select class="form-control" id="ActionTypeInput" name="ActionTypeInput" required>
+                            <option value="action">Action</option>
+                            <option value="bonusAction">Bonus Action</option>
+                            <option value="freeAction">Free Action</option>
+                        </select>
+>>>>>>> origin/main
+
+>>>>>>> 65c377515378432712d5252fbbad6ef817704a4d
                         <div class="modal-footer mt-4">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" onclick="submitAbilityForm()">Save changes</button>
+                            @* <button type="button" class="btn btn-primary" onclick="submitAbilityForm()">Save changes</button> *@
+                            <button type="submit" class="btn btn-primary">Save changes</button>
                         </div>
                     </form>
                 </div>
@@ -337,6 +453,13 @@
 
         // Now load the character data
         toggleElementsVisibility();
+
+        const hiddenCharacterIdInput = document.getElementById('selectedCharacterId');
+        if (hiddenCharacterIdInput) {
+            hiddenCharacterIdInput.value = characterId;
+            console.log(hiddenCharacterIdInput.value)
+        }
+
         fetch('/api/CharacterAPI/GetSelectedCharacters/' + characterId)
             .then(response => response.json())
             .then(data => {
@@ -429,6 +552,7 @@
         currentlyHighightedElement = element;
     }
 
+<<<<<<< HEAD
     function submitAbilityForm() {
         const ability = {
             abilityName: $('#AbilityNameInput').val(),
@@ -454,6 +578,183 @@
 
         $('#AbilityJson').val(JSON.stringify(ability));
         $('#createAbilityForm').submit();
+=======
+    function collectAbilityForm() {
+        const ability = {
+            // Basic fields
+            abilityName: document.getElementById('AbilityNameInput').value,
+            meleeRangedAOE: document.getElementById('TargetInput').value,
+            healingTag: document.getElementById('HealingFlag').checked,
+            itemToHitBonus: parseInt(document.getElementById('ToHitBonusInput').value || 0),
+
+            // First damage fields
+            firstNumDice: parseInt(document.getElementById('FirstNumDiceInput').value || 1),
+            firstDiceSize: parseInt(document.getElementById('FirstDiceSizeInput').value || 2),
+            firstDamageType: document.getElementById('FirstDamageTypeInput').value,
+
+            // Second damage fields
+            secondNumDice: parseInt(document.getElementById('SecondNumDiceInput').value || 0),
+            secondDiceSize: parseInt(document.getElementById('SecondDiceSizeInput').value || 0),
+            secondDamageType: document.getElementById('SecondDamageTypeInput').value,
+
+            // Range and AoE fields
+            rangeOne: parseInt(document.getElementById('RangeOneInput').value || 0),
+            rangeTwo: parseInt(document.getElementById('RangeTwoInput').value || 0),
+            radius: parseInt(document.getElementById('RadiusInput').value || 0),
+            coneLineSphere: document.getElementById('AoETypeInput').value,
+
+            // Action type
+            actionType: document.getElementById('ActionTypeInput').value
+        };
+
+        // Serialize the ability object into JSON and store it in the hidden input field
+        document.getElementById('AbilityJson').value = JSON.stringify(ability);
+
+        // Debugging log to verify the collected data
+        console.log('Ability JSON:', ability);
+    }
+
+    function submitAbilityForm() {
+        // Get the AbilityJson and selectedCharacterId values
+        const abilityJson = document.getElementById('AbilityJson').value;
+        const selectedCharacterId = document.getElementById('selectedCharacterId').value;
+
+        // Ensure both values are present
+        if (!abilityJson || !selectedCharacterId) {
+            console.error('AbilityJson or selectedCharacterId is missing.');
+            alert('Please ensure all fields are filled out before submitting.');
+            return;
+        }
+
+        // Create the payload for the API
+        const payload = {
+            CharacterID: parseInt(selectedCharacterId),
+            Ability: JSON.parse(abilityJson)
+        };
+
+        // Call the CreateAbility API
+        fetch('/api/CharacterAPI/CreateAbility', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Ability created successfully:', data);
+                alert('Ability created successfully!');
+                // Optionally reload abilities for the selected character
+                displayAbilities(selectedCharacterId);
+            })
+            .catch(error => {
+                console.error('Error creating ability:', error);
+                alert('An error occurred while creating the ability.');
+            });
+    }
+
+    function collectCharacterData() {
+        // Collect character attributes
+        const character = {
+            characterID: parseInt(document.getElementById('selectedCharacterId').value), // Add characterID
+            accountID: parseInt(document.querySelector('input[name="accountID"]').value || 0), // Add accountID
+            characterName: document.querySelector('input[name="characterName"]').value,
+            ancestry: document.querySelector('input[name="ancestry"]').value,
+            charLevel: parseInt(document.querySelector('input[name="charLevel"]').value || 0),
+            characterClass: document.querySelector('select[name="class"]').value,
+            friendFoe: document.querySelector('input[name="isAlly"]').checked,
+            hp: parseInt(document.querySelector('input[name="hp"]').value || 0),
+            hpMax: parseInt(document.querySelector('input[name="hpMax"]').value || 0),
+            ac: parseInt(document.querySelector('input[name="ac"]').value || 0),
+            movementSpeed: parseInt(document.querySelector('input[name="movementSpeed"]').value || 0),
+            strScore: parseInt(document.querySelector('input[name="strScore"]').value || 0),
+            dexScore: parseInt(document.querySelector('input[name="dexScore"]').value || 0),
+            conScore: parseInt(document.querySelector('input[name="conScore"]').value || 0),
+            intScore: parseInt(document.querySelector('input[name="intScore"]').value || 0),
+            wisScore: parseInt(document.querySelector('input[name="wisScore"]').value || 0),
+            chaScore: parseInt(document.querySelector('input[name="chaScore"]').value || 0),
+            strSaveProf: document.querySelector('input[name="strSaveProf"]').checked,
+            dexSaveProf: document.querySelector('input[name="dexSaveProf"]').checked,
+            conSaveProf: document.querySelector('input[name="conSaveProf"]').checked,
+            intSaveProf: document.querySelector('input[name="intSaveProf"]').checked,
+            wisSaveProf: document.querySelector('input[name="wisSaveProf"]').checked,
+            chaSaveProf: document.querySelector('input[name="chaSaveProf"]').checked,
+            mainScore: document.querySelector('select[name="mainScore"]').value,
+            spellLevel1: parseInt(document.querySelector('input[name="spellCountLevel1"]').value || 0),
+            spellLevel2: parseInt(document.querySelector('input[name="spellCountLevel2"]').value || 0),
+            spellLevel3: parseInt(document.querySelector('input[name="spellCountLevel3"]').value || 0),
+            spellLevel4: parseInt(document.querySelector('input[name="spellCountLevel4"]').value || 0),
+            spellLevel5: parseInt(document.querySelector('input[name="spellCountLevel5"]').value || 0),
+            proficiencyBonus: 0,
+            charToken: ""
+        };
+
+        // Collect abilities
+        const abilities = [];
+        const abilityElements = document.querySelectorAll('.abilityPane .form-group'); // Select all ability divs
+
+        abilityElements.forEach(abilityElement => {
+            const ability = {
+                abilityID: parseInt(abilityElement.getAttribute('data-ability-id')), // Add abilityID
+                abilityName: abilityElement.querySelector('input[name="abilityName"]').value,
+                meleeRangedAOE: abilityElement.querySelector('select[name="meleeRangedAOE"]').value,
+                rangeOne: parseInt(abilityElement.querySelector('input[name="rangeOne"]').value || 0),
+                rangeTwo: parseInt(abilityElement.querySelector('input[name="rangeTwo"]').value || 0),
+                radius: parseInt(abilityElement.querySelector('input[name="radius"]').value || 0),
+                coneLineSphere: abilityElement.querySelector('select[name="coneLineSphere"]').value,
+                actionType: abilityElement.querySelector('select[name="actionType"]').value,
+                healTag: abilityElement.querySelector('input[name="healTag"]').checked,
+                itemToHitBonus: parseInt(abilityElement.querySelector('input[name="toHit"]').value || 0),
+                firstNumDice: parseInt(abilityElement.querySelector('input[name="numDice1"]').value || 0),
+                firstDiceSize: parseInt(abilityElement.querySelector('input[name="numDiceSize1"]').value || 0),
+                firstDamageType: abilityElement.querySelector('select[name="firstDamageType"]').value,
+                secondNumDice: parseInt(abilityElement.querySelector('input[name="numDice1"]').value || 0),
+                secondDiceSize: parseInt(abilityElement.querySelector('input[name="numDiceSize1"]').value || 0),
+                secondDamageType: abilityElement.querySelector('select[name="secondDamageType"]').value
+            };
+            abilities.push(ability);
+        });
+
+        // Combine character and abilities into one object
+        const characterData = {
+            character,
+            abilities
+        };
+
+        document.getElementById('CharacterSheet').value = JSON.stringify(characterData);
+        console.log('Collected Character Data:', characterData); // Debugging log
+    }
+
+    function submitCharacterData(){
+        const characterData = document.getElementById('CharacterSheet').value;
+
+        fetch ('/api/CharacterAPI/UpdateCharacter', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: characterData
+        })
+            .then(response => {
+                if (!response.ok){
+                    throw new Error(`HTTP Error on submitting character! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('character updated successfully:', data);
+                alert('Character updated successfully!');
+            })
+            .catch(error => {
+                console.error('Error updating character:', error);
+                alert('An error occured while updating the character');
+            });
+>>>>>>> origin/main
     }
 
     function displayAttributes(character){
@@ -476,7 +777,7 @@
             <div class="form-group">
                 <h4>Class: <span class="view-mode">${character.characterClass || "None"}</span></h4>
                 <select name="class" class="form-control edit-mode d-none">
-                    <option value="" ${!character.class ? 'selected' : ''}>Blank</option>
+                    <option value="" ${!character.characterClass ? 'selected' : ''}>Blank</option>
                     <option value="Fighter" ${character.characterClass === 'Fighter' ? 'selected' : ''}>Fighter</option>
                     <option value="Cleric" ${character.characterClass === 'Cleric' ? 'selected' : ''}>Cleric</option>
                     <option value="Rogue" ${character.characterClass === 'Rogue' ? 'selected' : ''}>Rogue</option>
@@ -568,13 +869,13 @@
                 </table>
                 <div class="form-group">
                 <h4>Main Ability Score: <span class="view-mode">${character.mainScore || "None"}</span></h4>
-                    <select name="class" class="form-control edit-mode d-none">
-                        <option value="" ${!character.class ? 'selected' : ''}>Blank</option>
+                    <select name="mainScore" class="form-control edit-mode d-none">
+                        <option value="" ${!character.mainScore ? 'selected' : ''}>Blank</option>
                         <option value="STR" ${character.mainScore === 'STR' ? 'selected' : ''}>STR</option>
                         <option value="DEX" ${character.mainScore === 'DEX' ? 'selected' : ''}>DEX</option>
                         <option value="CON" ${character.mainScore === 'CON' ? 'selected' : ''}>CON</option>
                         <option value="INT" ${character.mainScore === 'INT' ? 'selected' : ''}>INT</option>
-                        <option value="WIS" ${character.characterClass === 'WIS' ? 'selected' : ''}>WIS</option>
+                        <option value="WIS" ${character.mainScore === 'WIS' ? 'selected' : ''}>WIS</option>
                         <option value="CHA" ${character.mainScore === 'CHA' ? 'selected' : ''}>CHA</option>
                     </select>
                 </div>
@@ -670,12 +971,142 @@
                 };
 
                 abilities.forEach(ability => {
+<<<<<<< HEAD
                     const actionType = ability.actionType || 'Action'; // Default to Action if not specified
                     if (groupedAbilities[actionType]) {
                         groupedAbilities[actionType].push(ability);
                     } else {
                         groupedAbilities.Action.push(ability); // Fallback to Action
                     }
+=======
+                    const abilityElement = document.createElement('div');
+                    abilityElement.className = 'form-group';
+
+                    abilityElement.setAttribute('data-ability-id', ability.abilityID);
+
+                    abilityElement.innerHTML = `
+                            <div class="d-flex justify-content-between">
+                                <h4>Ability Name: <span class="view-mode">${ability.abilityName}</span></h4>
+                                <input type="text" name="abilityName" class="form-control edit-mode d-none" value="${ability.abilityName}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Target Type: <span class="view-mode">${ability.meleeRangedAOE}</span></label>
+                                <select name="meleeRangedAOE" class="form-control edit-mode d-none">
+                                    <option value="Melee" ${ability.meleeRangedAOE === 'Melee' ? 'selected' : ''}>Melee</option>
+                                    <option value="Ranged" ${ability.meleeRangedAOE === 'Ranged' ? 'selected' : ''}>Ranged</option>
+                                    <option value="AOE" ${ability.meleeRangedAOE === 'AOE' ? 'selected' : ''}>AOE</option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Range One: <span class="view-mode">${ability.rangeOne}</span></label>
+                                <input type="number" name="rangeOne" class="form-control edit-mode d-none" value="${ability.rangeOne}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Range Two: <span class="view-mode">${ability.rangeTwo}</span></label>
+                                <input type="number" name="rangeTwo" class="form-control edit-mode d-none" value="${ability.rangeTwo}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Radius: <span class="view-mode">${ability.radius}</span></label>
+                                <input type="number" name="radius" class="form-control edit-mode d-none" value="${ability.radius}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>AoE Type: <span class="view-mode">${ability.coneLineSphere}</span></label>
+                                <select name="coneLineSphere" class="form-control edit-mode d-none">
+                                    <option value="Cone" ${ability.coneLineSphere === 'Cone' ? 'selected' : ''}>Cone</option>
+                                    <option value="Line" ${ability.coneLineSphere === 'Line' ? 'selected' : ''}>Line</option>
+                                    <option value="Sphere" ${ability.coneLineSphere === 'Sphere' ? 'selected' : ''}>Sphere</option>
+                                    <option value="None" ${ability.coneLineSphere === '' ? 'selected' : ''}>None</option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Action Cost: <span class="view-mode">${ability.actionType}</span></label>
+                                <select name="actionType" class="form-control edit-mode d-none">
+                                    <option value="Action" ${ability.actionType === 'Action' ? 'selected' : ''}>Action</option>
+                                    <option value="Bonus" ${ability.actionType === 'Bonus' ? 'selected' : ''}>Bonus</option>
+                                    <option value="Free" ${ability.actionType === 'Free' ? 'selected' : ''}>Free</option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <input type="checkbox" class="view-mode" ${ability.healTag ? "checked" : ""} disabled>Healing? </input>
+                                <input type="checkbox" class="edit-mode d-none" name="healTag" ${ability.healTag ? "checked" : ""} />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>To hit bonus: <span class="view-mode">${ability.itemToHitBonus}</span></label>
+                                <input type="number" name="toHit" class="form-control edit-mode d-none" value="${ability.itemToHitBonus}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>1st # Dice: <span class="view-mode">${ability.firstNumDice}</span></label>
+                                <input type="number" name="numDice1" class="form-control edit-mode d-none" value="${ability.firstNumDice}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>1st Dice Type: <span class="view-mode">${ability.firstDiceSize}</span></label>
+                                <input type="number" name="numDiceSize1" class="form-control edit-mode d-none" value="${ability.firstDiceSize}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>1st Damage Type: <span class="view-mode">${ability.firstDamageType}</span></label>
+                                <select name="firstDamageType" class="form-control edit-mode d-none">
+                                    <option value="Bludgeoning" ${ability.firstDamageType === 'Bludgeoning' ? 'selected' : ''}>Bludgeoning</option>
+                                    <option value="Slashing" ${ability.firstDamageType === 'Slashing' ? 'selected' : ''}>Slashing</option>
+                                    <option value="Piercing" ${ability.firstDamageType === 'Piercing' ? 'selected' : ''}>Piercing</option>
+                                    <option value="Force" ${ability.firstDamageType === 'Force' ? 'selected' : ''}>Force</option>
+                                    <option value="Psychic" ${ability.firstDamageType === 'Psychic' ? 'selected' : ''}>Psychic</option>
+                                    <option value="Fire" ${ability.firstDamageType === 'Fire' ? 'selected' : ''}>Fire</option>
+                                    <option value="Cold" ${ability.firstDamageType === 'Cold' ? 'selected' : ''}>Cold</option>
+                                    <option value="Lightning" ${ability.firstDamageType === 'Lightning' ? 'selected' : ''}>Lightning</option>
+                                    <option value="Thunder" ${ability.firstDamageType === 'Thunder' ? 'selected' : ''}>Thunder</option>
+                                    <option value="Acid" ${ability.firstDamageType === 'Acid' ? 'selected' : ''}>Acid</option>
+                                    <option value="Poison" ${ability.firstDamageType === 'Poison' ? 'selected' : ''}>Poison</option>
+                                    <option value="Radiant" ${ability.firstDamageType === 'Radiant' ? 'selected' : ''}>Radiant</option>
+                                    <option value="Necrotic" ${ability.firstDamageType === 'Necrotic' ? 'selected' : ''}>Necrotic</option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>2nd # Dice: <span class="view-mode">${ability.secondNumDice}</span></label>
+                                <input type="number" name="numDice1" class="form-control edit-mode d-none" value="${ability.secondNumDice}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>2nd Dice Type: <span class="view-mode">${ability.secondDiceSize}</span></label>
+                                <input type="number" name="numDiceSize1" class="form-control edit-mode d-none" value="${ability.secondDiceSize}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>2nd Damage Type<span class="view-mode">${ability.secondDamageType}</span></label>
+                                <select name="secondDamageType" class="form-control edit-mode d-none">
+                                    <option value="Bludgeoning" ${ability.secondDamageType === 'Bludgeoning' ? 'selected' : ''}>Bludgeoning</option>
+                                    <option value="Slashing" ${ability.secondDamageType === 'Slashing' ? 'selected' : ''}>Slashing</option>
+                                    <option value="Piercing" ${ability.secondDamageType === 'Piercing' ? 'selected' : ''}>Piercing</option>
+                                    <option value="Force" ${ability.secondDamageType === 'Force' ? 'selected' : ''}>Force</option>
+                                    <option value="Psychic" ${ability.secondDamageType === 'Psychic' ? 'selected' : ''}>Psychic</option>
+                                    <option value="Fire" ${ability.secondDamageType === 'Fire' ? 'selected' : ''}>Fire</option>
+                                    <option value="Cold" ${ability.secondDamageType === 'Cold' ? 'selected' : ''}>Cold</option>
+                                    <option value="Lightning" ${ability.secondDamageType === 'Lightning' ? 'selected' : ''}>Lightning</option>
+                                    <option value="Thunder" ${ability.secondDamageType === 'Thunder' ? 'selected' : ''}>Thunder</option>
+                                    <option value="Acid" ${ability.secondDamageType === 'Acid' ? 'selected' : ''}>Acid</option>
+                                    <option value="Poison" ${ability.secondDamageType === 'Poison' ? 'selected' : ''}>Poison</option>
+                                    <option value="Radiant" ${ability.secondDamageType === 'Radiant' ? 'selected' : ''}>Radiant</option>
+                                    <option value="Necrotic" ${ability.secondDamageType === 'Necrotic' ? 'selected' : ''}>Necrotic</option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Spell Cost: <span class="view-mode">${ability.spellLevel}</span></label>
+                                <input type="number" name="spellLevel" class="form-control edit-mode d-none" value="${ability.spellLevel}" />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <label>Spell Save Type: <span class="view-mode">${ability.saveType}</span></label>
+                                <select name="spellSave" class="form-control edit-mode d-none">
+                                    <option value="" ${!ability.saveType ? 'selected' : ''}>Blank</option>
+                                    <option value="STR" ${ability.saveType === 'STR' ? 'selected' : ''}>STR</option>
+                                    <option value="DEX" ${ability.saveType === 'DEX' ? 'selected' : ''}>DEX</option>
+                                    <option value="CON" ${ability.saveType === 'CON' ? 'selected' : ''}>CON</option>
+                                    <option value="INT" ${ability.saveType === 'INT' ? 'selected' : ''}>INT</option>
+                                    <option value="WIS" ${ability.saveType=== 'WIS' ? 'selected' : ''}>WIS</option>
+                                    <option value="CHA" ${ability.saveType === 'CHA' ? 'selected' : ''}>CHA</option>
+                                </select>
+                            </div>
+
+                    `;
+
+                    container.appendChild(abilityElement);
+>>>>>>> origin/main
                 });
 
                 // Create sections for each action type
@@ -750,6 +1181,7 @@
         // Initialize the page
         loadCharacters();
 
+<<<<<<< HEAD
         // Set up ability form submission
         const createAbilityForm = document.querySelector('#createAbilityForm');
         if (createAbilityForm) {
@@ -797,6 +1229,44 @@
 
         // Initialize the form state
         $('#TargetInput').trigger('change');
+=======
+            // Old Page version
+            const createAbilityForm = document.querySelector('#createAbilityForm'); // Use the form's ID
+            if (createAbilityForm) {
+                createAbilityForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    collectAbilityForm();
+                    submitAbilityForm();
+
+                    createAbilityForm.reset(); // Reset the form after submission
+
+                    // Trigger the close button's data-dismiss behavior
+                    const closeButton = document.querySelector('#AbilityEditorModal .close');
+                    if (closeButton) {
+                        closeButton.click();
+                    } else {
+                        console.error('Close button not found in the modal.');
+                    }
+                });
+            } else {
+                console.error('createAbilityForm form not found in the DOM.');
+            }
+
+            //API Version
+            const saveButton = document.querySelector('#SaveCharacterForm'); // Use the form's ID
+            if (saveButton) {
+                saveButton.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    collectCharacterData();
+                    submitCharacterData();
+                    toggleEdit();
+                    loadCharacters();
+                    //saveButton.submit()
+                });
+            } else {
+                console.error('saveButton form not found in the DOM.');
+            }
+>>>>>>> origin/main
     });
 </script>
 

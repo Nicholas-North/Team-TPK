@@ -39,13 +39,15 @@
         <form method="post" asp-page-handler="SaveEncounter" id="SaveEncounterForm" class="requires-encounter d-none">
             <input type="hidden" asp-for="SelectedEncounter.encounterID" id="SelectedEncounterId" />
             <input type="hidden" asp-for="SelectedCharacter.characterID" />
+
             <input type="hidden" id="gridData" name="gridData" />
             <button type="button" class="btn btn-secondary btn-sm edit-button" onclick="toggleEdit(this)" id="EditButton">Edit</button>
             <button type="button" class="btn btn-secondary btn-sm close-button d-none" onclick="toggleEdit(this)" id="CloseButton">Close</button>
             <button type="submit" class="btn btn-primary btn-sm save-button d-none" id="SaveButton">Save</button>
         </form>
-        <form method="post" asp-page-handler="RunEncounter" class="requires-encounter d-none">
-            <input type="hidden" asp-for="SelectedEncounter.encounterID" />
+        <form method="post" asp-page-handler="RunEncounter" class="requires-encounter d-none" id="RunEncounterForm">
+            <input type="hidden" id="selectedEncounterId" name="selectedEncounterId" value="@Model.SelectedEncounter.encounterID" />
+            <input type="hidden" asp-for="SelectedEncounter.encounterID" id="SelectedEncounterId" />
             <button type="submit" class="btn btn-primary">Run Encounter</button>
         </form>
     </div>
@@ -439,12 +441,39 @@
             currentlyHighightedElement = element;
         }
 
+<<<<<<< HEAD
         function getRandomColor() {
             const colors = ['#FFADAD', '#FFD6A5', '#FDFFB6', '#CAFFBF', '#9BF6FF', '#A0C4FF', '#BDB2FF', '#FFC6FF'];
             return colors[Math.floor(Math.random() * colors.length)];
         }
 
         // Initialize on page load
+=======
+        function runEncounter(encounterId) {
+            fetch('/api/EncounterAPI/RunEncounter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(encounterId)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Encounter started successfully:', data);
+                    alert(`Encounter started successfully! Batch ID: ${data.batchId}`);
+                })
+                .catch(error => {
+                    console.error('Error starting encounter:', error);
+                    alert('An error occurred while starting the encounter.');
+                });
+        }
+        // Load encounters on page load
+>>>>>>> origin/main
         document.addEventListener('DOMContentLoaded', () => {
             initializeGrid();
             loadEncounters();
@@ -456,7 +485,21 @@
                 e.target.submit();
             });
 
+<<<<<<< HEAD
             // Zoom and pan functionality
+=======
+            const selectedEncounterInput = document.getElementById('SelectedEncounterId');
+            const runEncounterForm = document.querySelector('#RunEncounterForm'); // Use the form's ID
+            if (runEncounterForm) {
+                runEncounterForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    runEncounter(selectedEncounterInput.value);
+                });
+            } else {
+                console.error('SaveEncounter form not found in the DOM.');
+            }
+
+>>>>>>> origin/main
             const gridContainer = document.getElementById('grid-container');
             let scale = 1;
             let isPanning = false;
