@@ -17,7 +17,7 @@ namespace TPK_Web_Application.Model
         public short? secondDiceSize { get; set; }
         public string? secondDamageType { get; set; }
         public int? rangeOne {  get; set; }
-        public string? rangeTwo { get; set; }
+        public int? rangeTwo { get; set; }
         public int? radius {  get; set; }
         public string? coneLineSphere { get; set; }
         public short? spellLevel {  get; set; }

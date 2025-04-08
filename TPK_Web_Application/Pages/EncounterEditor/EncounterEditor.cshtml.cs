@@ -72,6 +72,19 @@ namespace TPK_Web_Application.Pages.EncounterEditor
                             .OrderByDescending(c => c.batchID)
                             .Select(c => c.batchID)
                             .FirstOrDefault();
+
+            long highestEncounterVersion = 0;
+            try
+            {
+                highestEncounterVersion = _dataContext.encounterPosition
+                    .Where(filter => filter.encounterID == SelectedEncounter.encounterID)
+                    .Max(filter => filter.encounterVersion);
+            }
+            catch (InvalidOperationException)
+            {
+                highestEncounterVersion = 0;
+            }
+
             // Handle the form submission and save the encounter data
             if (SelectedEncounter.encounterID != 0)
             {
@@ -79,16 +92,13 @@ namespace TPK_Web_Application.Pages.EncounterEditor
                 {
                     batchID = highestBatchID + 1,
                     encounterID = SelectedEncounter.encounterID,
+                    encounterVersion = highestEncounterVersion,
                     startTime = DateTime.Now,
                 };
                 _dataContext.Batch.Add(batch);
                 _dataContext.SaveChanges();
                 return RedirectToPage("/EncounterHistory/EncounterHistory");
             }
-            //batch.batchID = 1009;
-            //_dataContext.Batch.Add(batch);
-            //_dataContext.SaveChanges();
-            //return RedirectToPage("/EncounterEditor/EncounterEditor");
             return RedirectToPage();
         }
         public IActionResult OnPostSaveEncounter()

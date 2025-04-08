@@ -1,6 +1,16 @@
 [
   {
     "ContainingType": "TPK_Web_Application.Pages.CharacterEditor.CharacterAPIController",
+    "Method": "CreateAbility",
+    "RelativePath": "api/CharacterAPI/CreateAbility",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TPK_Web_Application.Pages.CharacterEditor.CharacterAPIController",
     "Method": "GetAbilities",
     "RelativePath": "api/CharacterAPI/GetAbilities",
     "HttpMethod": "GET",
@@ -49,6 +59,16 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "TPK_Web_Application.Pages.CharacterEditor.CharacterAPIController",
+    "Method": "UpdateCharacter",
+    "RelativePath": "api/CharacterAPI/UpdateCharacter",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
