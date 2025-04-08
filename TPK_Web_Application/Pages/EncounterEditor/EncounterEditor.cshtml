@@ -39,7 +39,6 @@
         <form method="post" asp-page-handler="SaveEncounter" id="SaveEncounterForm" class="requires-encounter d-none">
             <input type="hidden" asp-for="SelectedEncounter.encounterID" id="SelectedEncounterId" />
             <input type="hidden" asp-for="SelectedCharacter.characterID" />
-
             <input type="hidden" id="gridData" name="gridData" />
             <button type="button" class="btn btn-secondary btn-sm edit-button" onclick="toggleEdit(this)" id="EditButton">Edit</button>
             <button type="button" class="btn btn-secondary btn-sm close-button d-none" onclick="toggleEdit(this)" id="CloseButton">Close</button>
@@ -58,7 +57,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Encounter Editor</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -77,44 +76,29 @@
             </div>
         </div>
     </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
-        // Global variables
         let currentlyHighightedElement = null;
         let selectedEncounter = null;
         let gridSizeX = 50;
         let gridSizeY = 50;
         let showCoordinates = false;
-        let draggedToken = null;
-        let draggedTokenOriginalCell = null;
-        const characterMap = new Map(); // Stores character data by ID
+        const characterMap = new Map();
 
-        // Helper function to get initials from name
-        function getInitials(name) {
-            return name.split(' ')
-                .map(word => word[0])
-                .join('')
-                .toUpperCase()
-                .substring(0, 2);
-        }
-
-        // Initialize grid on page load
         function initializeGrid() {
             createGrid(gridSizeX, gridSizeY);
             setupGridControls();
         }
 
-        // Create grid with dynamic dimensions
         function createGrid(xSize, ySize) {
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
-
             gridSizeX = xSize;
             gridSizeY = ySize;
             document.getElementById('grid-size-display').textContent = `${xSize}x${ySize}`;
-
             grid.style.gridTemplateColumns = `repeat(${xSize}, 50px)`;
             grid.style.gridTemplateRows = `repeat(${ySize}, 50px)`;
 
@@ -122,32 +106,24 @@
                 const gridItem = document.createElement('div');
                 gridItem.className = 'grid-item';
                 gridItem.id = `grid-item-${i}`;
-
                 if (showCoordinates) {
                     const x = i % xSize;
                     const y = Math.floor(i / xSize);
                     gridItem.setAttribute('title', `(${x}, ${y})`);
                 }
-
                 grid.appendChild(gridItem);
             }
-
             enableGridDropping();
             enableGridItemDeletion();
         }
 
-        // Setup grid controls
         function setupGridControls() {
             document.getElementById('increase-grid').addEventListener('click', () => {
-                createGrid(gridSizeX + 5, gridSizeY + 5);
+                if (gridSizeX < 100) createGrid(gridSizeX + 5, gridSizeY + 5);
             });
-
             document.getElementById('decrease-grid').addEventListener('click', () => {
-                if (gridSizeX > 5 && gridSizeY > 5) {
-                    createGrid(gridSizeX - 5, gridSizeY - 5);
-                }
+                if (gridSizeX > 5) createGrid(gridSizeX - 5, gridSizeY - 5);
             });
-
             document.getElementById('toggle-coords').addEventListener('click', () => {
                 showCoordinates = !showCoordinates;
                 const gridItems = document.querySelectorAll('.grid-item');
@@ -163,15 +139,9 @@
             });
         }
 
-        // Fetch and display encounters
         function loadEncounters() {
             fetch('/api/EncounterAPI/GetEncounters')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     const encounterList = document.getElementById('encounter-list');
                     encounterList.innerHTML = '';
@@ -179,7 +149,6 @@
                         const listItem = document.createElement('li');
                         listItem.className = 'list-group-item';
                         listItem.textContent = `Encounter ID: ${encounter.encounterID}`;
-
                         listItem.onclick = () => {
                             selectEncounter(encounter.encounterID);
                             highlightSelected(listItem);
@@ -192,28 +161,21 @@
 
         function loadCharacters() {
             fetch('/api/EncounterAPI/GetCharacters')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     const characterList = document.getElementById('character-list');
                     characterList.innerHTML = '';
-                    
-                    // Clear and rebuild character map
                     characterMap.clear();
+
                     data.forEach(character => {
                         characterMap.set(character.characterID, character);
-                        
+
                         const listItem = document.createElement('li');
                         listItem.className = 'list-group-item character-item';
-                        listItem.textContent = character.characterName;
                         listItem.setAttribute('data-character-id', character.characterID);
                         listItem.setAttribute('data-character-name', character.characterName);
+                        listItem.textContent = character.characterName;
 
-                        // Add colored token preview with initials
                         const tokenPreview = document.createElement('span');
                         tokenPreview.className = 'token-preview';
                         tokenPreview.style.backgroundColor = getRandomColor();
@@ -226,13 +188,20 @@
                         }
                         characterList.appendChild(listItem);
                     });
-
                     makeCharactersDraggable();
                 })
                 .catch(error => console.error('Error fetching characters:', error));
         }
 
-        // Select an encounter and display its characters
+        function getInitials(name) {
+            return name.split(' ').map(word => word[0]).join('').toUpperCase().substring(0, 2);
+        }
+
+        function getRandomColor() {
+            const colors = ['#FFADAD', '#FFD6A5', '#FDFFB6', '#CAFFBF', '#9BF6FF', '#A0C4FF', '#BDB2FF', '#FFC6FF'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
         function selectEncounter(encounterId) {
             toggleElementsVisibility();
             document.getElementById('SelectedEncounterId').value = encounterId;
@@ -241,14 +210,12 @@
             fetch(`/api/EncounterAPI/GetPositions/${encounterId}`)
                 .then(response => response.json())
                 .then(data => {
-                    // Clear the grid
                     const gridItems = document.querySelectorAll('.grid-item');
                     gridItems.forEach(item => {
                         item.innerHTML = '';
                         item.style.backgroundColor = '';
                     });
 
-                    // Place characters on grid
                     data.forEach(character => {
                         if (character.xloc !== undefined && character.yloc !== undefined) {
                             const gridIndex = character.yloc * gridSizeX + character.xloc;
@@ -260,6 +227,7 @@
                                 token.textContent = getInitials(charData.characterName);
                                 token.style.backgroundColor = getRandomColor();
                                 token.setAttribute('data-character-id', character.characterID);
+                                token.setAttribute('data-character-name', charData.characterName);
                                 token.setAttribute('draggable', true);
                                 gridItem.appendChild(token);
                             }
@@ -290,9 +258,7 @@
         function toggleElementsVisibility() {
             const elementsToToggle = document.querySelectorAll('.requires-encounter');
             elementsToToggle.forEach(element => {
-                if (selectedEncounter == null) {
-                    element.classList.remove('d-none');
-                }
+                element.classList.remove('d-none');
             });
         }
 
@@ -300,7 +266,6 @@
             const characterItems = document.querySelectorAll('.character-item');
             characterItems.forEach(item => {
                 item.setAttribute('draggable', true);
-
                 item.addEventListener('dragstart', (e) => {
                     e.dataTransfer.setData('text/plain', JSON.stringify({
                         characterId: item.dataset.characterId,
@@ -309,7 +274,6 @@
                     }));
                     item.classList.add('dragging');
                 });
-
                 item.addEventListener('dragend', () => {
                     item.classList.remove('dragging');
                 });
@@ -318,29 +282,26 @@
 
         function enableGridDropping() {
             const gridItems = document.querySelectorAll('.grid-item');
+            let draggedToken = null;
+            let draggedTokenOriginalCell = null;
 
             gridItems.forEach(item => {
-                // Handle drag start for tokens already on the grid
                 item.addEventListener('dragstart', (e) => {
                     if (e.target.classList.contains('character-token')) {
                         draggedToken = e.target;
                         draggedTokenOriginalCell = item;
-                        
                         const characterId = e.target.dataset.characterId;
-                        const charData = characterMap.get(characterId);
-                        
+                        const characterName = e.target.dataset.characterName;
                         e.dataTransfer.setData('text/plain', JSON.stringify({
                             characterId: characterId,
-                            characterName: charData.characterName,
+                            characterName: characterName,
                             color: e.target.style.backgroundColor
                         }));
-                        
                         e.target.classList.add('dragging');
                         setTimeout(() => e.target.classList.add('invisible'), 0);
                     }
                 });
 
-                // Handle drag end for tokens
                 item.addEventListener('dragend', (e) => {
                     if (e.target.classList.contains('character-token')) {
                         e.target.classList.remove('dragging', 'invisible');
@@ -349,7 +310,6 @@
                     }
                 });
 
-                // Handle drop zone functionality
                 item.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     if (!item.querySelector('.character-token')) {
@@ -364,28 +324,19 @@
                 item.addEventListener('drop', (e) => {
                     e.preventDefault();
                     item.classList.remove('drop-target');
-
-                    try {
-                        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-                        if (data.characterId && data.characterName) {
-                            // Remove the original token if it exists and we're moving to a new cell
-                            if (draggedTokenOriginalCell && draggedTokenOriginalCell !== item) {
-                                draggedTokenOriginalCell.innerHTML = '';
-                            }
-
-                            // Only create token if the target cell is empty
-                            if (!item.querySelector('.character-token')) {
-                                const token = document.createElement('div');
-                                token.className = 'character-token';
-                                token.textContent = getInitials(data.characterName);
-                                token.style.backgroundColor = data.color || getRandomColor();
-                                token.setAttribute('data-character-id', data.characterId);
-                                token.setAttribute('draggable', true);
-                                item.appendChild(token);
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Error processing drop:', error);
+                    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                    if (draggedTokenOriginalCell && draggedTokenOriginalCell !== item) {
+                        draggedTokenOriginalCell.innerHTML = '';
+                    }
+                    if (!item.querySelector('.character-token')) {
+                        const token = document.createElement('div');
+                        token.className = 'character-token';
+                        token.textContent = getInitials(data.characterName);
+                        token.style.backgroundColor = data.color || getRandomColor();
+                        token.setAttribute('data-character-id', data.characterId);
+                        token.setAttribute('data-character-name', data.characterName);
+                        token.setAttribute('draggable', true);
+                        item.appendChild(token);
                     }
                 });
             });
@@ -397,10 +348,8 @@
 
             gridItems.forEach(item => {
                 item.addEventListener('click', (e) => {
-                    if (e.target === item) { // Only select if clicking the grid item itself, not a token
-                        if (selectedGridItem) {
-                            selectedGridItem.classList.remove('selected');
-                        }
+                    if (e.target === item) {
+                        if (selectedGridItem) selectedGridItem.classList.remove('selected');
                         selectedGridItem = item;
                         item.classList.add('selected');
                     }
@@ -419,16 +368,15 @@
         function collectGridData() {
             const gridItems = document.querySelectorAll('.grid-item');
             const gridData = [];
-
             gridItems.forEach((item, index) => {
-                if (item.firstChild && item.firstChild.classList.contains('character-token')) {
+                const token = item.querySelector('.character-token');
+                if (token) {
                     const x = index % gridSizeX;
                     const y = Math.floor(index / gridSizeX);
-                    const characterId = item.firstChild.dataset.characterId;
-                    gridData.push({ x, y, characterId });
+                    const characterId = parseInt(token.dataset.characterId); // Convert to integer
+                    gridData.push({ x, y, characterID: characterId });
                 }
             });
-
             document.getElementById('gridData').value = JSON.stringify(gridData);
             console.log('Grid Data:', gridData);
         }
@@ -441,28 +389,13 @@
             currentlyHighightedElement = element;
         }
 
-
-        function getRandomColor() {
-            const colors = ['#FFADAD', '#FFD6A5', '#FDFFB6', '#CAFFBF', '#9BF6FF', '#A0C4FF', '#BDB2FF', '#FFC6FF'];
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
-
-        // Initialize on page load
-
         function runEncounter(encounterId) {
             fetch('/api/EncounterAPI/RunEncounter', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(encounterId)
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     console.log('Encounter started successfully:', data);
                     alert(`Encounter started successfully! Batch ID: ${data.batchId}`);
@@ -472,7 +405,6 @@
                     alert('An error occurred while starting the encounter.');
                 });
         }
-        // Load encounters on page load
 
         document.addEventListener('DOMContentLoaded', () => {
             initializeGrid();
@@ -485,20 +417,13 @@
                 e.target.submit();
             });
 
-
-            // Zoom and pan functionality
-
-            const selectedEncounterInput = document.getElementById('SelectedEncounterId');
-            const runEncounterForm = document.querySelector('#RunEncounterForm'); // Use the form's ID
+            const runEncounterForm = document.getElementById('RunEncounterForm');
             if (runEncounterForm) {
-                runEncounterForm.addEventListener('submit', (event) => {
-                    event.preventDefault();
-                    runEncounter(selectedEncounterInput.value);
+                runEncounterForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    runEncounter(document.getElementById('SelectedEncounterId').value);
                 });
-            } else {
-                console.error('SaveEncounter form not found in the DOM.');
             }
-
 
             const gridContainer = document.getElementById('grid-container');
             let scale = 1;
@@ -511,20 +436,14 @@
                 const zoomSpeed = 0.1;
                 const delta = e.deltaY < 0 ? zoomSpeed : -zoomSpeed;
                 const newScale = Math.max(0.1, Math.min(3, scale + delta));
-
-                const mouseX = e.clientX;
-                const mouseY = e.clientY;
                 const rect = gridContainer.getBoundingClientRect();
-                const offsetX = mouseX - rect.left;
-                const offsetY = mouseY - rect.top;
-
+                const offsetX = e.clientX - rect.left;
+                const offsetY = e.clientY - rect.top;
                 const gridX = (offsetX - translateX) / scale;
                 const gridY = (offsetY - translateY) / scale;
-
                 scale = newScale;
                 translateX = offsetX - gridX * scale;
                 translateY = offsetY - gridY * scale;
-
                 gridContainer.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
             });
 
@@ -538,10 +457,11 @@
             });
 
             document.addEventListener('mousemove', (e) => {
-                if (!isPanning) return;
-                translateX = e.clientX - startX;
-                translateY = e.clientY - startY;
-                gridContainer.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+                if (isPanning) {
+                    translateX = e.clientX - startX;
+                    translateY = e.clientY - startY;
+                    gridContainer.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+                }
             });
 
             document.addEventListener('mouseup', () => {
@@ -606,17 +526,17 @@
             transition: background-color 0.2s;
         }
 
-        .grid-item:nth-child(odd) {
-            background-color: #f8f9fa;
-        }
+            .grid-item:nth-child(odd) {
+                background-color: #f8f9fa;
+            }
 
-        .grid-item.selected {
-            outline: 2px solid #dc3545;
-        }
+            .grid-item.selected {
+                outline: 2px solid #dc3545;
+            }
 
-        .grid-item.drop-target {
-            background-color: #e2f0fd !important;
-        }
+            .grid-item.drop-target {
+                background-color: #e2f0fd !important;
+            }
 
         .character-token {
             width: 40px;
@@ -631,16 +551,16 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        .character-token.invisible {
-            opacity: 0.2;
-            background-color: #ccc !important;
-        }
+            .character-token.invisible {
+                opacity: 0.2;
+                background-color: #ccc !important;
+            }
 
-        .character-token.dragging {
-            transform: scale(1.1);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            z-index: 100;
-        }
+            .character-token.dragging {
+                transform: scale(1.1);
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                z-index: 100;
+            }
 
         .token-preview {
             width: 20px;
@@ -675,9 +595,9 @@
             transition: background-color 0.2s;
         }
 
-        .list-group-item:hover {
-            background-color: #f8f9fa;
-        }
+            .list-group-item:hover {
+                background-color: #f8f9fa;
+            }
 
         .highlight-selected {
             background-color: #e2f0fd !important;
@@ -702,16 +622,20 @@
             .Formatting {
                 flex-direction: column;
             }
+
             .frame {
                 height: 60vh;
             }
+
             .col-md-4 {
                 width: 100%;
             }
+
             .grid-item {
                 width: 30px;
                 height: 30px;
             }
+
             .character-token {
                 width: 25px;
                 height: 25px;
