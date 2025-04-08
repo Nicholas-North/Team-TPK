@@ -78,55 +78,158 @@
                 <div class="modal-body">
                     <form method="post" asp-page-handler="CreateAbility" id="createAbilityForm">
                         <input type="hidden" id="selectedCharacterId" name="selectedCharacterId" value="@Model.SelectedCharacter.characterID" />
-
-                        <!-- Hidden input to store JSON -->
                         <input type="hidden" id="AbilityJson" name="AbilityJson" />
 
-                        <!-- Ability Name -->
-                        <label for="NameInput">Ability Name:</label>
-                        <input type="text" class="form-control" id="AbilityNameInput" name="NameInput" required />
+                        <!-- Basic Info Section -->
+                        <div class="form-group">
+                            <label for="AbilityNameInput">Ability Name:</label>
+                            <input type="text" class="form-control" id="AbilityNameInput" name="NameInput" required />
+                        </div>
 
-                        <!-- Target Type -->
-                        <label for="TargetInput" class="mt-3">Target:</label>
-                        <select class="form-control" id="TargetInput" name="TargetInput" required>
-                            <option value="Melee">Melee</option>
-                            <option value="Ranged">Ranged</option>
-                            <option value="AOE">AOE</option>
-                        </select>
+                        <div class="form-group">
+                            <label for="TargetInput">Target:</label>
+                            <select class="form-control" id="TargetInput" name="TargetInput" required>
+                                <option value="Melee">Melee</option>
+                                <option value="Ranged">Ranged</option>
+                                <option value="AOE">AOE</option>
+                            </select>
+                        </div>
+
+                        <!-- Conditional Range Fields -->
+                        <div id="rangeFields" class="d-none">
+                            <div class="form-group">
+                                <label for="RangeOneInput">Range (ft):</label>
+                                <input type="number" class="form-control" id="RangeOneInput" name="RangeOneInput" min="0" />
+                            </div>
+                            <div class="form-group">
+                                <label for="RangeTwoInput">Long Range (ft):</label>
+                                <input type="number" class="form-control" id="RangeTwoInput" name="RangeTwoInput" min="0" />
+                            </div>
+                        </div>
+
+                        <!-- Conditional AOE Fields -->
+                        <div id="aoeFields" class="d-none">
+                            <div class="form-group">
+                                <label for="RadiusInput">Radius (ft):</label>
+                                <input type="number" class="form-control" id="RadiusInput" name="RadiusInput" min="0" />
+                            </div>
+                            <div class="form-group">
+                                <label for="AoeTypeInput">AOE Type:</label>
+                                <select class="form-control" id="AoeTypeInput" name="AoeTypeInput">
+                                    <option value="Sphere">Sphere</option>
+                                    <option value="Cone">Cone</option>
+                                    <option value="Line">Line</option>
+                                </select>
+                            </div>
+                        </div>
 
                         <!-- Healing Flag -->
-                        <div class="form-check mt-3">
+                        <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="HealingFlag" name="HealingFlag" />
                             <label class="form-check-label" for="HealingFlag">Healing Ability</label>
                         </div>
 
-                        <!-- Additional To-Hit Bonus -->
-                        <label for="ToHitBonusInput" class="mt-3">Additional To-Hit Bonus:</label>
-                        <input type="number" class="form-control" id="ToHitBonusInput" name="ToHitBonusInput" min="0" />
+                        <!-- To-Hit Bonus -->
+                        <div class="form-group">
+                            <label for="ToHitBonusInput">Additional To-Hit Bonus:</label>
+                            <input type="number" class="form-control" id="ToHitBonusInput" name="ToHitBonusInput" min="0" />
+                        </div>
 
-                        <!-- First Number of Dice -->
-                        <label for="FirstNumDiceInput" class="mt-3">Number of Dice:</label>
-                        <input type="number" class="form-control" id="FirstNumDiceInput" name="FirstNumDiceInput" min="1" required />
+                        <!-- Primary Damage Section -->
+                        <div class="form-group">
+                            <label for="FirstNumDiceInput">Number of Dice:</label>
+                            <input type="number" class="form-control" id="FirstNumDiceInput" name="FirstNumDiceInput" min="1" required />
+                        </div>
 
-                        <!-- First Dice Size -->
-                        <label for="FirstDiceSizeInput" class="mt-3">Dice Size:</label>
-                        <select class="form-control" id="FirstDiceSizeInput" name="FirstDiceSizeInput" required>
-                            <option value="2">2</option>
-                            <option value="4">4</option>
-                            <option value="6">6</option>
-                            <option value="8">8</option>
-                            <option value="10">10</option>
-                            <option value="12">12</option>
-                            <option value="20">20</option>
-                        </select>
+                        <div class="form-group">
+                            <label for="FirstDiceSizeInput">Dice Size:</label>
+                            <select class="form-control" id="FirstDiceSizeInput" name="FirstDiceSizeInput" required>
+                                <option value="2">2</option>
+                                <option value="4">4</option>
+                                <option value="6">6</option>
+                                <option value="8">8</option>
+                                <option value="10">10</option>
+                                <option value="12">12</option>
+                                <option value="20">20</option>
+                            </select>
+                        </div>
 
-                        <!-- Action Type: Action or Bonus Action -->
-                        <label for="ActionTypeInput" class="mt-3">Action Type:</label>
-                        <select class="form-control" id="ActionTypeInput" name="ActionTypeInput" required>
-                            <option value="action">Action</option>
-                            <option value="bonusAction">Bonus Action</option>
-                            <option value="freeAction">Free Action</option>
-                        </select>
+                        <div class="form-group">
+                            <label for="FirstDamageTypeInput">Damage Type:</label>
+                            <select class="form-control" id="FirstDamageTypeInput" name="FirstDamageTypeInput">
+                                <option value="">None</option>
+                                <option value="Bludgeoning">Bludgeoning</option>
+                                <option value="Slashing">Slashing</option>
+                                <option value="Piercing">Piercing</option>
+                                <option value="Fire">Fire</option>
+                                <option value="Cold">Cold</option>
+                                <option value="Lightning">Lightning</option>
+                                <option value="Acid">Acid</option>
+                                <option value="Poison">Poison</option>
+                                <option value="Psychic">Psychic</option>
+                                <option value="Necrotic">Necrotic</option>
+                                <option value="Radiant">Radiant</option>
+                                <option value="Force">Force</option>
+                                <option value="Thunder">Thunder</option>
+                            </select>
+                        </div>
+
+                        <!-- Secondary Damage Toggle -->
+                        <div class="form-check mb-3">
+                            <input type="checkbox" class="form-check-input" id="HasSecondaryDamage" />
+                            <label class="form-check-label" for="HasSecondaryDamage">Add Secondary Damage</label>
+                        </div>
+
+                        <!-- Secondary Damage Section (Hidden by default) -->
+                        <div id="secondaryDamageFields" class="d-none">
+                            <div class="form-group">
+                                <label for="SecondNumDiceInput">Secondary Number of Dice:</label>
+                                <input type="number" class="form-control" id="SecondNumDiceInput" name="SecondNumDiceInput" min="1" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="SecondDiceSizeInput">Secondary Dice Size:</label>
+                                <select class="form-control" id="SecondDiceSizeInput" name="SecondDiceSizeInput">
+                                    <option value="2">2</option>
+                                    <option value="4">4</option>
+                                    <option value="6">6</option>
+                                    <option value="8">8</option>
+                                    <option value="10">10</option>
+                                    <option value="12">12</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="SecondDamageTypeInput">Secondary Damage Type:</label>
+                                <select class="form-control" id="SecondDamageTypeInput" name="SecondDamageTypeInput">
+                                    <option value="">None</option>
+                                    <option value="Bludgeoning">Bludgeoning</option>
+                                    <option value="Slashing">Slashing</option>
+                                    <option value="Piercing">Piercing</option>
+                                    <option value="Fire">Fire</option>
+                                    <option value="Cold">Cold</option>
+                                    <option value="Lightning">Lightning</option>
+                                    <option value="Acid">Acid</option>
+                                    <option value="Poison">Poison</option>
+                                    <option value="Psychic">Psychic</option>
+                                    <option value="Necrotic">Necrotic</option>
+                                    <option value="Radiant">Radiant</option>
+                                    <option value="Force">Force</option>
+                                    <option value="Thunder">Thunder</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Action Type -->
+                        <div class="form-group">
+                            <label for="ActionTypeInput">Action Type:</label>
+                            <select class="form-control" id="ActionTypeInput" name="ActionTypeInput" required>
+                                <option value="action">Action</option>
+                                <option value="bonusAction">Bonus Action</option>
+                                <option value="freeAction">Free Action</option>
+                            </select>
+                        </div>
 
                         <div class="modal-footer mt-4">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -138,6 +241,9 @@
         </div>
     </div>
 
+  
+
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
@@ -147,56 +253,119 @@
     let selectedCharacter = null;
     let currentTab = 0;
 
-    function loadCharacters() 
-    {
+        function loadCharacters() {
+        const characterList = document.getElementById('character-list');
+        characterList.innerHTML = '<li class="list-group-item text-center py-4">Loading characters...</li>';
+
         fetch('/api/CharacterAPI/GetCharacters')
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return response.json();
             })
             .then(data => {
-                console.log('Characters:', data); // Log the data for debugging
-                const characterList = document.getElementById('character-list');
-                characterList.innerHTML = ''; // Clear existing characters
+                characterList.innerHTML = ''; // Clear loading message
+
+                if (data.length === 0) {
+                    characterList.innerHTML = '<li class="list-group-item text-center py-4">No characters found</li>';
+                    return;
+                }
+
                 data.forEach(character => {
                     const listItem = document.createElement('li');
-                    listItem.className = 'list-group-item';
-                    listItem.textContent = `Character: ${character.characterName} (ID: ${character.characterID})`;
+                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    listItem.innerHTML = `
+                        <span>
+                            <strong>${character.characterName}</strong>
+                            <small class="d-block text-muted">${character.ancestry || 'No ancestry'} - Lvl ${character.charLevel || '?'}</small>
+                        </span>
+                        <span class="badge badge-primary badge-pill">ID: ${character.characterID}</span>
+                    `;
 
-                    // Set data attributes for drag-and-drop functionality
                     listItem.setAttribute('data-character-id', character.characterID);
-                    listItem.setAttribute('data-character-name', character.characterName);
+                    listItem.onclick = (e) => selectCharacter(character.characterID, e.currentTarget);
 
-                    listItem.onclick = () =>{
-                        selectCharacter(character.characterID);
-                        highlightSelected(listItem);
-                    }
                     characterList.appendChild(listItem);
                 });
-                displayAttributes([]);
-                displayAbilities([]);
             })
-            .catch(error => console.error('Error fetching characters:', error));
+            .catch(error => {
+                console.error('Error fetching characters:', error);
+                characterList.innerHTML = `
+                    <li class="list-group-item text-center py-4 text-danger">
+                        Failed to load characters
+                        <button onclick="loadCharacters()" class="btn btn-sm btn-outline-secondary mt-2">
+                            Retry
+                        </button>
+                    </li>
+                `;
+            });
     }
 
-    function selectCharacter(characterId) {
+            function selectCharacter(characterId, clickedElement) {
+        // Store the current character ID and element before any changes
+        const currentCharacterId = selectedCharacter ? selectedCharacter.characterID : null;
+        const currentCharacterElement = currentlyHighightedElement;
+
+        // Check if we're in edit mode
+        const editModeElements = document.querySelectorAll('.edit-mode:not(.d-none)');
+        if (editModeElements.length > 0) {
+            if (!confirm('You have unsaved changes. Are you sure you want to switch characters?')) {
+                // If canceled, ensure the current character stays highlighted
+                if (clickedElement) {
+                    clickedElement.classList.remove('highlight-selected');
+                }
+                if (currentCharacterElement) {
+                    currentCharacterElement.classList.add('highlight-selected');
+                }
+                return;
+            }
+        }
+
+        // Only proceed with highlighting if we either:
+        // 1. Aren't in edit mode, or
+        // 2. Are in edit mode and confirmed the switch
+
+        // Remove highlight from current element
+        if (currentlyHighightedElement) {
+            currentlyHighightedElement.classList.remove('highlight-selected');
+        }
+
+        // Highlight the new element
+        if (clickedElement) {
+            clickedElement.classList.add('highlight-selected');
+            currentlyHighightedElement = clickedElement;
+        }
+
+        // Now load the character data
         toggleElementsVisibility();
         fetch('/api/CharacterAPI/GetSelectedCharacters/' + characterId)
             .then(response => response.json())
             .then(data => {
                 if (Array.isArray(data) && data.length > 0) {
-                    const character = data[0]; // Grab the first character from the array
-                    selectedCharacter = character; // Update the global selectedCharacter variable
-                    displayAttributes(character); // Pass the character to displayAttributes
-                    displayAbilities(character.characterID)
-                } else {
-                    console.warn('No character data found.');
+                    const character = data[0];
+                    selectedCharacter = character;
+                    displayAttributes(character);
+                    displayAbilities(character.characterID);
+
+                    // Update button states based on edit mode
+                    const isEditMode = editModeElements.length > 0;
+                    if (isEditMode) {
+                        // Keep the edit mode UI
+                        document.getElementById('EditButton').classList.add('d-none');
+                        document.getElementById('CloseButton').classList.remove('d-none');
+                        document.getElementById('SaveButton').classList.remove('d-none');
+                    }
                 }
             })
             .catch(error => {
-                console.error('Error: ', error)
+                console.error('Error: ', error);
+                // On error, revert to the previous character
+                if (currentCharacterElement) {
+                    if (currentlyHighightedElement) {
+                        currentlyHighightedElement.classList.remove('highlight-selected');
+                    }
+                    currentCharacterElement.classList.add('highlight-selected');
+                    currentlyHighightedElement = currentCharacterElement;
+                }
             });
     }
 
@@ -219,12 +388,21 @@
         const closeButton = document.getElementById('CloseButton');
         const saveButton = document.getElementById('SaveButton');
 
-        viewModeElements.forEach(element => element.classList.toggle('d-none'));
-        editModeElements.forEach(element => element.classList.toggle('d-none'));
+        const isEnteringEditMode = button === editButton;
 
-        editButton.classList.toggle('d-none');
-        closeButton.classList.toggle('d-none');
-        saveButton.classList.toggle('d-none');
+        viewModeElements.forEach(element => element.classList.toggle('d-none', isEnteringEditMode));
+        editModeElements.forEach(element => element.classList.toggle('d-none', !isEnteringEditMode));
+
+        editButton.classList.toggle('d-none', isEnteringEditMode);
+        closeButton.classList.toggle('d-none', !isEnteringEditMode);
+        saveButton.classList.toggle('d-none', !isEnteringEditMode);
+
+        // Toggle create buttons visibility
+        document.querySelectorAll('[data-toggle="modal"]').forEach(btn => {
+            if (btn.id !== 'EditButton' && btn.id !== 'CloseButton' && btn.id !== 'SaveButton') {
+                btn.classList.toggle('d-none', isEnteringEditMode);
+            }
+        });
     }
 
     function togglePane(paneValue){
@@ -239,32 +417,48 @@
         abilityPane.forEach(element => element.classList.toggle('d-none'));
     }
 
-    function highlightSelected(currentElement){
+        function highlightSelected(currentElement) {
         const element = currentElement;
 
-        if (currentlyHighightedElement) {
-            currentlyHighightedElement.classList.remove('highlight-selected');
-        }
+        // Remove highlight from all elements first
+        document.querySelectorAll('.list-group-item').forEach(el => {
+            el.classList.remove('highlight-selected');
+        });
+
         element.classList.add('highlight-selected');
         currentlyHighightedElement = element;
     }
 
-    function submitAbilityForm(){
+    function submitAbilityForm() {
         const ability = {
-            abilityName: document.getElementById('AbilityNameInput').value,
-            meleeRangedAOE: document.getElementById('TargetInput').value,
-            healingTag: document.getElementById('HealingFlag').checked,
-            itemToHitBonus: parseInt(document.getElementById('ToHitBonusInput').value || 0),
-            firstNumDice: parseInt(document.getElementById('FirstNumDiceInput').value || 1),
-            firstDiceSize: parseInt(document.getElementById('FirstDiceSizeInput').value || 2)
+            abilityName: $('#AbilityNameInput').val(),
+            meleeRangedAOE: $('#TargetInput').val(),
+            healingTag: $('#HealingFlag').is(':checked'),
+            itemToHitBonus: parseInt($('#ToHitBonusInput').val() || 0),
+            firstNumDice: parseInt($('#FirstNumDiceInput').val() || 1),
+            firstDiceSize: parseInt($('#FirstDiceSizeInput').val() || 6),
+            firstDamageType: $('#FirstDamageTypeInput').val(),
+            actionType: $('#ActionTypeInput').val(),
+            rangeOne: $('#RangeOneInput').val() || null,
+            rangeTwo: $('#RangeTwoInput').val() || null,
+            radius: $('#RadiusInput').val() || null,
+            coneLineSphere: $('#AoeTypeInput').val() || null
         };
 
-        document.getElementById('AbilityJson').value = JSON.stringify(ability);
-        console.log('Ability Json:', ability); // Debugging log
+        // Add secondary damage if enabled
+        if ($('#HasSecondaryDamage').is(':checked')) {
+            ability.secondNumDice = parseInt($('#SecondNumDiceInput').val() || 1);
+            ability.secondDiceSize = parseInt($('#SecondDiceSizeInput').val() || 6);
+            ability.secondDamageType = $('#SecondDamageTypeInput').val();
+        }
+
+        $('#AbilityJson').val(JSON.stringify(ability));
+        $('#createAbilityForm').submit();
     }
 
     function displayAttributes(character){
         const container = document.getElementById('TabInfoPane');
+        const isEditMode = document.querySelectorAll('.edit-mode:not(.d-none)').length > 0;
         container.innerHTML = `
         <div class="attributePane">
             <div class="form-group d-flex">
@@ -428,24 +622,31 @@
         <div class="abilityPane d-none">
         </div
     `;
+    const viewModeElements = container.querySelectorAll('.view-mode');
+    const editModeElements = container.querySelectorAll('.edit-mode');
 
+    viewModeElements.forEach(el => el.classList.toggle('d-none', isEditMode));
+    editModeElements.forEach(el => el.classList.toggle('d-none', !isEditMode));
     }
 
-    function displayAbilities(characterId) {
+        function displayAbilities(characterId) {
+        // Show loading state
+        const container = document.querySelector('.abilityPane');
+        container.innerHTML = '<div class="text-center py-4">Loading abilities...</div>';
+
         fetch(`/api/CharacterAPI/GetSelectedCharacterAbilities/${characterId}`)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`HTTP error! ssstatus: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(abilities => {
-                const container = document.querySelector('.abilityPane');
-                container.innerHTML = ''; // Clear existing abilities
+                container.innerHTML = ''; // Clear loading state
 
                 // Add the "Create New Ability" button
                 const createButton = document.createElement('div');
-                createButton.className = 'sticky-top bg-white p-3 mb-3';
+                createButton.className = 'sticky-top bg-white p-3 mb-3 border-bottom';
                 createButton.innerHTML = `
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#AbilityEditorModal">
                         Create New Ability
@@ -454,139 +655,148 @@
                 container.appendChild(createButton);
 
                 if (abilities.length === 0) {
-                    const noAbilitiesMessage = document.createElement('p');
-                    noAbilitiesMessage.textContent = 'No abilities found for this characacter.';
+                    const noAbilitiesMessage = document.createElement('div');
+                    noAbilitiesMessage.className = 'alert alert-info';
+                    noAbilitiesMessage.textContent = 'No abilities found for this character.';
                     container.appendChild(noAbilitiesMessage);
                     return;
                 }
 
+                // Group abilities by action type
+                const groupedAbilities = {
+                    Action: [],
+                    Bonus: [],
+                    Free: []
+                };
+
                 abilities.forEach(ability => {
-                    const abilityElement = document.createElement('div');
-                    abilityElement.className = 'form-group';
-
-                    abilityElement.innerHTML = `
-                            <div class="d-flex justify-content-between">
-                                <h4>Ability Name: <span class="view-mode">${ability.abilityName}</span></h4>
-                                <input type="text" name="abilityName" class="form-control edit-mode d-none" value="${ability.abilityName}" />
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <label>Target Type: <span class="view-mode">${ability.meleeRangedAOE}</span></label>
-                                <select name="meleeRangedAOE" class="form-control edit-mode d-none">
-                                    <option value="Melee" ${ability.meleeRangedAOE === 'Melee' ? 'selected' : ''}>Melee</option>
-                                    <option value="Ranged" ${ability.meleeRangedAOE === 'Ranged' ? 'selected' : ''}>Ranged</option>
-                                    <option value="AOE" ${ability.meleeRangedAOE === 'AOE' ? 'selected' : ''}>AOE</option>
-                                </select>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <label>Range One: <span class="view-mode">${ability.rangeOne}</span></label>
-                                <input type="number" name="rangeOne" class="form-control edit-mode d-none" value="${ability.rangeOne}" />
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <label>Range Two: <span class="view-mode">${ability.rangeTwo}</span></label>
-                                <input type="number" name="rangeTwo" class="form-control edit-mode d-none" value="${ability.rangeTwo}" />
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <label>Radius: <span class="view-mode">${ability.radius}</span></label>
-                                <input type="number" name="radius" class="form-control edit-mode d-none" value="${ability.radius}" />
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <label>AoE Type: <span class="view-mode">${ability.coneLineSphere}</span></label>
-                                <select name="coneLineSphere" class="form-control edit-mode d-none">
-                                    <option value="Cone" ${ability.coneLineSphere === 'Cone' ? 'selected' : ''}>Cone</option>
-                                    <option value="Line" ${ability.coneLineSphere === 'Line' ? 'selected' : ''}>Line</option>
-                                    <option value="Sphere" ${ability.coneLineSphere === 'Sphere' ? 'selected' : ''}>Sphere</option>
-                                    <option value="AOE" ${ability.coneLineSphere === '' ? 'selected' : ''}></option>
-                                </select>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <label>Action Cost: <span class="view-mode">${ability.actionType}</span></label>
-                                <select name="actionType" class="form-control edit-mode d-none">
-                                    <option value="Action" ${ability.actionType === 'Action' ? 'selected' : ''}>Action</option>
-                                    <option value="Bonus" ${ability.actionType === 'Bonus' ? 'selected' : ''}>Bonus</option>
-                                    <option value="Free" ${ability.actionType === 'Free' ? 'selected' : ''}>Free</option>
-                                </select>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <input type="checkbox" class="view-mode" ${ability.healTag ? "checked" : ""} disabled />
-                                <input type="checkbox" class="edit-mode d-none" name="healTag" ${ability.healTag ? "checked" : ""} />
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <label>To hit bonus: <span class="view-mode">${ability.itemToHitBonus}</span></label>
-                                <input type="number" name="toHit" class="form-control edit-mode d-none" value="${ability.itemToHitBonus}" />
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <label># Dice: <span class="view-mode">${ability.firstNumDice}</span></label>
-                                <input type="number" name="numDice1" class="form-control edit-mode d-none" value="${ability.firstNumDice}" />
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <label>Dice Type: <span class="view-mode">${ability.firstDiceSize}</span></label>
-                                <input type="number" name="numDiceSize1" class="form-control edit-mode d-none" value="${ability.firstDiceSize}" />
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <label>Action Cost: <span class="view-mode">${ability.firstDamageType}</span></label>
-                                <select name="firstDamageType" class="form-control edit-mode d-none">
-                                    <option value="Bludgeoning" ${ability.firstDamageType === 'Bludgeoning' ? 'selected' : ''}>Bludgeoning</option>
-                                    <option value="Slashing" ${ability.firstDamageType === 'Slashing' ? 'selected' : ''}>Slashing</option>
-                                    <option value="Piercing" ${ability.firstDamageType === 'Piercing' ? 'selected' : ''}>Piercing</option>
-                                    <option value="Force" ${ability.firstDamageType === 'Force' ? 'selected' : ''}>Force</option>
-                                    <option value="Psychic" ${ability.firstDamageType === 'Psychic' ? 'selected' : ''}>Psychic</option>
-                                    <option value="Fire" ${ability.firstDamageType === 'Fire' ? 'selected' : ''}>Fire</option>
-                                    <option value="Cold" ${ability.firstDamageType === 'Cold' ? 'selected' : ''}>Cold</option>
-                                    <option value="Lightning" ${ability.firstDamageType === 'Lightning' ? 'selected' : ''}>Lightning</option>
-                                    <option value="Thunder" ${ability.firstDamageType === 'Thunder' ? 'selected' : ''}>Thunder</option>
-                                    <option value="Acid" ${ability.firstDamageType === 'Acid' ? 'selected' : ''}>Acid</option>
-                                    <option value="Poison" ${ability.firstDamageType === 'Poison' ? 'selected' : ''}>Poison</option>
-                                    <option value="Radiant" ${ability.firstDamageType === 'Radiant' ? 'selected' : ''}>Radiant</option>
-                                    <option value="Necrotic" ${ability.firstDamageType === 'Necrotic' ? 'selected' : ''}>Necrotic</option>
-                                </select>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <label># Dice: <span class="view-mode">${ability.secondNumDice}</span></label>
-                                <input type="number" name="numDice1" class="form-control edit-mode d-none" value="${ability.secondNumDice}" />
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <label>Dice Type: <span class="view-mode">${ability.secondDiceSize}</span></label>
-                                <input type="number" name="numDiceSize1" class="form-control edit-mode d-none" value="${ability.secondDiceSize}" />
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <label>Action Cost: <span class="view-mode">${ability.secondDamageType}</span></label>
-                                <select name="secondDamageType" class="form-control edit-mode d-none">
-                                    <option value="Bludgeoning" ${ability.secondDamageType === 'Bludgeoning' ? 'selected' : ''}>Bludgeoning</option>
-                                    <option value="Slashing" ${ability.secondDamageType === 'Slashing' ? 'selected' : ''}>Slashing</option>
-                                    <option value="Piercing" ${ability.secondDamageType === 'Piercing' ? 'selected' : ''}>Piercing</option>
-                                    <option value="Force" ${ability.secondDamageType === 'Force' ? 'selected' : ''}>Force</option>
-                                    <option value="Psychic" ${ability.secondDamageType === 'Psychic' ? 'selected' : ''}>Psychic</option>
-                                    <option value="Fire" ${ability.secondDamageType === 'Fire' ? 'selected' : ''}>Fire</option>
-                                    <option value="Cold" ${ability.secondDamageType === 'Cold' ? 'selected' : ''}>Cold</option>
-                                    <option value="Lightning" ${ability.secondDamageType === 'Lightning' ? 'selected' : ''}>Lightning</option>
-                                    <option value="Thunder" ${ability.secondDamageType === 'Thunder' ? 'selected' : ''}>Thunder</option>
-                                    <option value="Acid" ${ability.secondDamageType === 'Acid' ? 'selected' : ''}>Acid</option>
-                                    <option value="Poison" ${ability.secondDamageType === 'Poison' ? 'selected' : ''}>Poison</option>
-                                    <option value="Radiant" ${ability.secondDamageType === 'Radiant' ? 'selected' : ''}>Radiant</option>
-                                    <option value="Necrotic" ${ability.secondDamageType === 'Necrotic' ? 'selected' : ''}>Necrotic</option>
-                                </select>
-                            </div>
-                    `;
-
-                    container.appendChild(abilityElement);
+                    const actionType = ability.actionType || 'Action'; // Default to Action if not specified
+                    if (groupedAbilities[actionType]) {
+                        groupedAbilities[actionType].push(ability);
+                    } else {
+                        groupedAbilities.Action.push(ability); // Fallback to Action
+                    }
                 });
+
+                // Create sections for each action type
+                const createSection = (title, abilitiesList) => {
+                    if (abilitiesList.length === 0) return null;
+
+                    const section = document.createElement('div');
+                    section.className = 'ability-section mb-4';
+
+                    const header = document.createElement('h3');
+                    header.className = 'border-bottom pb-2 mb-3';
+                    header.textContent = title;
+                    section.appendChild(header);
+
+                    abilitiesList.forEach(ability => {
+                        const abilityElement = document.createElement('div');
+                        abilityElement.className = 'compact-ability mb-3 p-3 border rounded';
+
+                        // Determine styling based on action type and healing
+                        const actionTypeClass = ability.actionType ? ability.actionType.toLowerCase().replace(' ', '-') : 'action';
+                        const isHealing = ability.healTag || false;
+
+                        abilityElement.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h4 class="mb-0">${ability.abilityName || 'Unnamed Ability'}</h4>
+                                <span class="badge badge-${actionTypeClass}">${ability.actionType || 'Action'}</span>
+                            </div>
+                            <div class="ability-details">
+                                <div><strong>Target:</strong> ${ability.meleeRangedAOE || 'Melee'}</div>
+                                ${ability.rangeOne ? `<div><strong>Range:</strong> ${ability.rangeOne}${ability.rangeTwo ? `/${ability.rangeTwo}` : ''} ft.</div>` : ''}
+                                ${ability.radius ? `<div><strong>Radius:</strong> ${ability.radius} ft.</div>` : ''}
+                                ${ability.coneLineSphere ? `<div><strong>Shape:</strong> ${ability.coneLineSphere}</div>` : ''}
+                                <div><strong>To Hit Bonus:</strong> ${ability.itemToHitBonus >= 0 ? '+' : ''}${ability.itemToHitBonus || 0}</div>
+                                <div class="${isHealing ? 'text-success' : 'text-danger'}">
+                                    <strong>${isHealing ? 'Healing' : 'Damage'}:</strong>
+                                    ${ability.firstNumDice || 1}d${ability.firstDiceSize || 6} ${ability.firstDamageType || ''}
+                                    ${ability.secondNumDice ? ` + ${ability.secondNumDice}d${ability.secondDiceSize} ${ability.secondDamageType}` : ''}
+                                </div>
+                            </div>
+                        `;
+
+                        section.appendChild(abilityElement);
+                    });
+
+                    return section;
+                };
+
+                // Append sections in order: Action, Bonus Action, Free Action
+                const actionSection = createSection('Actions', groupedAbilities.Action);
+                const bonusSection = createSection('Bonus Actions', groupedAbilities.Bonus);
+                const freeSection = createSection('Free Actions', groupedAbilities.Free);
+
+                if (actionSection) container.appendChild(actionSection);
+                if (bonusSection) container.appendChild(bonusSection);
+                if (freeSection) container.appendChild(freeSection);
             })
-            .catch(error => console.error('Error fetching abilities:', error));
+            .catch(error => {
+                console.error('Error fetching abilities:', error);
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        Failed to load abilities. Please try again later.
+                        <div class="text-muted small">${error.message}</div>
+                    </div>
+                    <button onclick="displayAbilities(${characterId})" class="btn btn-sm btn-warning mt-2">
+                        Retry
+                    </button>
+                `;
+            });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the page
         loadCharacters();
 
-            const createAbilityForm = document.querySelector('#createAbilityForm'); // Use the form's ID
-            if (createAbilityForm) {
-                createAbilityForm.addEventListener('submit', (event) => {
-                    event.preventDefault();
-                    submitAbilityForm();
-                    createAbilityForm.submit()
-                });
-            } else {
-                console.error('createAbilityForm form not found in the DOM.');
+        // Set up ability form submission
+        const createAbilityForm = document.querySelector('#createAbilityForm');
+        if (createAbilityForm) {
+            createAbilityForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                try {
+                    await submitAbilityForm();
+                    createAbilityForm.submit();
+                } catch (error) {
+                    console.error('Form submission failed:', error);
+                    alert('Failed to save ability. Please check the form and try again.');
+                }
+            });
+        } else {
+            console.error('createAbilityForm form not found in the DOM.');
+        }
+
+        // Conditional field display logic
+        $('#TargetInput').change(function() {
+            const targetType = $(this).val();
+            $('#rangeFields').addClass('d-none');
+            $('#aoeFields').addClass('d-none');
+
+            if (targetType === 'Ranged') {
+                $('#rangeFields').removeClass('d-none');
+            } else if (targetType === 'AOE') {
+                $('#aoeFields').removeClass('d-none');
             }
+        });
+
+        // Secondary damage toggle
+        $('#HasSecondaryDamage').change(function() {
+            if ($(this).is(':checked')) {
+                $('#secondaryDamageFields').removeClass('d-none');
+                // Set required fields if needed
+                $('#SecondNumDiceInput').prop('required', true);
+            } else {
+                $('#secondaryDamageFields').addClass('d-none');
+                // Clear values when hidden
+                $('#SecondNumDiceInput').val('').prop('required', false);
+                $('#SecondDiceSizeInput').val('2');
+                $('#SecondDamageTypeInput').val('');
+            }
+        });
+
+        // Initialize the form state
+        $('#TargetInput').trigger('change');
     });
 </script>
 
@@ -630,4 +840,122 @@
     .list-group-item:hover .edit-icon {
         display: inline;
     }
+
+    .badge-action {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .badge-bonus {
+        background-color: #fd7e14;
+        color: white;
+    }
+
+    .badge-free {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .ability-section {
+        margin-bottom: 2rem;
+    }
+
+        .ability-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+    .compact-ability {
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+        .compact-ability h4 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+    .damage {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .healing {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    #CharacterVault {
+        height: 70vh; 
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-left: 1px solid #dee2e6;
+    }
+
+        #CharacterVault h2 {
+            padding: 10px;
+            background-color: #343a40;
+            color: white;
+            margin: -15px -15px 15px -15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+    #character-list {
+        overflow-y: auto;
+        max-height: calc(100vh - 150px); /* Adjust based on your header height */
+        flex-grow: 1;
+        margin-bottom: 0;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        background-color: white;
+    }
+
+        #character-list li {
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-left: none;
+            border-right: none;
+        }
+
+            #character-list li:first-child {
+                border-top: none;
+            }
+
+            #character-list li:last-child {
+                border-bottom: none;
+            }
+
+            #character-list li:hover {
+                background-color: #f1f1f1;
+            }
+
+        /* Custom scrollbar */
+        #character-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #character-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        #character-list::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+            #character-list::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
+
 </style>

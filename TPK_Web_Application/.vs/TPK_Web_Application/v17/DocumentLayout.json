@@ -11,36 +11,36 @@
       "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\charactereditor\\charactereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\pages\\shared\\_layout.cshtml.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\shared\\_layout.cshtml.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\model\\encounter_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:model\\encounter_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\model\\batch_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:model\\batch_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\model\\encounterhistory_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:model\\encounterhistory_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\pages\\encountereditor\\encountereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encountereditor\\encountereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\pages\\charactereditor\\charactereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\charactereditor\\charactereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\pages\\encountereditor\\encountereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encountereditor\\encountereditor.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\pages\\charactereditor\\charactereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\charactereditor\\charactereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\pages\\encountereditor\\encountereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\encountereditor\\encountereditor.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\model\\batch_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:model\\batch_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\pages\\shared\\_layout.cshtml.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:pages\\shared\\_layout.cshtml.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\model\\encounter_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:model\\encounter_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|c:\\users\\bxcrn\\source\\repos\\team-tpk\\tpk_web_application\\model\\encounterhistory_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{28354369-0AEC-4D21-A08B-0C9D826EB292}|TPK_Web_Application.csproj|solutionrelative:model\\encounterhistory_model.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -50,11 +50,71 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
+              "Title": "site.css",
+              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\wwwroot\\css\\site.css",
+              "RelativeDocumentMoniker": "wwwroot\\css\\site.css",
+              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\wwwroot\\css\\site.css",
+              "RelativeToolTip": "wwwroot\\css\\site.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-04-06T05:23:23.757Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CharacterEditor.cshtml",
+              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
+              "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
+              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
+              "RelativeToolTip": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
+              "ViewState": "AgIAAGsDAAAAAAAAAAAhwH0DAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-04T21:57:15.819Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "EncounterEditor.cshtml",
+              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
+              "RelativeDocumentMoniker": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
+              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
+              "RelativeToolTip": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
+              "ViewState": "AgIAACUBAAAAAAAAAAAhwKMBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-04T21:57:20.842Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "EncounterEditor.cshtml.cs",
+              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
+              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
+              "RelativeToolTip": "Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHYAAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-04T21:57:23.578Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Encounter_Model.cs",
+              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Model\\Encounter_Model.cs",
+              "RelativeDocumentMoniker": "Model\\Encounter_Model.cs",
+              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Model\\Encounter_Model.cs",
+              "RelativeToolTip": "Model\\Encounter_Model.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-06T07:24:09.238Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
               "Title": "EncounterHistory_Model.cs",
               "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Model\\EncounterHistory_Model.cs",
               "RelativeDocumentMoniker": "Model\\EncounterHistory_Model.cs",
@@ -62,8 +122,44 @@
               "RelativeToolTip": "Model\\EncounterHistory_Model.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-06T07:36:42.249Z",
+              "WhenOpened": "2025-04-06T07:36:42.249Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CharacterEditor.cshtml.cs",
+              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
+              "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
+              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
+              "RelativeToolTip": "Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-06T00:40:01.363Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "EncounterHistory.cshtml",
+              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistory.cshtml",
+              "RelativeDocumentMoniker": "Pages\\EncounterHistory\\EncounterHistory.cshtml",
+              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistory.cshtml",
+              "RelativeToolTip": "Pages\\EncounterHistory\\EncounterHistory.cshtml",
+              "ViewState": "AgIAAEAAAAAAAAAAAADwv3UAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-06T07:26:53.244Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "_Layout.cshtml.css",
+              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\Shared\\_Layout.cshtml.css",
+              "RelativeDocumentMoniker": "Pages\\Shared\\_Layout.cshtml.css",
+              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\Shared\\_Layout.cshtml.css",
+              "RelativeToolTip": "Pages\\Shared\\_Layout.cshtml.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-04-06T07:02:56.017Z"
             },
             {
               "$type": "Document",
@@ -75,112 +171,7 @@
               "RelativeToolTip": "Model\\Batch_Model.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-06T07:33:27.369Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "EncounterHistory.cshtml",
-              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistory.cshtml",
-              "RelativeDocumentMoniker": "Pages\\EncounterHistory\\EncounterHistory.cshtml",
-              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterHistory\\EncounterHistory.cshtml",
-              "RelativeToolTip": "Pages\\EncounterHistory\\EncounterHistory.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAASAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-06T07:26:53.244Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Encounter_Model.cs",
-              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Model\\Encounter_Model.cs",
-              "RelativeDocumentMoniker": "Model\\Encounter_Model.cs",
-              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Model\\Encounter_Model.cs",
-              "RelativeToolTip": "Model\\Encounter_Model.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-06T07:24:09.238Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "_Layout.cshtml.css",
-              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\Shared\\_Layout.cshtml.css",
-              "RelativeDocumentMoniker": "Pages\\Shared\\_Layout.cshtml.css",
-              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\Shared\\_Layout.cshtml.css",
-              "RelativeToolTip": "Pages\\Shared\\_Layout.cshtml.css",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABwAAAAeAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2025-04-06T07:02:56.017Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "site.css",
-              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\wwwroot\\css\\site.css",
-              "RelativeDocumentMoniker": "wwwroot\\css\\site.css",
-              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\wwwroot\\css\\site.css",
-              "RelativeToolTip": "wwwroot\\css\\site.css",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2025-04-06T05:23:23.757Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "CharacterEditor.cshtml",
-              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
-              "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
-              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml",
-              "RelativeToolTip": "Pages\\CharacterEditor\\CharacterEditor.cshtml",
-              "ViewState": "AgIAAKsAAAAAAAAAAAAAAFsAAAA+AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-04T21:57:15.819Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "CharacterEditor.cshtml.cs",
-              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
-              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
-              "RelativeToolTip": "Pages\\CharacterEditor\\CharacterEditor.cshtml.cs",
-              "ViewState": "AgIAAEkAAAAAAAAAAAAYwKYAAAATAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-06T00:40:01.363Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "EncounterEditor.cshtml.cs",
-              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
-              "RelativeDocumentMoniker": "Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
-              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
-              "RelativeToolTip": "Pages\\EncounterEditor\\EncounterEditor.cshtml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-04T21:57:23.578Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "EncounterEditor.cshtml",
-              "DocumentMoniker": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
-              "RelativeDocumentMoniker": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
-              "ToolTip": "C:\\Users\\bxcrn\\source\\repos\\Team-TPK\\TPK_Web_Application\\Pages\\EncounterEditor\\EncounterEditor.cshtml",
-              "RelativeToolTip": "Pages\\EncounterEditor\\EncounterEditor.cshtml",
-              "ViewState": "AgIAAMUBAAAAAAAAAAAcwOABAAAHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-04T21:57:20.842Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-06T07:33:27.369Z"
             }
           ]
         }
