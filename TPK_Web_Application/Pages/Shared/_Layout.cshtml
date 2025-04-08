@@ -39,8 +39,8 @@
                         <li class="nav-item">
                             <a class="nav-link text-light" asp-area="" asp-page="/EncounterHistory/EncounterHistory">Encounter History</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-page="/Account/Login">Login</a>
+                        <li class="nav-item" id="auth-link">
+@*                             <a class="nav-link text-light" asp-area="" asp-page="/Account/Login">Login</a> *@
                         </li>
                     </ul>
                 </div>
@@ -65,4 +65,26 @@
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log('Testing');
+        // Call the API to check authentication status
+        fetch('/api/ServiceAPI/GetAuthenticated')
+            .then(response => response.json())
+            .then(data => {
+                const authLink = document.getElementById("auth-link");
+                console.log(data)
+                if (data) {
+                    // User is authenticated
+                    authLink.innerHTML = `<a class="nav-link text-light" href="/Account/Account">My Account</a>`;
+                } else {
+                    // User is not authenticated
+                    authLink.innerHTML = `<a class="nav-link text-light" href="/Account/Login">Login</a>`;
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching authentication status:", error);
+            });
+    });
+</script>
 </html>

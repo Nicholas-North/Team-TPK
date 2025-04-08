@@ -38,6 +38,13 @@ namespace TPK_Web_Application.Pages.Account
             Console.WriteLine(Credential.UserName);
             var user = _dataContext.Accounts.SingleOrDefault(u => u.username == Credential.UserName && u.password == Credential.Password);
 
+
+            if (user == null)
+            {
+                // If no user is found, notify the user of an invalid login attempt
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                return Page();
+            }
             // TODO: Fix if user misinputs here.
             if (user.deleted == true)
             {
@@ -51,6 +58,7 @@ namespace TPK_Web_Application.Pages.Account
                 _sessionContext.Account.password = user.password;
                 _sessionContext.Account.email = user.email;
                 _sessionContext.Account.accountID = user.accountID;
+                _sessionContext.IsAuthenticated = true;
                 return RedirectToPage("/Account/Account");
             }
 

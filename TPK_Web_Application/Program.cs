@@ -10,6 +10,8 @@ builder.Services.AddSingleton<SessionContext>();
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("NickTesting")));
 
+builder.WebHost.UseWebRoot("wwwroot");
+
 
 var app = builder.Build();
 

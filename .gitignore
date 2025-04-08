@@ -1,10 +1,12 @@
 # Ignore Visual Studio files
-.vs/
+.TPK_Web_Application/.vs/
 .TPK_Web_Application/obj/
+.TPK_Web_Application/bin/
 *.user
 *.suo
 
 # Ignore build outputs
+.vs/
 bin/
 obj/
 

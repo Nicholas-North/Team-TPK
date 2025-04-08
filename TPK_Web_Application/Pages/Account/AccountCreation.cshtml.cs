@@ -50,6 +50,7 @@ namespace TPK_Web_Application.Pages.Account
                 _sessionContext.Account.email = newUser.email;
                 _sessionContext.Account.accountID = newUser.accountID;
                 _sessionContext.Account.deleted = newUser.deleted;
+                _sessionContext.IsAuthenticated = true;
                 return RedirectToPage("/Account/Account");
             }
 

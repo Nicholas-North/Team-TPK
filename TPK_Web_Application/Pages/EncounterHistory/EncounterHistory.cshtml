@@ -4,82 +4,210 @@
     ViewData["Title"] = "Encounter History";
 }
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-4">
-            <h2>Encounter History</h2>
-            <div style="position: sticky; top: 0; background-color: white; z-index: 1000;">
-                <label class="list-group-item list-group-item-action mb-3">View the results of your Encounter here!</label>
-            </div>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4">
+                <h2>Encounter History</h2>
+                <div style="position: sticky; top: 0; background-color: white; z-index: 1000;">
+                    <label class="list-group-item list-group-item-action mb-3">View the results of your Encounter here!</label>
+                </div>
 
             
-            <div class="accordion" id="encounterAccordion">
-                @if (Model.History != null && Model.History.Any())
-                {
-                    @foreach (var encounterGroup in Model.History.GroupBy(e => e.encounterID))
+                <div class="accordion" id="encounterAccordion">
+                    @if (Model.History != null && Model.History.Any())
+                    {
+                        @foreach (var encounterGroup in Model.History.GroupBy(e => e.encounterID))
+                        {
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="encounterHeading@encounterGroup.Key">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#encounterCollapse@encounterGroup.Key" aria-expanded="false" aria-controls="encounterCollapse@encounterGroup.Key">
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mr-3" style="width: 30px; height: 30px;">
+                                                @encounterGroup.Key
+                                            </div>
+                                            <span>Encounter ID: @encounterGroup.Key</span>
+                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="encounterCollapse@encounterGroup.Key" class="accordion-collapse collapse" aria-labelledby="encounterHeading@encounterGroup.Key" data-bs-parent="#encounterAccordion">
+                                    <div class="accordion-body">
+
+                                        <!-- Loop through batches related to this encounter -->
+                                        @foreach (var encounter in encounterGroup)
+                                        {
+                                            <div class="mb-2">
+                                                <h5>Batch ID: @encounter.batchID</h5>
+                                                <p><strong>Team 1 Win Percentage: @encounter.team1Wins%</strong></p>
+                                                <p><strong>Team 2 Win Percentage: @encounter.team2Wins%</strong></p>
+                                                <p>Encounter Version: @encounter.encounterVersion</p>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
                     {
                         <div class="accordion-item">
-                            <h2 class="accordion-header" id="encounterHeading@encounterGroup.Key">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#encounterCollapse@encounterGroup.Key" aria-expanded="false" aria-controls="encounterCollapse@encounterGroup.Key">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mr-3" style="width: 30px; height: 30px;">
-                                            @encounterGroup.Key
-                                        </div>
-                                        <span>Encounter ID: @encounterGroup.Key</span>
-                                    </div>
-                                </button>
-                            </h2>
-                            <div id="encounterCollapse@encounterGroup.Key" class="accordion-collapse collapse" aria-labelledby="encounterHeading@encounterGroup.Key" data-bs-parent="#encounterAccordion">
-                                <div class="accordion-body">
-
-                                    <!-- Loop through batches related to this encounter -->
-                                    @foreach (var encounter in encounterGroup)
-                                    {
-                                        <div class="mb-2">
-                                            <h5>Batch ID: @encounter.batchID</h5>
-                                            <p><strong>Team 1 Win Percentage: @encounter.team1Wins%</strong></p>
-                                            <p><strong>Team 2 Win Percentage: @encounter.team2Wins%</strong></p>
-                                            <p>Encounter Version: @encounter.encounterVersion</p>
-                                        </div>
-                                    }
-                                </div>
+                            <div class="accordion-body">
+                                <p>This is where your Encounter History will show after a run!</p>
                             </div>
                         </div>
                     }
-                }
-                else
-                {
-                    <div class="accordion-item">
-                        <div class="accordion-body">
-                            <p>This is where your Encounter History will show after a run!</p>
-                        </div>
-                    </div>
-                }
+                </div>
             </div>
-        </div>
 
-        <div class="col-md-8">
-            <h2>Encounter Details</h2>
-            <div id="encounterDetails">
-                @if (Model.selectedEncounter != null && Model.selectedEncounter.encounterID != 0)
-                {
-                    <p>Team 1 Win Percentage: @Model.selectedEncounter.team1Wins%</p>
-                    <p>Team 2 Win Percentage: @Model.selectedEncounter.team2Wins%</p>
-                    @* <p>Encounter Run Time: @Model.selectedEncounter.RunTime</p> *@
-                }
-                else
-                {
-                    <p>Select an encounter to see details.</p>
-                }
+            <div class="col-md-8 encounter-details">
+                <div class="Tabs">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="form1-tab" data-toggle="tab" onclick="togglePane(0)" href="#form1" role="tab" aria-controls="form1" aria-selected="true">Encounter Overview</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="form2-tab" data-toggle="tab" onclick="togglePane(1)" href="#form2" role="tab" aria-controls="form2" aria-selected="false">Team Composition</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="form3-tab" data-toggle="tab" onclick="togglePane(2)" href="#form3" role="tab" aria-controls="form3" aria-selected="false">Encounter Statistics</a>
+                        </li>
+                    </ul>
+                    <div class="TabInfo" id="TabInfoPane">
+                    </div>
+                </div>
+@*                 <h2>Encounter Details</h2>
+                <div id="encounterDetails">
+                    @if (Model.selectedEncounter != null && Model.selectedEncounter.encounterID != 0)
+                    {
+                        <p>Team 1 Win Percentage: @Model.selectedEncounter.team1Wins%</p>
+                        <p>Team 2 Win Percentage: @Model.selectedEncounter.team2Wins%</p>
+                    }
+                    else
+                    {
+                        <p>Select an encounter to see details.</p>
+                    }
+                </div> *@
             </div>
         </div>
     </div>
-</div>
 
-<
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentTab = 0;
+        // Initialize the accordion
+        var myAccordion = new bootstrap.Accordion(document.getElementById('encounterAccordion'));
 
-<script>
-    // Initialize the accordion
-    var myAccordion = new bootstrap.Accordion(document.getElementById('encounterAccordion'));
-</script>
+        function loadHistory(){
+            fetch('/api/EncounterHistoryAPI/GetHistory')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('History:', data); // Log the data for debugging
+                    const encounterList = document.getElementById('encounter-list');
+                    const versionList = document.getElementById('version-list');
+                    const batchList = document.getElementById('batch-list');
+                    encounterList.innerHTML = ''; // Clear existing encounters
+                    versionList.innerHTML = ''; // Clear existing version
+                    batchList.innerHTML = ''; // Clear existing batch
+                    data.forEach(character => {
+                        // Replace with accoridan logic if necessary
+
+                        // const listItem = document.createElement('li');
+                        // listItem.className = 'list-group-item';
+                        // listItem.textContent = `Character: ${character.characterName} (ID: ${character.characterID})`;
+
+                        // listItem.onclick = () =>{
+                        //     selectCharacter(character.characterID);
+                        //     highlightSelected(listItem);
+                        // }
+                        // characterList.appendChild(listItem);
+                    });
+                    // Fill with empty?
+                    displayPaneOne();
+                    displayPaneTwo();
+                    displayPaneThree();
+                })
+                .catch(error => console.error('Error fetching characters:', error));
+        }
+
+        function grabSelectedHistory(encounterID, version, batchID){
+            const payload = {
+                encounterID: encounterID,
+                version: version,
+                batchID: batchID
+            };
+
+            const jsonString = JSON.stringify(payload);
+
+            fetch('/api/EncounterHistoryAPI/GetSelectedHistory', {
+                method: 'POST', // Use POST if you're sending data
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: jsonString
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('API Response:', data);
+                // Handle the API response here
+            })
+            .catch(error => console.error('Error fetching selected history:', error));
+        }
+
+        function togglePane(paneValue){
+            console.log(paneValue);
+            const overviewPane = document.querySelectorAll('.overviewPane');
+            const compositionPane = document.querySelectorAll('.compositionPane');
+            const statsPane = document.querySelectorAll('.statsPane');
+            if (currentTab === paneValue){  // Attribute Pane
+                return;
+            }
+            currentTab = paneValue;
+            if (currentTab === 0){
+                overviewPane.forEach(element => element.classList.remove('d-none'));
+                compositionPane.forEach(element => element.classList.add('d-none'));
+                statsPane.forEach(element => element.classList.add('d-none'));
+            }
+            if (currentTab === 1){
+                overviewPane.forEach(element => element.classList.add('d-none'));
+                compositionPane.forEach(element => element.classList.remove('d-none'));
+                statsPane.forEach(element => element.classList.add('d-none'));
+            }
+            if (currentTab === 2){
+                overviewPane.forEach(element => element.classList.add('d-none'));
+                compositionPane.forEach(element => element.classList.add('d-none'));
+                statsPane.forEach(element => element.classList.remove('d-none'));
+
+            }
+        }
+
+        // function toggleElementsVisibility() {
+        //     const elementsToToggle = document.querySelectorAll('.requires-character'); // Elements that depend on a selected character
+
+        //     elementsToToggle.forEach(element => {
+        //         if (selectedCharacter == null) {
+        //             element.classList.remove('d-none'); // Show the element
+        //         }
+        //     });
+        // }
+
+        function displayPaneOne(){
+            // Map overview
+        }
+        function displayPaneTwo(){
+            // Team comp & MVP
+        }
+        function displayPaneThree(){
+            // All other statistics (MVP might go here)
+        }
+    </script>
+</body>
