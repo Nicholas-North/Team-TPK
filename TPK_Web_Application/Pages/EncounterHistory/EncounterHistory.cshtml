@@ -1,0 +1,170 @@
+﻿@page
+@model TPK_Web_Application.Pages.EncounterHistory.EncounterHistoryPageModel
+@{
+    ViewData["Title"] = "Encounter History";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Encounter History</h2>
+            <div style="position: sticky; top: 0; background-color: white; z-index: 1000;">
+                <label class="list-group-item list-group-item-action mb-3">View the results of your Encounter here!</label>
+            </div>
+
+            <!-- Main accordion -->
+            <div class="accordion" id="encounterAccordion">
+                @if (Model.History != null && Model.History.Any())
+                {
+                    @foreach (var encounterGroup in Model.History.GroupBy(e => e.encounterID))
+                    {
+                        var encounterId = encounterGroup.Key;
+                        var encounterHeaderId = $"heading-{encounterId}";
+                        var encounterCollapseId = $"collapse-{encounterId}";
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="@encounterHeaderId">
+                                <button class="accordion-button collapsed" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#@encounterCollapseId"
+                                        aria-expanded="false"
+                                        aria-controls="@encounterCollapseId">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px;">
+                                            @encounterId
+                                        </div>
+                                        <span>Encounter ID: @encounterId</span>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="@encounterCollapseId"
+                                 class="accordion-collapse collapse"
+                                 aria-labelledby="@encounterHeaderId"
+                                 data-bs-parent="#encounterAccordion">
+                                <div class="accordion-body">
+
+                                    <!-- Sub-accordion: group by encounterVersion -->
+                                    <div class="accordion" id="versionAccordion@encounterId">
+                                        @foreach (var versionGroup in encounterGroup.GroupBy(e => e.encounterVersion))
+                                        {
+                                            var versionKey = $"{encounterId}-v{versionGroup.Key}";
+                                            var versionAccordionId = $"versionAccordion-{versionKey}";
+                                            var versionHeadingId = $"versionHeading-{versionKey}";
+                                            var versionCollapseId = $"versionCollapse-{versionKey}";
+
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="@versionHeadingId">
+                                                    <button class="accordion-button collapsed" type="button"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#@versionCollapseId"
+                                                            aria-expanded="false"
+                                                            aria-controls="@versionCollapseId">
+                                                        Encounter Version: @versionGroup.Key
+                                                    </button>
+                                                </h2>
+                                                <div id="@versionCollapseId"
+                                                     class="accordion-collapse collapse"
+                                                     aria-labelledby="@versionHeadingId"
+                                                     data-bs-parent="#versionAccordion@encounterId">
+                                                    <div class="accordion-body">
+                                                        @foreach (var encounter in versionGroup)
+                                                        {
+                                                            <div class="mb-3 border p-2 rounded encounter-item"
+                                                                 data-encounter-id="@encounter.encounterID"
+                                                                 data-version="@encounter.encounterVersion"
+                                                                 data-batch-id="@encounter.batchID"
+                                                                 data-team1-wins="@encounter.team1Wins"
+                                                                 data-team2-wins="@encounter.team2Wins">
+                                                                <p><strong>Batch ID:</strong> @encounter.batchID</p>
+                                                                <p><strong>Team 1 Win Percentage:</strong> @encounter.team1Wins%</p>
+                                                                <p><strong>Team 2 Win Percentage:</strong> @encounter.team2Wins%</p>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="accordion-item">
+                        <div class="accordion-body">
+                            <p>This is where your Encounter History will show after a run!</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <h2>Encounter Details</h2>
+            <div id="encounterDetails">
+                <p id="detailsPlaceholder">Select an encounter to see details.</p>
+                <div id="detailsContent" class="d-none">
+                    <p><strong>Encounter ID:</strong> <span id="detailEncounterId"></span></p>
+                    <p><strong>Version:</strong> <span id="detailVersion"></span></p>
+                    <p><strong>Batch ID:</strong> <span id="detailBatchId"></span></p>
+                    <p><strong>Team 1 Win Percentage:</strong> <span id="detailTeam1Wins"></span>%</p>
+                    <p><strong>Team 2 Win Percentage:</strong> <span id="detailTeam2Wins"></span>%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const encounterItems = document.querySelectorAll('.encounter-item');
+        const detailsPlaceholder = document.getElementById('detailsPlaceholder');
+        const detailsContent = document.getElementById('detailsContent');
+        const detailEncounterId = document.getElementById('detailEncounterId');
+        const detailVersion = document.getElementById('detailVersion');
+        const detailBatchId = document.getElementById('detailBatchId');
+        const detailTeam1Wins = document.getElementById('detailTeam1Wins');
+        const detailTeam2Wins = document.getElementById('detailTeam2Wins');
+
+        encounterItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Get encounter details from data attributes
+                const encounterId = item.dataset.encounterId;
+                const version = item.dataset.version;
+                const batchId = item.dataset.batchId;
+                const team1Wins = item.dataset.team1Wins;
+                const team2Wins = item.dataset.team2Wins;
+
+                // Update the details section
+                detailEncounterId.textContent = encounterId;
+                detailVersion.textContent = version;
+                detailBatchId.textContent = batchId;
+                detailTeam1Wins.textContent = team1Wins;
+                detailTeam2Wins.textContent = team2Wins;
+
+                // Show the details and hide the placeholder
+                detailsPlaceholder.classList.add('d-none');
+                detailsContent.classList.remove('d-none');
+
+                // Optional: Highlight the selected item
+                encounterItems.forEach(el => el.classList.remove('bg-light'));
+                item.classList.add('bg-light');
+            });
+        });
+    });
+</script>
+
+<style>
+    .encounter-item {
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        .encounter-item:hover {
+            background-color: #f8f9fa;
+        }
+</style>

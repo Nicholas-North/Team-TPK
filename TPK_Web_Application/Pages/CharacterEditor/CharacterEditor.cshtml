@@ -1,0 +1,947 @@
+﻿@page
+@model CharacterEditorModel
+@{
+    ViewData["Title"] = "Character Editor";
+}
+<body>
+    <div class="mainframe container-fluid d-flex">
+        <div class="DisplayCharacter col-md-8">
+            <div class="CharacterInfo">
+                <div class="Tabs">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="form1-tab" data-toggle="tab" onclick="togglePane(0)" href="#form1" role="tab" aria-controls="form1" aria-selected="true">Character Stats</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="form2-tab" data-toggle="tab" onclick="togglePane(1)" href="#form2" role="tab" aria-controls="form2" aria-selected="false">Character Behavior</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="TabInfo" id="TabInfoPane">
+                </div>
+            </div>
+            <div class="Manip-Buttons">
+                <form method="post" asp-page-handler="SaveCharacter" id="SaveCharacterForm" class="requires-character d-none">
+                    <input type="hidden" asp-for="SelectedCharacter.characterID" />
+                    <button type="button" class="btn btn-secondary btn-sm edit-button" onclick="toggleEdit(this)" id="EditButton">Edit</button>
+                    <button type="button" class="btn btn-secondary btn-sm close-button d-none" onclick="toggleEdit(this)" id="CloseButton">Close</button>
+                    <button type="submit" class="btn btn-primary btn-sm save-button d-none" id="SaveButton">Save</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-4" id="CharacterVault">
+            <h2>Character Vault</h2>
+            <ul class="list-group" id="character-list">
+                <!-- Characters will be dynamically loaded here -->
+            </ul>
+        </div>
+    </div>
+
+    @* Character Modal *@
+    <div class="modal fade" id="CharacterEditorModal" tabindex="-1" role="dialog" aria-labelledby="Character Editor" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Character Editor</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" asp-page-handler="CreateCharacter">
+                        <input type="hidden" id="selectedCharacterId" name="selectedCharacterId" value="@Model.SelectedCharacter.characterID" />
+                        <label for="NameInput">Name: </label>
+                        <input type="text" asp-for="NameInput" class="form-control" id="NameInput" name="NameInput" />
+                        <label for="AncestryInput">Ancestry: </label>
+                        <input type="text" asp-for="AncestryInput" class="form-control" id="AncestryInput" name="AncestryInput" />
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Ability Modal *@
+    <div class="modal fade" id="AbilityEditorModal" tabindex="-1" role="dialog" aria-labelledby="Ability Editor" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ability Editor</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" asp-page-handler="CreateAbility" id="createAbilityForm">
+                        <input type="hidden" id="selectedCharacterId" name="selectedCharacterId" value="@Model.SelectedCharacter.characterID" />
+                        <input type="hidden" id="AbilityJson" name="AbilityJson" />
+
+                        <!-- Basic Info Section -->
+                        <div class="form-group">
+                            <label for="AbilityNameInput">Ability Name:</label>
+                            <input type="text" class="form-control" id="AbilityNameInput" name="NameInput" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="TargetInput">Target:</label>
+                            <select class="form-control" id="TargetInput" name="TargetInput" required>
+                                <option value="Melee">Melee</option>
+                                <option value="Ranged">Ranged</option>
+                                <option value="AOE">AOE</option>
+                            </select>
+                        </div>
+
+                        <!-- Conditional Range Fields -->
+                        <div id="rangeFields" class="d-none">
+                            <div class="form-group">
+                                <label for="RangeOneInput">Range (ft):</label>
+                                <input type="number" class="form-control" id="RangeOneInput" name="RangeOneInput" min="0" />
+                            </div>
+                            <div class="form-group">
+                                <label for="RangeTwoInput">Long Range (ft):</label>
+                                <input type="number" class="form-control" id="RangeTwoInput" name="RangeTwoInput" min="0" />
+                            </div>
+                        </div>
+
+                        <!-- Conditional AOE Fields -->
+                        <div id="aoeFields" class="d-none">
+                            <div class="form-group">
+                                <label for="RadiusInput">Radius (ft):</label>
+                                <input type="number" class="form-control" id="RadiusInput" name="RadiusInput" min="0" />
+                            </div>
+                            <div class="form-group">
+                                <label for="AoeTypeInput">AOE Type:</label>
+                                <select class="form-control" id="AoeTypeInput" name="AoeTypeInput">
+                                    <option value="Sphere">Sphere</option>
+                                    <option value="Cone">Cone</option>
+                                    <option value="Line">Line</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Healing Flag -->
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="HealingFlag" name="HealingFlag" />
+                            <label class="form-check-label" for="HealingFlag">Healing Ability</label>
+                        </div>
+
+                        <!-- To-Hit Bonus -->
+                        <div class="form-group">
+                            <label for="ToHitBonusInput">Additional To-Hit Bonus:</label>
+                            <input type="number" class="form-control" id="ToHitBonusInput" name="ToHitBonusInput" min="0" />
+                        </div>
+
+                        <!-- Primary Damage Section -->
+                        <div class="form-group">
+                            <label for="FirstNumDiceInput">Number of Dice:</label>
+                            <input type="number" class="form-control" id="FirstNumDiceInput" name="FirstNumDiceInput" min="1" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="FirstDiceSizeInput">Dice Size:</label>
+                            <select class="form-control" id="FirstDiceSizeInput" name="FirstDiceSizeInput" required>
+                                <option value="2">2</option>
+                                <option value="4">4</option>
+                                <option value="6">6</option>
+                                <option value="8">8</option>
+                                <option value="10">10</option>
+                                <option value="12">12</option>
+                                <option value="20">20</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="FirstDamageTypeInput">Damage Type:</label>
+                            <select class="form-control" id="FirstDamageTypeInput" name="FirstDamageTypeInput">
+                                <option value="">None</option>
+                                <option value="Bludgeoning">Bludgeoning</option>
+                                <option value="Slashing">Slashing</option>
+                                <option value="Piercing">Piercing</option>
+                                <option value="Fire">Fire</option>
+                                <option value="Cold">Cold</option>
+                                <option value="Lightning">Lightning</option>
+                                <option value="Acid">Acid</option>
+                                <option value="Poison">Poison</option>
+                                <option value="Psychic">Psychic</option>
+                                <option value="Necrotic">Necrotic</option>
+                                <option value="Radiant">Radiant</option>
+                                <option value="Force">Force</option>
+                                <option value="Thunder">Thunder</option>
+                            </select>
+                        </div>
+
+                        <!-- Secondary Damage Toggle -->
+                        <div class="form-check mb-3">
+                            <input type="checkbox" class="form-check-input" id="HasSecondaryDamage" />
+                            <label class="form-check-label" for="HasSecondaryDamage">Add Secondary Damage</label>
+                        </div>
+
+                        <!-- Secondary Damage Section (Hidden by default) -->
+                        <div id="secondaryDamageFields" class="d-none">
+                            <div class="form-group">
+                                <label for="SecondNumDiceInput">Secondary Number of Dice:</label>
+                                <input type="number" class="form-control" id="SecondNumDiceInput" name="SecondNumDiceInput" min="1" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="SecondDiceSizeInput">Secondary Dice Size:</label>
+                                <select class="form-control" id="SecondDiceSizeInput" name="SecondDiceSizeInput">
+                                    <option value="2">2</option>
+                                    <option value="4">4</option>
+                                    <option value="6">6</option>
+                                    <option value="8">8</option>
+                                    <option value="10">10</option>
+                                    <option value="12">12</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="SecondDamageTypeInput">Secondary Damage Type:</label>
+                                <select class="form-control" id="SecondDamageTypeInput" name="SecondDamageTypeInput">
+                                    <option value="">None</option>
+                                    <option value="Bludgeoning">Bludgeoning</option>
+                                    <option value="Slashing">Slashing</option>
+                                    <option value="Piercing">Piercing</option>
+                                    <option value="Fire">Fire</option>
+                                    <option value="Cold">Cold</option>
+                                    <option value="Lightning">Lightning</option>
+                                    <option value="Acid">Acid</option>
+                                    <option value="Poison">Poison</option>
+                                    <option value="Psychic">Psychic</option>
+                                    <option value="Necrotic">Necrotic</option>
+                                    <option value="Radiant">Radiant</option>
+                                    <option value="Force">Force</option>
+                                    <option value="Thunder">Thunder</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Action Type -->
+                        <div class="form-group">
+                            <label for="ActionTypeInput">Action Type:</label>
+                            <select class="form-control" id="ActionTypeInput" name="ActionTypeInput" required>
+                                <option value="action">Action</option>
+                                <option value="bonusAction">Bonus Action</option>
+                                <option value="freeAction">Free Action</option>
+                            </select>
+                        </div>
+
+                        <div class="modal-footer mt-4">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="submitAbilityForm()">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+<script>
+    let currentlyHighightedElement = null;
+    let selectedCharacter = null;
+    let currentTab = 0;
+
+    function loadCharacters() {
+        const characterList = document.getElementById('character-list');
+        characterList.innerHTML = '<li class="list-group-item text-center py-4">Loading characters...</li>';
+
+        fetch('/api/CharacterAPI/GetCharacters')
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                characterList.innerHTML = ''; // Clear loading message
+
+                if (data.length === 0) {
+                    characterList.innerHTML = '<li class="list-group-item text-center py-4">No characters found</li>';
+                    return;
+                }
+
+                data.forEach(character => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    listItem.innerHTML = `
+                        <span>
+                            <strong>${character.characterName}</strong>
+                            <small class="d-block text-muted">${character.ancestry || 'No ancestry'} - Lvl ${character.charLevel || '?'}</small>
+                        </span>
+                        <span class="badge badge-primary badge-pill">ID: ${character.characterID}</span>
+                    `;
+
+                    listItem.setAttribute('data-character-id', character.characterID);
+                    listItem.onclick = (e) => selectCharacter(character.characterID, e.currentTarget);
+
+                    characterList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching characters:', error);
+                characterList.innerHTML = `
+                    <li class="list-group-item text-center py-4 text-danger">
+                        Failed to load characters
+                        <button onclick="loadCharacters()" class="btn btn-sm btn-outline-secondary mt-2">
+                            Retry
+                        </button>
+                    </li>
+                `;
+            });
+    }
+
+    function selectCharacter(characterId, clickedElement) {
+        // Store the current character ID and element before any changes
+        const currentCharacterId = selectedCharacter ? selectedCharacter.characterID : null;
+        const currentCharacterElement = currentlyHighightedElement;
+
+        // Check if we're in edit mode
+        const editModeElements = document.querySelectorAll('.edit-mode:not(.d-none)');
+        if (editModeElements.length > 0) {
+            if (!confirm('You have unsaved changes. Are you sure you want to switch characters?')) {
+                // If canceled, ensure the current character stays highlighted
+                if (clickedElement) {
+                    clickedElement.classList.remove('highlight-selected');
+                }
+                if (currentCharacterElement) {
+                    currentCharacterElement.classList.add('highlight-selected');
+                }
+                return;
+            }
+        }
+
+        // Remove highlight from current element
+        if (currentlyHighightedElement) {
+            currentlyHighightedElement.classList.remove('highlight-selected');
+        }
+
+        // Highlight the new element
+        if (clickedElement) {
+            clickedElement.classList.add('highlight-selected');
+            currentlyHighightedElement = clickedElement;
+        }
+
+        // Now load the character data
+        toggleElementsVisibility();
+        fetch('/api/CharacterAPI/GetSelectedCharacters/' + characterId)
+            .then(response => response.json())
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    const character = data[0];
+                    selectedCharacter = character;
+
+                    // Display the correct pane based on the current tab
+                    if (currentTab === 0) {
+                        displayAttributes(character);
+                    } else if (currentTab === 1) {
+                        displayAttributes(character); // Still need to set up the panes
+                        displayAbilities(character.characterID);
+                    }
+
+                    // Update button states based on edit mode
+                    const isEditMode = editModeElements.length > 0;
+                    if (isEditMode) {
+                        document.getElementById('EditButton').classList.add('d-none');
+                        document.getElementById('CloseButton').classList.remove('d-none');
+                        document.getElementById('SaveButton').classList.remove('d-none');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error: ', error);
+                // On error, revert to the previous character
+                if (currentCharacterElement) {
+                    if (currentlyHighightedElement) {
+                        currentlyHighightedElement.classList.remove('highlight-selected');
+                    }
+                    currentCharacterElement.classList.add('highlight-selected');
+                    currentlyHighightedElement = currentCharacterElement;
+                }
+            });
+    }
+
+    function toggleElementsVisibility() {
+        const elementsToToggle = document.querySelectorAll('.requires-character');
+        elementsToToggle.forEach(element => {
+            if (selectedCharacter == null) {
+                element.classList.remove('d-none');
+            }
+        });
+    }
+
+    function toggleEdit(button) {
+        const parentTab = document.getElementById('TabInfoPane');
+        const viewModeElements = parentTab.querySelectorAll('.view-mode');
+        const editModeElements = parentTab.querySelectorAll('.edit-mode');
+
+        const editButton = document.getElementById('EditButton');
+        const closeButton = document.getElementById('CloseButton');
+        const saveButton = document.getElementById('SaveButton');
+
+        const isEnteringEditMode = button === editButton;
+
+        viewModeElements.forEach(element => element.classList.toggle('d-none', isEnteringEditMode));
+        editModeElements.forEach(element => element.classList.toggle('d-none', !isEnteringEditMode));
+
+        editButton.classList.toggle('d-none', isEnteringEditMode);
+        closeButton.classList.toggle('d-none', !isEnteringEditMode);
+        saveButton.classList.toggle('d-none', !isEnteringEditMode);
+
+        // Toggle create buttons visibility
+        document.querySelectorAll('[data-toggle="modal"]').forEach(btn => {
+            if (btn.id !== 'EditButton' && btn.id !== 'CloseButton' && btn.id !== 'SaveButton') {
+                btn.classList.toggle('d-none', isEnteringEditMode);
+            }
+        });
+    }
+
+    function togglePane(paneValue) {
+        console.log(paneValue);
+        const attributePane = document.querySelectorAll('.attributePane');
+        const abilityPane = document.querySelectorAll('.abilityPane');
+        if (currentTab === paneValue) {
+            return;
+        }
+        currentTab = paneValue;
+        attributePane.forEach(element => element.classList.toggle('d-none'));
+        abilityPane.forEach(element => element.classList.toggle('d-none'));
+
+        // Load abilities if switching to the behavior tab and a character is selected
+        if (paneValue === 1 && selectedCharacter) {
+            displayAbilities(selectedCharacter.characterID);
+        }
+    }
+
+    function highlightSelected(currentElement) {
+        const element = currentElement;
+
+        // Remove highlight from all elements first
+        document.querySelectorAll('.list-group-item').forEach(el => {
+            el.classList.remove('highlight-selected');
+        });
+
+        element.classList.add('highlight-selected');
+        currentlyHighightedElement = element;
+    }
+
+    function submitAbilityForm() {
+        const ability = {
+            abilityName: $('#AbilityNameInput').val(),
+            meleeRangedAOE: $('#TargetInput').val(),
+            healingTag: $('#HealingFlag').is(':checked'),
+            itemToHitBonus: parseInt($('#ToHitBonusInput').val() || 0),
+            firstNumDice: parseInt($('#FirstNumDiceInput').val() || 1),
+            firstDiceSize: parseInt($('#FirstDiceSizeInput').val() || 6),
+            firstDamageType: $('#FirstDamageTypeInput').val(),
+            actionType: $('#ActionTypeInput').val(),
+            rangeOne: $('#RangeOneInput').val() || null,
+            rangeTwo: $('#RangeTwoInput').val() || null,
+            radius: $('#RadiusInput').val() || null,
+            coneLineSphere: $('#AoeTypeInput').val() || null
+        };
+
+        if ($('#HasSecondaryDamage').is(':checked')) {
+            ability.secondNumDice = parseInt($('#SecondNumDiceInput').val() || 1);
+            ability.secondDiceSize = parseInt($('#SecondDiceSizeInput').val() || 6);
+            ability.secondDamageType = $('#SecondDamageTypeInput').val();
+        }
+
+        $('#AbilityJson').val(JSON.stringify(ability));
+        $('#createAbilityForm').submit();
+    }
+
+    function displayAttributes(character) {
+        const container = document.getElementById('TabInfoPane');
+        const isEditMode = document.querySelectorAll('.edit-mode:not(.d-none)').length > 0;
+        container.innerHTML = `
+        <div class="attributePane ${currentTab === 0 ? '' : 'd-none'}">
+            <div class="form-group d-flex">
+                <div class="mr-3">
+                    <h2>Name: <span class="view-mode">${character.characterName}</span></h2>
+                    <input type="text" name="characterName" class="form-control edit-mode d-none" value="${character.characterName}" />
+                    <h4>Ancestry: <span class="view-mode">${character.ancestry}</span></h4>
+                    <input type="text" name="ancestry" class="form-control edit-mode d-none" value="${character.ancestry}" />
+                </div>
+                <div>
+                    <h2>Level: <span class="view-mode">${character.charLevel}</span></h2>
+                    <input type="number" name="charLevel" class="form-control edit-mode d-none" value="${character.charLevel}" />
+                </div>
+            </div>
+            <div class="form-group">
+                <h4>Class: <span class="view-mode">${character.characterClass || "None"}</span></h4>
+                <select name="class" class="form-control edit-mode d-none">
+                    <option value="" ${!character.class ? 'selected' : ''}>Blank</option>
+                    <option value="Fighter" ${character.characterClass === 'Fighter' ? 'selected' : ''}>Fighter</option>
+                    <option value="Cleric" ${character.characterClass === 'Cleric' ? 'selected' : ''}>Cleric</option>
+                    <option value="Rogue" ${character.characterClass === 'Rogue' ? 'selected' : ''}>Rogue</option>
+                    <option value="Wizard" ${character.characterClass === 'Wizard' ? 'selected' : ''}>Wizard</option>
+                    <option value="Monster" ${character.characterClass === 'Monster' ? 'selected' : ''}>Monster</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Friend or Foe: <span class="view-mode">${character.isAlly === 1 ? "Friend" : "Foe"}</span></label>
+                <input type="checkbox" name="isAlly" class="edit-mode d-none" ${character.isAlly === 1 ? "checked" : ""} />
+            </div>
+            <div class="form-group d-flex align-items-center">
+                <div class="mr-3">
+                    <label>Current Health: ${character.hp}</label>
+                    <input type="number" name="hp" class="form-control edit-mode d-none" value="${character.hp}" />
+                    <br />
+                    <label>Maximum Health: ${character.hpMax}</label>
+                    <input type="number" name="hpMax" class="form-control edit-mode d-none" value="${character.hpMax}" />
+                </div>
+                <div class="mr-3">
+                    <label>AC: ${character.ac}</label>
+                    <input type="number" name="ac" class="form-control edit-mode d-none" value="${character.ac}" />
+                </div>
+                <div>
+                    <label>Movement: ${character.movementSpeed}</label>
+                    <input type="number" name="movementSpeed" class="form-control edit-mode d-none" value="${character.movementSpeed}" />
+                </div>
+            </div>
+            <div class="form-group">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>STR</th>
+                            <th>DEX</th>
+                            <th>CON</th>
+                            <th>INT</th>
+                            <th>WIS</th>
+                            <th>CHA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Score</td>
+                            <td><span class="view-mode">${character.strScore}</span><input type="number" name="strScore" class="form-control edit-mode d-none" value="${character.strScore}" /></td>
+                            <td><span class="view-mode">${character.dexScore}</span><input type="number" name="dexScore" class="form-control edit-mode d-none" value="${character.dexScore}" /></td>
+                            <td><span class="view-mode">${character.conScore}</span><input type="number" name="conScore" class="form-control edit-mode d-none" value="${character.conScore}" /></td>
+                            <td><span class="view-mode">${character.intScore}</span><input type="number" name="intScore" class="form-control edit-mode d-none" value="${character.intScore}" /></td>
+                            <td><span class="view-mode">${character.wisScore}</span><input type="number" name="wisScore" class="form-control edit-mode d-none" value="${character.wisScore}" /></td>
+                            <td><span class="view-mode">${character.chaScore}</span><input type="number" name="chaScore" class="form-control edit-mode d-none" value="${character.chaScore}" /></td>
+                        </tr>
+                        <tr>
+                            <td>Ability Bonus</td>
+                            <td>${Math.floor((character.strScore - 10) / 2)}</td>
+                            <td>${Math.floor((character.dexScore - 10) / 2)}</td>
+                            <td>${Math.floor((character.conScore - 10) / 2)}</td>
+                            <td>${Math.floor((character.intScore - 10) / 2)}</td>
+                            <td>${Math.floor((character.wisScore - 10) / 2)}</td>
+                            <td>${Math.floor((character.chaScore - 10) / 2)}</td>
+                        </tr>
+                        <tr>
+                            <td>Saving Throw Proficiency</td>
+                            <td>
+                                <input type="checkbox" class="view-mode" ${character.strSaveProf ? "checked" : ""} disabled />
+                                <input type="checkbox" class="edit-mode d-none" name="strSaveProf" ${character.strSaveProf ? "checked" : ""} />
+                            </td>
+                            <td>
+                                <input type="checkbox" class="view-mode" ${character.dexSaveProf ? "checked" : ""} disabled />
+                                <input type="checkbox" class="edit-mode d-none" name="dexSaveProf" ${character.dexSaveProf ? "checked" : ""} />
+                            </td>
+                            <td>
+                                <input type="checkbox" class="view-mode" ${character.conSaveProf ? "checked" : ""} disabled />
+                                <input type="checkbox" class="edit-mode d-none" name="conSaveProf" ${character.conSaveProf ? "checked" : ""} />
+                            </td>
+                            <td>
+                                <input type="checkbox" class="view-mode" ${character.intSaveProf ? "checked" : ""} disabled />
+                                <input type="checkbox" class="edit-mode d-none" name="intSaveProf" ${character.intSaveProf ? "checked" : ""} />
+                            </td>
+                            <td>
+                                <input type="checkbox" class="view-mode" ${character.wisSaveProf ? "checked" : ""} disabled />
+                                <input type="checkbox" class="edit-mode d-none" name="wisSaveProf" ${character.wisSaveProf ? "checked" : ""} />
+                            </td>
+                            <td>
+                                <input type="checkbox" class="view-mode" ${character.chaSaveProf ? "checked" : ""} disabled />
+                                <input type="checkbox" class="edit-mode d-none" name="chaSaveProf" ${character.chaSaveProf ? "checked" : ""} />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="form-group">
+                    <h4>Main Ability Score: <span class="view-mode">${character.mainScore || "None"}</span></h4>
+                    <select name="mainScore" class="form-control edit-mode d-none">
+                        <option value="" ${!character.mainScore ? 'selected' : ''}>Blank</option>
+                        <option value="STR" ${character.mainScore === 'STR' ? 'selected' : ''}>STR</option>
+                        <option value="DEX" ${character.mainScore === 'DEX' ? 'selected' : ''}>DEX</option>
+                        <option value="CON" ${character.mainScore === 'CON' ? 'selected' : ''}>CON</option>
+                        <option value="INT" ${character.mainScore === 'INT' ? 'selected' : ''}>INT</option>
+                        <option value="WIS" ${character.mainScore === 'WIS' ? 'selected' : ''}>WIS</option>
+                        <option value="CHA" ${character.mainScore === 'CHA' ? 'selected' : ''}>CHA</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Spell Count</th>
+                                <th>Level 1</th>
+                                <th>Level 2</th>
+                                <th>Level 3</th>
+                                <th>Level 4</th>
+                                <th>Level 5</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Spell Count</td>
+                                <td>
+                                    <span class="view-mode">${character.spellLevel1 || 0}</span>
+                                    <input type="number" name="spellCountLevel1" class="form-control edit-mode d-none" value="${character.spellLevel1 || 0}" min="0" max="4" />
+                                </td>
+                                <td>
+                                    <span class="view-mode">${character.spellLevel2 || 0}</span>
+                                    <input type="number" name="spellCountLevel2" class="form-control edit-mode d-none" value="${character.spellLevel2 || 0}" min="0" max="4" />
+                                </td>
+                                <td>
+                                    <span class="view-mode">${character.spellLevel3 || 0}</span>
+                                    <input type="number" name="spellCountLevel3" class="form-control edit-mode d-none" value="${character.spellLevel3 || 0}" min="0" max="4" />
+                                </td>
+                                <td>
+                                    <span class="view-mode">${character.spellLevel4 || 0}</span>
+                                    <input type="number" name="spellCountLevel4" class="form-control edit-mode d-none" value="${character.spellLevel4 || 0}" min="0" max="4" />
+                                </td>
+                                <td>
+                                    <span class="view-mode">${character.spellLevel5 || 0}</span>
+                                    <input type="number" name="spellCountLevel5" class="form-control edit-mode d-none" value="${character.spellLevel5 || 0}" min="0" max="4" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="abilityPane ${currentTab === 1 ? '' : 'd-none'}">
+        </div>
+        `;
+
+        const viewModeElements = container.querySelectorAll('.view-mode');
+        const editModeElements = container.querySelectorAll('.edit-mode');
+
+        viewModeElements.forEach(el => el.classList.toggle('d-none', isEditMode));
+        editModeElements.forEach(el => el.classList.toggle('d-none', !isEditMode));
+    }
+
+    function displayAbilities(characterId) {
+        const container = document.querySelector('.abilityPane');
+        container.innerHTML = '<div class="text-center py-4">Loading abilities...</div>';
+
+        fetch(`/api/CharacterAPI/GetSelectedCharacterAbilities/${characterId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(abilities => {
+                container.innerHTML = '';
+
+                const createButton = document.createElement('div');
+                createButton.className = 'sticky-top bg-white p-3 mb-3 border-bottom';
+                createButton.innerHTML = `
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#AbilityEditorModal">
+                        Create New Ability
+                    </button>
+                `;
+                container.appendChild(createButton);
+
+                if (abilities.length === 0) {
+                    const noAbilitiesMessage = document.createElement('div');
+                    noAbilitiesMessage.className = 'alert alert-info';
+                    noAbilitiesMessage.textContent = 'No abilities found for this character.';
+                    container.appendChild(noAbilitiesMessage);
+                    return;
+                }
+
+                const groupedAbilities = {
+                    Action: [],
+                    Bonus: [],
+                    Free: []
+                };
+
+                abilities.forEach(ability => {
+                    const actionType = ability.actionType || 'Action';
+                    if (groupedAbilities[actionType]) {
+                        groupedAbilities[actionType].push(ability);
+                    } else {
+                        groupedAbilities.Action.push(ability);
+                    }
+                });
+
+                const createSection = (title, abilitiesList) => {
+                    if (abilitiesList.length === 0) return null;
+
+                    const section = document.createElement('div');
+                    section.className = 'ability-section mb-4';
+
+                    const header = document.createElement('h3');
+                    header.className = 'border-bottom pb-2 mb-3';
+                    header.textContent = title;
+                    section.appendChild(header);
+
+                    abilitiesList.forEach(ability => {
+                        const abilityElement = document.createElement('div');
+                        abilityElement.className = 'compact-ability mb-3 p-3 border rounded';
+
+                        const actionTypeClass = ability.actionType ? ability.actionType.toLowerCase().replace(' ', '-') : 'action';
+                        const isHealing = ability.healTag || false;
+
+                        abilityElement.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h4 class="mb-0">${ability.abilityName || 'Unnamed Ability'}</h4>
+                                <span class="badge badge-${actionTypeClass}">${ability.actionType || 'Action'}</span>
+                            </div>
+                            <div class="ability-details">
+                                <div><strong>Target:</strong> ${ability.meleeRangedAOE || 'Melee'}</div>
+                                ${ability.rangeOne ? `<div><strong>Range:</strong> ${ability.rangeOne}${ability.rangeTwo ? `/${ability.rangeTwo}` : ''} ft.</div>` : ''}
+                                ${ability.radius ? `<div><strong>Radius:</strong> ${ability.radius} ft.</div>` : ''}
+                                ${ability.coneLineSphere ? `<div><strong>Shape:</strong> ${ability.coneLineSphere}</div>` : ''}
+                                <div><strong>To Hit Bonus:</strong> ${ability.itemToHitBonus >= 0 ? '+' : ''}${ability.itemToHitBonus || 0}</div>
+                                <div class="${isHealing ? 'text-success' : 'text-danger'}">
+                                    <strong>${isHealing ? 'Healing' : 'Damage'}:</strong>
+                                    ${ability.firstNumDice || 1}d${ability.firstDiceSize || 6} ${ability.firstDamageType || ''}
+                                    ${ability.secondNumDice ? ` + ${ability.secondNumDice}d${ability.secondDiceSize} ${ability.secondDamageType}` : ''}
+                                </div>
+                            </div>
+                        `;
+
+                        section.appendChild(abilityElement);
+                    });
+
+                    return section;
+                };
+
+                const actionSection = createSection('Actions', groupedAbilities.Action);
+                const bonusSection = createSection('Bonus Actions', groupedAbilities.Bonus);
+                const freeSection = createSection('Free Actions', groupedAbilities.Free);
+
+                if (actionSection) container.appendChild(actionSection);
+                if (bonusSection) container.appendChild(bonusSection);
+                if (freeSection) container.appendChild(freeSection);
+            })
+            .catch(error => {
+                console.error('Error fetching abilities:', error);
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        Failed to load abilities. Please try again later.
+                        <div class="text-muted small">${error.message}</div>
+                    </div>
+                    <button onclick="displayAbilities(${characterId})" class="btn btn-sm btn-warning mt-2">
+                        Retry
+                    </button>
+                `;
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadCharacters();
+
+        const createAbilityForm = document.querySelector('#createAbilityForm');
+        if (createAbilityForm) {
+            createAbilityForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                try {
+                    await submitAbilityForm();
+                    createAbilityForm.submit();
+                } catch (error) {
+                    console.error('Form submission failed:', error);
+                    alert('Failed to save ability. Please check the form and try again.');
+                }
+            });
+        } else {
+            console.error('createAbilityForm form not found in the DOM.');
+        }
+
+        $('#TargetInput').change(function() {
+            const targetType = $(this).val();
+            $('#rangeFields').addClass('d-none');
+            $('#aoeFields').addClass('d-none');
+
+            if (targetType === 'Ranged') {
+                $('#rangeFields').removeClass('d-none');
+            } else if (targetType === 'AOE') {
+                $('#aoeFields').removeClass('d-none');
+            }
+        });
+
+        $('#HasSecondaryDamage').change(function() {
+            if ($(this).is(':checked')) {
+                $('#secondaryDamageFields').removeClass('d-none');
+                $('#SecondNumDiceInput').prop('required', true);
+            } else {
+                $('#secondaryDamageFields').addClass('d-none');
+                $('#SecondNumDiceInput').val('').prop('required', false);
+                $('#SecondDiceSizeInput').val('2');
+                $('#SecondDamageTypeInput').val('');
+            }
+        });
+
+        $('#TargetInput').trigger('change');
+    });
+</script>
+
+<style>
+    .sticky-top {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .highlight-selected {
+        outline: 2px solid black;
+        background-color: lightgray;
+    }
+
+    .rounded-circle {
+        border-radius: 50%;
+    }
+
+    .bg-secondary {
+        background-color: #6c757d;
+    }
+
+    .text-white {
+        color: #fff;
+    }
+
+    .mr-3 {
+        margin-right: 1rem;
+    }
+
+    .edit-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
+    }
+
+    .list-group-item:hover .edit-icon {
+        display: inline;
+    }
+
+    .badge-action {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .badge-bonus {
+        background-color: #fd7e14;
+        color: white;
+    }
+
+    .badge-free {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .ability-section {
+        margin-bottom: 2rem;
+    }
+
+        .ability-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+    .compact-ability {
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+        .compact-ability h4 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+    .damage {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .healing {
+        color: #28a745;
+        font-weight: bold;
+    }
+
+    #CharacterVault {
+        height: 70vh;
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-left: 1px solid #dee2e6;
+    }
+
+        #CharacterVault h2 {
+            padding: 10px;
+            background-color: #343a40;
+            color: white;
+            margin: -15px -15px 15px -15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+    #character-list {
+        overflow-y: auto;
+        max-height: calc(100vh - 150px);
+        flex-grow: 1;
+        margin-bottom: 0;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        background-color: white;
+    }
+
+        #character-list li {
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-left: none;
+            border-right: none;
+        }
+
+            #character-list li:first-child {
+                border-top: none;
+            }
+
+            #character-list li:last-child {
+                border-bottom: none;
+            }
+
+            #character-list li:hover {
+                background-color: #f1f1f1;
+            }
+
+        #character-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #character-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        #character-list::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+            #character-list::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
+</style>
