@@ -1,0 +1,75 @@
+﻿@page
+@model TPK_Web_Application.Pages.Account.AccountModel
+@{
+    ViewData["Title"] = "Account Details";
+}
+
+<h2 class="my-4">Account Details</h2>
+
+<div class="container">
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Username:</label>
+                </div>
+                <div class="col-md-4">
+                    <span class="form-control-plaintext">@Model.Username</span>
+                </div>
+                <div class="col-md-4">
+                    <a asp-page="/Account/ChangeUsername" class="btn btn-link">Change Username</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Password:</label>
+                </div>
+                <div class="col-md-4">
+                    <span class="form-control-plaintext">@Model.Password</span>
+                </div>
+                <div class="col-md-4">
+                    <a asp-page="/Account/ChangePassword" class="btn btn-link">Change Password</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Email:</label>
+                </div>
+                <div class="col-md-4">
+                    <span class="form-control-plaintext">@Model.Email</span>
+                </div>
+                <div class="col-md-4">
+                    <a asp-page="/Account/ChangeEmail" class="btn btn-link">Change Email</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <form method="post" class="d-inline">
+                        <button type="submit" asp-page-handler="SignOut" class="btn btn-primary">Sign Out</button>
+                    </form>
+                    <form method="post" class="d-inline" onsubmit="return confirmDeleteAccount();">
+                        <button type="submit" asp-page-handler="DeleteAccount" class="btn btn-danger">Delete Account</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDeleteAccount() {
+        return confirm("Are you sure you want to delete your account? This action cannot be undone.");
+    }
+</script>

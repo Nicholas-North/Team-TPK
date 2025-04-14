@@ -1,0 +1,49 @@
+- Next stage is what production rules a player actor can take
+- Take some time over the next week learning/experimenting what a production system is. Very specific algorithm idea:
+	- Imagine a data struct (array where every slot represents some condition)
+	- Look at the world for which you're running the production system, what is everything we can sense in the world? Simplest production systems are binary. Can be scalar
+	- Feature vector for what your agent can see
+	- Define it such that slot 1 = feature 1, slot 2 = feature 2, etc.
+	- Our input vector is most likely very big
+	- We will hand design these templates to reflect how our player sees the world
+	- Arrays position meaning will stay consistent across all agents
+	- Each feature vector is associated with one action
+	- Each player has their own unique database
+	- Every single player agent AIs, when it's their turn, they do a pattern match within the database. Go through the possible rules and best matches what the environment looks like now. 
+	- Every time you advance a turn in battle, the player selects a rule that matches their most likely action.
+	- Monte Carlo simulation is over multiple games
+	- Every game is played by R1 Production Rules -> Actions -> R2 Production Rules -> Actions -> Until end of combat and then score the combat
+- What do matching templates look like?
+- How to store in database so it's accurate and fast?
+- What do my production rules look like?
+- How big are they?
+- What kinds of actions am I allowing my players to take?
+- Recommended:
+	- 1 Action per round
+	- Limited Number of Spells
+	- Limited Number of Classes
+- Classes are determined by what production rules are inserted into them
+- Depending on how many rules are in each database, it can be a significant amount of time to select the "correct" rule. Will cause the program to run very slowly.
+- Determine the scope of the game
+	- Actions Possible
+	- Environmental Conditions
+- This will determine our production rule data structure
+- If we go with a production rule system, it can be easily edited by the user. They can insert their own monsters/players. Loaded into the simulation as text files. Use editor to generate production rules.
+- What do the production rules look like?
+	- Workshop it out 
+	- How many actions are there?
+	- What are we monitoring? Are they important?
+	- These fundamental decisions will impact everything else
+- Make this project a proof of concept instead of a final project
+	- So put a limit on the scope (don't have big ass production rules)
+	- Gallagher is recommending to convert this to 1e (BOOOOOOOO)
+- Gallagher wants to be talking less
+	- Do independent things to maximize resources, parallel programming
+	- Come to an agreement over the scope of the game and what's going to be there
+- Come back next week with a "first cut" of the production rules
+- Player definitions are production rules + stat blocks
+	- Fairly flexible definition that captures the definitions of the player
+- Next week he wants a "reasonably convincing representation of a player" with production rules included.
+	- Screenshare, show some pictures. Sell him. 
+- Coconut battery
+![[coconut.avif]]

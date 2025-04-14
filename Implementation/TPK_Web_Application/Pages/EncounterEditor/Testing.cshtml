@@ -1,0 +1,215 @@
+﻿@page
+@model EncounterEditorModel
+@{
+}
+
+<body>
+    <div class="Formatting">
+        <div class="frame">
+            <div class="grid-container" id="grid-container">
+                <div class="grid" id="grid">
+                    @for (int i = 0; i < 150 * 150; i++)
+                    {
+                        <div class="grid-item" id="grid-item-@i"></div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4" id="EncounterVault">
+            <h2>Encounter Vault</h2>
+            <div class="sticky-top bg-white p-3 mb-3">
+                <button type="button" class="list-group-item list-group-item-action mb-3" data-toggle="modal" data-target="#EncounterEditorModal">Create New Encounter</button>
+            </div>
+            <ul class="list-group" id="encounter-list">
+                <!-- Encounters will be dynamically loaded here -->
+            </ul>
+        </div>
+        <div class="col-md-4 d-none" id="CharacterVault">
+            <h2>Character Vault</h2>
+            <ul class="list-group" id="character-list">
+                <!-- Characters will be dynamically loaded here -->
+            </ul>
+        </div>
+    </div>
+
+    <div class="Manip-Buttons">
+        <form method="post" asp-page-handler="EditEncounter">
+            <input type="hidden" asp-for="SelectedEncounter.encounterID" />
+            <input type="hidden" asp-for="SelectedCharacter.characterID" />
+            <button type="button" class="btn btn-secondary btn-sm edit-button" onclick="toggleEdit(this)">Edit</button>
+            <button type="submit" class="btn btn-primary btn-sm save-button d-none">Save</button>
+        </form>
+        <form method="post" asp-page-handler="RunEncounter">
+            <input type="hidden" asp-for="SelectedEncounter.encounterID" />
+            <button type="submit" class="btn btn-primary">Run Encounter</button>
+        </form>
+    </div>
+
+    <div class="modal fade" id="EncounterEditorModal" tabindex="-1" role="dialog" aria-labelledby="Encounter Editor" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Encounter Editor</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" asp-page-handler="CreateEncounter">
+                        <input type="hidden" id="selectedEncounterId" name="selectedEncounterId" value="@Model.SelectedEncounter.encounterID" />
+                        <label for="NameInput">Map X dimensions: </label>
+                        <input type="number" asp-for="XInput" class="form-control" id="XInput" name="XInput" />
+                        <label for="AncestryInput">Map Y dimensions: </label>
+                        <input type="number" asp-for="YInput" class="form-control" id="YInput" name="YInput" />
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Fetch and display encounters
+        function loadEncounters() {
+            fetch('/api/EncounterAPI/GetEncounters')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Encounters:', data); // Log the data for debugging
+                    const encounterList = document.getElementById('encounter-list');
+                    encounterList.innerHTML = ''; // Clear existing encounters
+                    data.forEach(encounter => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'list-group-item';
+                        listItem.textContent = `Encounter ID: ${encounter.encounterID}`;
+                        listItem.onclick = () => selectEncounter(encounter.encounterID);
+                        encounterList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error('Error fetching encounters:', error));
+        }
+
+        function loadCharacters() {
+            fetch('/api/EncounterAPI/GetCharacters')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Characters:', data); // Log the data for debugging
+                    const characterList = document.getElementById('character-list');
+                    characterList.innerHTML = ''; // Clear existing characters
+                    data.forEach(character => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'list-group-item';
+                        listItem.textContent = `Character: ${character.characterName} (ID: ${character.characterID})`;
+                        listItem.onclick = () => selectCharacter(character.characterID);
+                        characterList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error('Error fetching characters:', error));
+        }
+
+        // Fetch and display characters for a selected encounter
+        function selectEncounter(encounterId) {
+            fetch(`/api/EncounterAPI/GetSelectedCharacters/${encounterId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const characterList = document.getElementById('character-list');
+                    characterList.innerHTML = ''; // Clear existing characters
+                    data.forEach(character => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'list-group-item';
+                        listItem.textContent = `Character: ${character.characterName} (ID: ${character.characterID})`;
+                        listItem.onclick = () => selectCharacter(character.characterID);
+                        characterList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error('Error fetching characters:', error));
+        }
+
+        // Handle character selection
+        function selectCharacter(characterId) {
+            console.log(`Selected Character ID: ${characterId}`);
+            // You can add additional logic here, such as updating the UI or sending data to the server
+        }
+
+        function toggleEdit(button) {
+            const encounterVault = document.getElementById('EncounterVault');
+            const characterVault = document.getElementById('CharacterVault');
+            const editButton = button;
+            const saveButton = button.nextElementSibling;
+
+            // Toggle visibility of vaults
+            encounterVault.classList.toggle('d-none');
+            characterVault.classList.toggle('d-none');
+
+            // Toggle visibility of buttons
+            editButton.classList.toggle('d-none');
+            saveButton.classList.toggle('d-none');
+        }
+
+        // Load encounters on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadEncounters();
+            loadCharacters();
+        });
+    </script>
+
+    <style>
+        .frame {
+            width: 600px;
+            height: 600px;
+            overflow: hidden;
+            border: 2px solid #000;
+            position: relative;
+            flex: 1;
+        }
+
+        .col-md-4 {
+            flex: 0 0 300px;
+        }
+
+        .Formatting {
+            display: flex;
+            gap: 20px;
+        }
+
+        .grid-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: 0 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(150, 50px);
+            grid-template-rows: repeat(150, 50px);
+            gap: 0;
+            border: 1px solid #000;
+        }
+
+        .grid-item {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #ccc;
+            background-color: #f0f0f0;
+        }
+
+        .list-group-item {
+            cursor: pointer;
+        }
+    </style>
+</body>
