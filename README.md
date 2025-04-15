@@ -20,7 +20,7 @@ We aim to design an innovative web application tailored for Dungeons and Dragons
 
 ## [Spring Final PPT Presentation](Documentation/Team-TPK-Documentation-Presentation-(1).pdf)
 
-## [Final Expo Poster](Documentation/Team-TPK-Expo-Poster.pptx)
+## [Final Expo Poster](Documentation/Team-TPK-Expo-Poster-Upscaled.pdf)
 
 ## Self-Assessment Essay's
 - [Nick's Fall Self-Assessment Essay](Professional-Profiles/Nick-North/Nick-North-Self-Assessment.md)
@@ -36,7 +36,8 @@ We aim to design an innovative web application tailored for Dungeons and Dragons
 - [Sam's Summary & Justification](Professional-Profiles/Samuel-Puffer/)
 - [Brandon's Summary & Justification](Professional-Profiles/Brandon-Thompson/)
 
-## Summary of Expenses()
+## Summary of Expenses
+![image](https://github.com/user-attachments/assets/002f8bdc-692b-420b-adaf-360217c3e827)
 
 ## Appendix
 - See Advisor-Notes Directory, Team-Meeting-Notes Directory
