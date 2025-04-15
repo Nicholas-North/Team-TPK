@@ -20,7 +20,7 @@ We aim to design an innovative web application tailored for Dungeons and Dragons
 
 ## [Spring Final PPT Presentation](Documentation/Team-TPK-Presentation.pptx)
 
-## [Final Expo Poster](Documentation/Team-TPK-Expo-Poster.pptx)
+## [Final Expo Poster](Documentation/Team-TPK-Expo-Poster-Upscaled.pdf)
 
 ## Self-Assessment Essay's
 - [Nick's Fall Self-Assessment Essay](Professional-Profiles/Nick-North/Nick-North-Self-Assessment.md)
