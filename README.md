@@ -27,7 +27,7 @@ We aim to design an innovative web application tailored for Dungeons and Dragons
 - [Sam's Fall Self-Assessment Essay](Professional-Profiles/Samuel-Puffer/Samuel-Self-Assessment.docx)
 - [Brandon's Fall Self-Assessment Essay](Professional-Profiles/Brandon-Thompson/Brandon-Thompson-Self-Assessment.pdf)
 
-- [Nick's Spring Self-Assessment Essay](Professional-Profiles/Nick-North/Nick-North-Self-Assessment.md)
+- [Nick's Spring Self-Assessment Essay](Professional-Profiles/Nick-North/North-Spring-Self-Assessment.docx)
 - [Sam's Spring Self-Assessment Essay](Professional-Profiles/Samuel-Puffer/Samuel-Self-Assessment.docx)
 - [Brandon's Spring Self-Assessment Essay](Professional-Profiles/Brandon-Thompson/Spring-Assignment-6-Self-Assessment-Brandon-Thompson.md)
 
