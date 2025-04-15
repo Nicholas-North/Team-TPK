@@ -36,15 +36,6 @@ We aim to design an innovative web application tailored for Dungeons and Dragons
 - [Sam's Summary & Justification](Professional-Profiles/Samuel-Puffer/)
 - [Brandon's Summary & Justification](Professional-Profiles/Brandon-Thompson/)
 
-## Summary of Expenses()
-Team TPK Expenses 	
-AWS January	 $3.07 
-AWS February	 $42.30 
-AWS March	 $74.67 
-AWS April (Expected)	 $30.00 
-D&D Dice (for expo booth)	 $22.58 
-D&D Dice Case (also for expo)	 $24.99 
-Total 	 $197.61 
 ![image](https://github.com/user-attachments/assets/002f8bdc-692b-420b-adaf-360217c3e827)
 
 ## Appendix
