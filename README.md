@@ -36,6 +36,7 @@ We aim to design an innovative web application tailored for Dungeons and Dragons
 - [Sam's Summary & Justification](Professional-Profiles/Samuel-Puffer/)
 - [Brandon's Summary & Justification](Professional-Profiles/Brandon-Thompson/)
 
+## Summary of Expenses
 ![image](https://github.com/user-attachments/assets/002f8bdc-692b-420b-adaf-360217c3e827)
 
 ## Appendix
