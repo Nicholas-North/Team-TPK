@@ -12,7 +12,7 @@ We aim to design an innovative web application tailored for Dungeons and Dragons
 
 ## [Project Description](Documentation/Misc/Project-Overview.md)
 
-## [User Interface Specification](Ideation/User_Stories.md)
+## [User Interface Specification](Documentation/Misc/User-Docs.docx)
 
 ## [Test Plan and Results](Documentation/Misc/Team-TPK-Test-Plan.docx)
 
