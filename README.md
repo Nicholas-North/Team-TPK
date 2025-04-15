@@ -32,7 +32,7 @@ We aim to design an innovative web application tailored for Dungeons and Dragons
 - [Brandon's Spring Self-Assessment Essay](Professional-Profiles/Brandon-Thompson/Spring-Assignment-6-Self-Assessment-Brandon-Thompson.md)
 
 ## Summary of Hours and Justification:
-- [Nick's Summary & Justification](Professional-Profiles/Nick-North/)
+- [Nick's Summary & Justification](Professional-Profiles/Nick-North/Nick-North-Hour-Summary.docx)
 - [Sam's Summary & Justification](Professional-Profiles/Samuel-Puffer/)
 - [Brandon's Summary & Justification](Professional-Profiles/Brandon-Thompson/)
 
