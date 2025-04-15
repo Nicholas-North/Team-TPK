@@ -18,7 +18,7 @@ We aim to design an innovative web application tailored for Dungeons and Dragons
 
 ## [User Manual](Documentation/Misc/User-Docs.docx)
 
-## [Spring Final PPT Presentation](Documentation/Team-TPK-Presentation.pptx)
+## [Spring Final PPT Presentation](Documentation/Team-TPK-Documentation-Presentation-(1).pdf)
 
 ## [Final Expo Poster](Documentation/Team-TPK-Expo-Poster.pptx)
 
