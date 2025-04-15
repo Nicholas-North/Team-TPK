@@ -1,0 +1,30 @@
+﻿@page
+@model TPK_Web_Application.Pages.Account.AccountCreationModel
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<h2>Create Account</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Credential.UserName"></label>
+        <input asp-for="Credential.UserName" class="form-control" />
+        <span asp-validation-for="Credential.UserName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Credential.Password"></label>
+        <input asp-for="Credential.Password" type="password" class="form-control" />
+        <span asp-validation-for="Credential.Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Credential.Email"></label>
+        <input asp-for="Credential.Email" class="form-control" />
+        <span asp-validation-for="Credential.Email" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Create Account</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

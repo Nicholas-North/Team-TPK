@@ -1,0 +1,34 @@
+- What do we need to cover today?
+	- Formal definition for lower bound and upper bound player
+	- What each player knows and what they remember
+- What does each player know?
+	- Internal
+		- Their possible actions, bonus actions, and reactions
+			- Damage Type / Saving Throw or Attack Roll?
+		- Saving Throws
+		- Spell Save DC
+		- Health
+		- Movement Speed
+		- Spell Slots / Level (Dictionary)
+		- AC
+		- Initiative Order
+		- Remembrance 
+			- Advantage / Disadvantage State
+			- Damage Taken Last Turn
+			- Enemy Damage Type Vulnerabilities / Resistances
+	- External
+		- If enemy or allies are bloodied/unconscious
+		- Battlemap Layout / Character Positions
+			- Linear Distance
+		- Fellow Player Class (priority vs other player options)
+		- Total Enemy/Ally Count
+- Unknown Metrics
+	- Internal metrics of other player / enemy actors
+- Lower Bound Player - randomly makes decisions without interacting with the external game state. It's choices are random, and it does not consider the rest of the combat
+- Upper Bound Player - follows a set of production rules (potentially a HMM) to make its decisions for a given turn, considering all the other players, enemies, and board state. 
+
+- Included Classes
+	- Fighter
+	- Wizard
+	- Cleric
+	- Rogue
